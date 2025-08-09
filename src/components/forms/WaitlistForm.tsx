@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { addWaitlistEntry, saveToLocalStorage } from "@/lib/firestore";
 
 const WaitlistForm = () => {
   const [loading, setLoading] = useState(false);
@@ -15,10 +16,14 @@ const WaitlistForm = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Local first – safe by default. Backend wiring (Supabase) can be added later.
-      const existing = JSON.parse(localStorage.getItem("nurture_waitlist") || "[]");
-      existing.push({ name, email, age, interests, ts: Date.now() });
-      localStorage.setItem("nurture_waitlist", JSON.stringify(existing));
+      // Try Firestore first, fallback to localStorage
+      await addWaitlistEntry({ name, email, age, interests });
+      toast.success("You're on the list! We'll be in touch soon.");
+      setName(""); setEmail(""); setAge(""); setInterests("");
+    } catch (error) {
+      console.error("Firestore error, falling back to localStorage:", error);
+      // Fallback to localStorage
+      saveToLocalStorage("nurture_waitlist", { name, email, age, interests });
       toast.success("You're on the list! We'll be in touch soon.");
       setName(""); setEmail(""); setAge(""); setInterests("");
     } finally {

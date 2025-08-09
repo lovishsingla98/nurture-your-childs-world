@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { addFeedbackEntry, saveToLocalStorage } from "@/lib/firestore";
 
 const FeedbackForm = () => {
   const [loading, setLoading] = useState(false);
@@ -14,9 +15,14 @@ const FeedbackForm = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const existing = JSON.parse(localStorage.getItem("nurture_feedback") || "[]");
-      existing.push({ name, email, message, ts: Date.now() });
-      localStorage.setItem("nurture_feedback", JSON.stringify(existing));
+      // Try Firestore first, fallback to localStorage
+      await addFeedbackEntry({ name, email, message });
+      toast.success("Thanks for the feedback!");
+      setName(""); setEmail(""); setMessage("");
+    } catch (error) {
+      console.error("Firestore error, falling back to localStorage:", error);
+      // Fallback to localStorage
+      saveToLocalStorage("nurture_feedback", { name, email, message });
       toast.success("Thanks for the feedback!");
       setName(""); setEmail(""); setMessage("");
     } finally {
