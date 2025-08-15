@@ -1,7 +1,11 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { AuthButtons } from "@/components/auth/AuthWrapper";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Header = () => {
+  const { user } = useAuth();
+
   return (
     <header className="w-full py-4 md:py-6 bg-transparent">
       <div className="container flex items-center justify-between gap-4">
@@ -26,6 +30,12 @@ const Header = () => {
           <Button asChild variant="hero" size="sm">
             <a href="#waitlist">Join Waitlist</a>
           </Button>
+          {user && (
+            <Button asChild variant="outline" size="sm">
+              <Link to="/dashboard">Dashboard</Link>
+            </Button>
+          )}
+          <AuthButtons />
         </div>
       </div>
     </header>
