@@ -5,11 +5,40 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { useAuth } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
+import ChildDashboard from "./pages/ChildDashboard";
+import DailyTask from "./pages/features/DailyTask";
+import WeeklyInterest from "./pages/features/WeeklyInterest";
+import WeeklyPotential from "./pages/features/WeeklyPotential";
+import CareerInsights from "./pages/features/CareerInsights";
+import SparkInterest from "./pages/features/SparkInterest";
+import WeeklyQuiz from "./pages/features/WeeklyQuiz";
+import MoralStory from "./pages/features/MoralStory";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
+
+// Route wrapper that redirects authenticated users to dashboard
+const PublicRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+  
+  if (user) {
+    window.location.href = '/dashboard';
+    return null;
+  }
+  
+  return <>{children}</>;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -19,12 +48,76 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={<PublicRoute><Index /></PublicRoute>} />
             <Route 
               path="/dashboard" 
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/child/:childId" 
+              element={
+                <ProtectedRoute>
+                  <ChildDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/child/:childId/daily-task" 
+              element={
+                <ProtectedRoute>
+                  <DailyTask />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/child/:childId/weekly-interest" 
+              element={
+                <ProtectedRoute>
+                  <WeeklyInterest />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/child/:childId/weekly-potential" 
+              element={
+                <ProtectedRoute>
+                  <WeeklyPotential />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/child/:childId/career-insights" 
+              element={
+                <ProtectedRoute>
+                  <CareerInsights />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/child/:childId/spark-interest" 
+              element={
+                <ProtectedRoute>
+                  <SparkInterest />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/child/:childId/weekly-quiz" 
+              element={
+                <ProtectedRoute>
+                  <WeeklyQuiz />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/child/:childId/moral-story" 
+              element={
+                <ProtectedRoute>
+                  <MoralStory />
                 </ProtectedRoute>
               } 
             />

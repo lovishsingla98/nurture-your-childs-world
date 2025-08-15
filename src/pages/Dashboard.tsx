@@ -283,12 +283,14 @@ const Dashboard: React.FC = () => {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Button variant="outline" size="sm">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => window.location.href = `/child/${child.id}`}
+                            className="hover:bg-purple-50 hover:border-purple-200"
+                          >
                             <Calendar className="w-4 h-4 mr-2" />
-                            Progress
-                          </Button>
-                          <Button variant="ghost" size="sm">
-                            <User className="w-4 h-4" />
+                            View Dashboard
                           </Button>
                         </div>
                       </div>
