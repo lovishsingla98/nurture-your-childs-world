@@ -25,6 +25,7 @@ interface Question {
   context: string;
   options: string[];
   selectedAnswer?: string;
+  selectedIndex?: number;
 }
 
 interface WeeklyPotentialData {
@@ -51,81 +52,13 @@ const WeeklyPotential: React.FC = () => {
       setLoading(true);
       await getValidToken();
       
-      // TODO: Replace with actual API call
-      // const response = await apiClient.getWeeklyPotential(childId, getCurrentWeek());
+      const response = await apiClient.getWeeklyPotential(childId!);
       
-      // Mock data for now
-      const mockData: WeeklyPotentialData = {
-        id: 'potential_week_3_2025',
-        week: 'Week 3, 2025',
-        title: 'Discovering Natural Strengths',
-        description: 'These questions help us understand your child\'s natural abilities and talents.',
-        questions: [
-          {
-            id: 'q1',
-            question: 'When given a complex puzzle or building challenge, how does your child typically approach it?',
-            context: 'Observing problem-solving approach and persistence',
-            options: [
-              'Jumps in immediately and learns by trial and error',
-              'Studies it carefully first, then creates a systematic plan',
-              'Asks for hints or guidance before starting',
-              'Gets excited but needs encouragement to stick with it',
-              'Breaks it down into smaller, manageable pieces'
-            ]
-          },
-          {
-            id: 'q2',
-            question: 'How well can your child explain something they just learned to another person?',
-            context: 'Assessing comprehension and communication skills',
-            options: [
-              'Explains clearly with good examples and details',
-              'Gets the main points across but misses some details',
-              'Struggles to put it into words but shows understanding',
-              'Prefers to demonstrate rather than explain verbally',
-              'Needs help organizing their thoughts first'
-            ]
-          },
-          {
-            id: 'q3',
-            question: 'When playing with others, what role does your child naturally take?',
-            context: 'Understanding social dynamics and leadership potential',
-            options: [
-              'Often becomes the leader and organizes activities',
-              'Happily follows along and supports group decisions',
-              'Suggests creative alternatives and new ideas',
-              'Prefers one-on-one interactions over groups',
-              'Takes on a peacemaker role when conflicts arise'
-            ]
-          },
-          {
-            id: 'q4',
-            question: 'How does your child handle tasks that require sustained attention?',
-            context: 'Evaluating focus and concentration abilities',
-            options: [
-              'Can focus intensely for long periods when interested',
-              'Works well in short bursts with breaks',
-              'Needs frequent reminders to stay on task',
-              'Performs better with background music or movement',
-              'Focuses best when working alongside someone'
-            ]
-          },
-          {
-            id: 'q5',
-            question: 'When something doesn\'t work as expected, how does your child typically react?',
-            context: 'Assessing resilience and growth mindset',
-            options: [
-              'Gets motivated to figure out what went wrong',
-              'Takes a break and comes back to it later',
-              'Asks for help or looks for alternative solutions',
-              'Shows initial frustration but bounces back quickly',
-              'Needs emotional support before trying again'
-            ]
-          }
-        ],
-        status: 'pending'
-      };
-      
-      setPotentialData(mockData);
+      if (response.success) {
+        setPotentialData(response.data);
+      } else {
+        toast.error(response.error || 'Failed to load weekly potential assessment');
+      }
     } catch (error: any) {
       console.error('Failed to fetch weekly potential:', error);
       toast.error('Failed to load this week\'s assessment');
@@ -133,12 +66,11 @@ const WeeklyPotential: React.FC = () => {
       setLoading(false);
     }
   };
-
-  const handleAnswerSelect = (questionId: string, answer: string) => {
+  const handleAnswerSelect = async (questionId: string, answer: string, selectedIndex: number) => {
     if (!potentialData) return;
     
     const updatedQuestions = potentialData.questions.map(q => 
-      q.id === questionId ? { ...q, selectedAnswer: answer } : q
+      q.id === questionId ? { ...q, selectedAnswer: answer, selectedIndex } : q
     );
     
     setPotentialData({
@@ -146,6 +78,15 @@ const WeeklyPotential: React.FC = () => {
       questions: updatedQuestions,
       status: 'in_progress'
     });
+
+    // Start the assessment if this is the first answer
+    if (potentialData.status === 'pending') {
+      try {
+        await apiClient.startWeeklyPotential(childId!);
+      } catch (error) {
+        console.error('Failed to start weekly potential:', error);
+      }
+    }
   };
 
   const handleNextQuestion = () => {
@@ -173,17 +114,25 @@ const WeeklyPotential: React.FC = () => {
       setSubmitting(true);
       await getValidToken();
       
-      // TODO: Replace with actual API call
-      // const result = await apiClient.submitWeeklyPotential(childId, potentialData.id, potentialData.questions);
+      // Prepare responses array for API
+      const responses = potentialData.questions.map(q => ({
+        questionId: q.id,
+        selectedAnswer: q.selectedAnswer!,
+        selectedIndex: q.selectedIndex!
+      }));
       
-      // Mock success for now
-      setPotentialData(prev => prev ? {
-        ...prev,
-        status: 'completed',
-        completedAt: new Date().toISOString()
-      } : null);
+      const result = await apiClient.completeWeeklyPotential(childId!, responses);
       
-      toast.success('Assessment completed! We\'re analyzing the strengths.');
+      if (result.success) {
+        setPotentialData(prev => prev ? {
+          ...prev,
+          status: 'completed',
+          completedAt: new Date().toISOString()
+        } : null);
+        toast.success('Assessment completed! We\'re analyzing the strengths.');
+      } else {
+        toast.error(result.error || 'Failed to submit assessment');
+      }
     } catch (error: any) {
       console.error('Failed to submit answers:', error);
       toast.error('Failed to submit assessment');
@@ -293,7 +242,10 @@ const WeeklyPotential: React.FC = () => {
                 <CardContent className="space-y-4">
                   <RadioGroup 
                     value={currentQuestion.selectedAnswer || ''} 
-                    onValueChange={(value) => handleAnswerSelect(currentQuestion.id, value)}
+                    onValueChange={(value) => {
+                      const selectedIndex = currentQuestion.options.findIndex(option => option === value);
+                      handleAnswerSelect(currentQuestion.id, value, selectedIndex);
+                    }}
                   >
                     {currentQuestion.options.map((option, index) => (
                       <div key={index} className="flex items-center space-x-3 p-4 rounded-lg hover:bg-emerald-50 transition-colors border border-slate-200">

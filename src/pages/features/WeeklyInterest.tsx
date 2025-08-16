@@ -23,6 +23,7 @@ interface Question {
   question: string;
   options: string[];
   selectedAnswer?: string;
+  selectedIndex?: number;
 }
 
 interface WeeklyInterestData {
@@ -49,76 +50,13 @@ const WeeklyInterest: React.FC = () => {
       setLoading(true);
       await getValidToken();
       
-      // TODO: Replace with actual API call
-      // const response = await apiClient.getWeeklyInterest(childId, getCurrentWeek());
+      const response = await apiClient.getWeeklyInterest(childId!);
       
-      // Mock data for now
-      const mockData: WeeklyInterestData = {
-        id: 'interest_week_3_2025',
-        week: 'Week 3, 2025',
-        title: 'What Sparks Your Curiosity?',
-        description: 'Help us understand what interests you most this week through these fun questions!',
-        questions: [
-          {
-            id: 'q1',
-            question: 'If you could spend the whole afternoon doing one thing, what would it be?',
-            options: [
-              'Building something with blocks or toys',
-              'Drawing, painting, or creating art',
-              'Reading stories or listening to books',
-              'Playing outside or doing sports',
-              'Solving puzzles or brain games'
-            ]
-          },
-          {
-            id: 'q2',
-            question: 'Which of these places sounds most exciting to visit?',
-            options: [
-              'A science museum with robots and experiments',
-              'An art studio where you can paint and sculpt',
-              'A library with thousands of stories',
-              'A playground with climbing structures',
-              'A computer lab with coding games'
-            ]
-          },
-          {
-            id: 'q3',
-            question: 'When you see something broken, what do you usually want to do?',
-            options: [
-              'Take it apart to see how it works',
-              'Decorate it to make it beautiful',
-              'Ask someone to tell you a story about it',
-              'Use it for a fun game',
-              'Think of a new way to fix it'
-            ]
-          },
-          {
-            id: 'q4',
-            question: 'What kind of TV shows or videos do you like most?',
-            options: [
-              'Shows about how things are made',
-              'Cartoons with colorful characters',
-              'Stories about adventures and heroes',
-              'Sports and active games',
-              'Educational shows that teach new things'
-            ]
-          },
-          {
-            id: 'q5',
-            question: 'If you could have a superpower, which would you choose?',
-            options: [
-              'Being able to build anything instantly',
-              'Making beautiful art appear from thin air',
-              'Bringing story characters to life',
-              'Super speed and strength',
-              'Reading minds and solving any problem'
-            ]
-          }
-        ],
-        status: 'pending'
-      };
-      
-      setInterestData(mockData);
+      if (response.success && response.data) {
+        setInterestData(response.data);
+      } else {
+        toast.error(response.error || 'Failed to load this week\'s questions');
+      }
     } catch (error: any) {
       console.error('Failed to fetch weekly interest:', error);
       toast.error('Failed to load this week\'s questions');
@@ -127,18 +65,40 @@ const WeeklyInterest: React.FC = () => {
     }
   };
 
-  const handleAnswerSelect = (questionId: string, answer: string) => {
+  const handleAnswerSelect = async (questionId: string, answer: string, selectedIndex: number) => {
     if (!interestData) return;
     
     const updatedQuestions = interestData.questions.map(q => 
-      q.id === questionId ? { ...q, selectedAnswer: answer } : q
+      q.id === questionId ? { ...q, selectedAnswer: answer, selectedIndex } : q
     );
     
-    setInterestData({
-      ...interestData,
-      questions: updatedQuestions,
-      status: 'in_progress'
-    });
+    // If this is the first answer and status is still pending, start the questionnaire
+    if (interestData.status === 'pending') {
+      try {
+        await getValidToken();
+        const startResponse = await apiClient.startWeeklyInterest(childId!);
+        
+        if (startResponse.success) {
+          setInterestData({
+            ...interestData,
+            questions: updatedQuestions,
+            status: 'in_progress'
+          });
+        } else {
+          toast.error('Failed to start questionnaire');
+          return;
+        }
+      } catch (error: any) {
+        console.error('Failed to start weekly interest:', error);
+        toast.error('Failed to start questionnaire');
+        return;
+      }
+    } else {
+      setInterestData({
+        ...interestData,
+        questions: updatedQuestions
+      });
+    }
   };
 
   const handleNextQuestion = () => {
@@ -166,17 +126,26 @@ const WeeklyInterest: React.FC = () => {
       setSubmitting(true);
       await getValidToken();
       
-      // TODO: Replace with actual API call
-      // const result = await apiClient.submitWeeklyInterest(childId, interestData.id, interestData.questions);
+      // Prepare responses array for API
+      const responses = interestData.questions.map(q => ({
+        questionId: q.id,
+        selectedAnswer: q.selectedAnswer!,
+        selectedIndex: q.selectedIndex!
+      }));
       
-      // Mock success for now
-      setInterestData(prev => prev ? {
-        ...prev,
-        status: 'completed',
-        completedAt: new Date().toISOString()
-      } : null);
+      const result = await apiClient.completeWeeklyInterest(childId!, responses);
       
-      toast.success('Thank you! Your interests have been recorded.');
+      if (result.success) {
+        setInterestData(prev => prev ? {
+          ...prev,
+          status: 'completed',
+          completedAt: new Date().toISOString()
+        } : null);
+        
+        toast.success('Thank you! Your interests have been recorded.');
+      } else {
+        toast.error(result.error || 'Failed to submit answers');
+      }
     } catch (error: any) {
       console.error('Failed to submit answers:', error);
       toast.error('Failed to submit answers');
@@ -279,7 +248,10 @@ const WeeklyInterest: React.FC = () => {
                 <CardContent className="space-y-4">
                   <RadioGroup 
                     value={currentQuestion.selectedAnswer || ''} 
-                    onValueChange={(value) => handleAnswerSelect(currentQuestion.id, value)}
+                    onValueChange={(value) => {
+                      const selectedIndex = currentQuestion.options.findIndex(option => option === value);
+                      handleAnswerSelect(currentQuestion.id, value, selectedIndex);
+                    }}
                   >
                     {currentQuestion.options.map((option, index) => (
                       <div key={index} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-50 transition-colors">

@@ -175,6 +175,24 @@ class ApiClient {
       body: JSON.stringify({ responses })
     });
   }
+
+  // Weekly Potential APIs
+  async getWeeklyPotential(childId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/weekly-potential/child/${childId}/weekly-potential`);
+  }
+
+  async startWeeklyPotential(childId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/weekly-potential/child/${childId}/weekly-potential/start`, {
+      method: 'PATCH'
+    });
+  }
+
+  async completeWeeklyPotential(childId: string, responses: Array<{ questionId: string; selectedAnswer: string; selectedIndex: number }>): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/weekly-potential/child/${childId}/weekly-potential/complete`, {
+      method: 'PATCH',
+      body: JSON.stringify({ responses })
+    });
+  }
 }
 
 export const apiClient = new ApiClient();
