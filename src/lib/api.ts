@@ -139,6 +139,24 @@ class ApiClient {
   async getChildren(): Promise<ApiResponse<any[]>> {
     return this.makeRequest('/children');
   }
+
+  // Daily Task APIs
+  async getDailyTask(childId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/daily-task/child/${childId}/daily-task`);
+  }
+
+  async startDailyTask(childId: string, taskId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/daily-task/child/${childId}/daily-task/${taskId}/start`, {
+      method: 'PATCH'
+    });
+  }
+
+  async completeDailyTask(childId: string, taskId: string, response: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/daily-task/child/${childId}/daily-task/${taskId}/complete`, {
+      method: 'PATCH',
+      body: JSON.stringify({ response })
+    });
+  }
 }
 
 export const apiClient = new ApiClient();

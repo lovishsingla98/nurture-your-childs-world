@@ -48,29 +48,14 @@ const DailyTask: React.FC = () => {
       setLoading(true);
       await getValidToken();
       
-      // TODO: Replace with actual API call
-      // const response = await apiClient.getDailyTask(childId, new Date().toISOString().split('T')[0]);
+      const response = await apiClient.getDailyTask(childId!);
       
-      // Mock data for now
-      const mockTask: DailyTaskData = {
-        id: 'task_20250115',
-        title: 'Build a Rainbow Tower',
-        description: 'Create a colorful tower using different objects around your house, arranging them by color like a rainbow!',
-        domain: 'Creative Engineering',
-        activityType: 'hands-on',
-        duration: 20,
-        instructions: [
-          'Find objects in 6 different colors: red, orange, yellow, green, blue, and purple',
-          'Stack them in rainbow order with red at the bottom',
-          'Measure how tall your tower is using a ruler or your hand',
-          'Take a photo or draw your creation',
-          'Tell us what was the most challenging part!'
-        ],
-        materials: ['Colored objects (toys, books, blocks)', 'Ruler or measuring tape', 'Camera or paper for drawing'],
-        status: 'pending'
-      };
-      
-      setTaskData(mockTask);
+      if (response.success && response.data) {
+        setTaskData(response.data);
+        console.log('Daily task loaded successfully:', response.data);
+      } else {
+        toast.error(response.message || 'Failed to load today\'s task');
+      }
     } catch (error: any) {
       console.error('Failed to fetch daily task:', error);
       toast.error('Failed to load today\'s task');
@@ -79,10 +64,21 @@ const DailyTask: React.FC = () => {
     }
   };
 
-  const handleStartTask = () => {
-    if (taskData) {
-      setTaskData({ ...taskData, status: 'in_progress' });
-      toast.success('Task started! Have fun learning!');
+  const handleStartTask = async () => {
+    if (!taskData || !childId) return;
+    
+    try {
+      const response = await apiClient.startDailyTask(childId, taskData.id);
+      
+      if (response.success && response.data) {
+        setTaskData(response.data);
+        toast.success('Task started! Have fun learning!');
+      } else {
+        toast.error(response.message || 'Failed to start task');
+      }
+    } catch (error: any) {
+      console.error('Failed to start task:', error);
+      toast.error('Failed to start task');
     }
   };
 
@@ -92,23 +88,26 @@ const DailyTask: React.FC = () => {
       return;
     }
 
+    if (response.trim().length < 50) {
+      toast.error('Please provide a more detailed response (at least 50 characters)');
+      return;
+    }
+
+    if (!taskData || !childId) return;
+
     try {
       setSubmitting(true);
       await getValidToken();
       
-      // TODO: Replace with actual API call
-      // const result = await apiClient.submitDailyTaskResponse(childId, taskData.id, response);
+      const result = await apiClient.completeDailyTask(childId, taskData.id, response.trim());
       
-      // Mock success for now
-      setTaskData(prev => prev ? {
-        ...prev,
-        status: 'completed',
-        response: response,
-        completedAt: new Date().toISOString()
-      } : null);
-      
-      toast.success('Great job! Task completed successfully!');
-      setResponse('');
+      if (result.success && result.data) {
+        setTaskData(result.data);
+        toast.success('Great job! Task completed successfully!');
+        setResponse('');
+      } else {
+        toast.error(result.message || 'Failed to submit response');
+      }
     } catch (error: any) {
       console.error('Failed to submit response:', error);
       toast.error('Failed to submit response');

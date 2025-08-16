@@ -14,8 +14,6 @@ import {
   Shield, 
   Plus, 
   Calendar, 
-  Target, 
-  BarChart3, 
   Heart,
   Star,
   TrendingUp
@@ -323,56 +321,7 @@ const Dashboard: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Quick Actions */}
-          <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <Target className="w-5 h-5 text-green-600" />
-                </div>
-                <div>
-                  <CardTitle className="text-lg">Quick Actions</CardTitle>
-                  <CardDescription>Common tasks and features</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Button variant="outline" className="h-24 flex flex-col gap-3 hover:bg-blue-50 hover:border-blue-200 transition-colors">
-                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Calendar className="w-4 h-4 text-blue-600" />
-                  </div>
-                  <span className="font-medium">Daily Tasks</span>
-                </Button>
-                <Button variant="outline" className="h-24 flex flex-col gap-3 hover:bg-purple-50 hover:border-purple-200 transition-colors">
-                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <Target className="w-4 h-4 text-purple-600" />
-                  </div>
-                  <span className="font-medium">Weekly Goals</span>
-                </Button>
-                <Button variant="outline" className="h-24 flex flex-col gap-3 hover:bg-green-50 hover:border-green-200 transition-colors">
-                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                    <BarChart3 className="w-4 h-4 text-green-600" />
-                  </div>
-                  <span className="font-medium">Progress Reports</span>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
 
-          {/* Debug Info */}
-          {process.env.NODE_ENV === 'development' && (
-            <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle>Debug Information</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <pre className="text-xs bg-gray-100 p-4 rounded-lg overflow-auto">
-                  {JSON.stringify(profile, null, 2)}
-                </pre>
-              </CardContent>
-            </Card>
-          )}
         </div>
       </div>
     </div>
