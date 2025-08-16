@@ -193,6 +193,17 @@ class ApiClient {
       body: JSON.stringify({ responses })
     });
   }
+
+  // Career Insights APIs
+  async getCareerInsights(childId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/career-insights/child/${childId}/career-insights`);
+  }
+
+  async regenerateCareerInsights(childId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/career-insights/child/${childId}/career-insights/regenerate`, {
+      method: 'POST'
+    });
+  }
 }
 
 export const apiClient = new ApiClient();

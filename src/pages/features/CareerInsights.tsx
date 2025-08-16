@@ -43,6 +43,8 @@ interface CareerInsightsData {
   };
   recommendations: string[];
   status: 'loading' | 'available' | 'error';
+  refreshAvailable?: boolean;
+  nextRefreshAvailableOn?: number;
 }
 
 const CareerInsights: React.FC = () => {
@@ -58,60 +60,14 @@ const CareerInsights: React.FC = () => {
       setLoading(true);
       await getValidToken();
       
-      // TODO: Replace with actual API call
-      // const response = await apiClient.getCareerInsights(childId);
+      const response = await apiClient.getCareerInsights(childId!);
       
-      // Mock data for now
-      const mockData: CareerInsightsData = {
-        id: 'insights_child_' + childId,
-        generatedAt: new Date().toISOString(),
-        childAge: 7,
-        topMatches: [
-          {
-            name: 'Engineer',
-            matchPercentage: 89,
-            category: 'STEM & Technology',
-            description: 'Designs and builds solutions to solve problems using science, technology, engineering, and math.',
-            keyStrengths: ['Problem-solving', 'Logical thinking', 'Building & construction', 'Math skills'],
-            developmentAreas: ['Communication skills', 'Teamwork', 'Project management'],
-            nextSteps: ['Continue building activities', 'Introduce basic coding', 'Science experiments']
-          },
-          {
-            name: 'Architect',
-            matchPercentage: 84,
-            category: 'Design & Construction',
-            description: 'Creates blueprints and designs for buildings, houses, and structures.',
-            keyStrengths: ['Visual-spatial skills', 'Creative design', 'Mathematical thinking', 'Attention to detail'],
-            developmentAreas: ['Art skills', 'Environmental awareness', 'Client communication'],
-            nextSteps: ['Drawing and sketching', 'Building with different materials', 'Study famous buildings']
-          },
-          {
-            name: 'Scientist',
-            matchPercentage: 81,
-            category: 'Research & Discovery',
-            description: 'Discovers new knowledge about how the world works through experiments and research.',
-            keyStrengths: ['Curiosity', 'Analytical thinking', 'Observation skills', 'Pattern recognition'],
-            developmentAreas: ['Data interpretation', 'Scientific writing', 'Laboratory skills'],
-            nextSteps: ['Simple experiments', 'Nature observation', 'Science museums visits']
-          }
-        ],
-        overallProfile: {
-          dominantInterests: ['Building & Construction', 'How Things Work', 'Problem Solving', 'Math & Numbers'],
-          strongestSkills: ['Logical Reasoning', 'Spatial Awareness', 'Persistence', 'Curiosity'],
-          learningStyle: 'Hands-on learner who learns best through experimentation and building',
-          personalityTraits: ['Independent', 'Analytical', 'Creative', 'Detail-oriented']
-        },
-        recommendations: [
-          'Encourage continued building activities with increasingly complex projects',
-          'Introduce age-appropriate science experiments and engineering challenges',
-          'Foster curiosity about how everyday objects work',
-          'Develop communication skills through explaining their creations',
-          'Explore STEM-focused camps and programs'
-        ],
-        status: 'available'
-      };
-      
-      setInsightsData(mockData);
+      if (response.success) {
+        setInsightsData(response.data);
+      } else {
+        toast.error(response.error || 'Failed to load career insights');
+        setInsightsData(prev => prev ? { ...prev, status: 'error' } : null);
+      }
     } catch (error: any) {
       console.error('Failed to fetch career insights:', error);
       toast.error('Failed to load career insights');
@@ -126,14 +82,14 @@ const CareerInsights: React.FC = () => {
       setRegenerating(true);
       await getValidToken();
       
-      // TODO: Replace with actual API call
-      // const response = await apiClient.regenerateCareerInsights(childId);
+      const response = await apiClient.regenerateCareerInsights(childId!);
       
-      // Mock regeneration delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      toast.success('Insights updated with latest data!');
-      fetchCareerInsights();
+      if (response.success) {
+        toast.success('Insights updated with latest data!');
+        fetchCareerInsights(); // Refresh the data
+      } else {
+        toast.error(response.error || 'Failed to update insights');
+      }
     } catch (error: any) {
       console.error('Failed to regenerate insights:', error);
       toast.error('Failed to update insights');
@@ -213,7 +169,7 @@ const CareerInsights: React.FC = () => {
                       variant="outline" 
                       size="sm" 
                       onClick={handleRegenerateInsights}
-                      disabled={regenerating}
+                      disabled={regenerating || !insightsData.refreshAvailable}
                       className="mt-2"
                     >
                       {regenerating ? (
@@ -228,6 +184,11 @@ const CareerInsights: React.FC = () => {
                         </>
                       )}
                     </Button>
+                    {!insightsData.refreshAvailable && insightsData.nextRefreshAvailableOn && (
+                      <p className="text-xs text-slate-500 mt-1">
+                        Next update: {new Date(insightsData.nextRefreshAvailableOn).toLocaleDateString()}
+                      </p>
+                    )}
                   </div>
                 </div>
               </CardHeader>
@@ -398,5 +359,4 @@ const CareerInsights: React.FC = () => {
     </div>
   );
 };
-
 export default CareerInsights;
