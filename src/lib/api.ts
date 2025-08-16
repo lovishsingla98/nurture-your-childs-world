@@ -157,6 +157,24 @@ class ApiClient {
       body: JSON.stringify({ response })
     });
   }
+
+  // Weekly Interest APIs
+  async getWeeklyInterest(childId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/weekly-interest/child/${childId}/weekly-interest`);
+  }
+
+  async startWeeklyInterest(childId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/weekly-interest/child/${childId}/weekly-interest/start`, {
+      method: 'PATCH'
+    });
+  }
+
+  async completeWeeklyInterest(childId: string, responses: Array<{ questionId: string; selectedAnswer: string; selectedIndex: number }>): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/weekly-interest/child/${childId}/weekly-interest/complete`, {
+      method: 'PATCH',
+      body: JSON.stringify({ responses })
+    });
+  }
 }
 
 export const apiClient = new ApiClient();
