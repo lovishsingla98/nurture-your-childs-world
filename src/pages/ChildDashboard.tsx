@@ -113,6 +113,14 @@ const ChildDashboard: React.FC = () => {
       icon: <BookOpen className="w-5 h-5" />,
       status: 'available',
       priority: 'medium'
+    },
+    {
+      id: 'parents-chatbot',
+      name: 'Parents Chatbot',
+      description: 'Get personalized parenting advice and guidance',
+      icon: <HelpCircle className="w-5 h-5" />,
+      status: 'available',
+      priority: 'low'
     }
   ];
 

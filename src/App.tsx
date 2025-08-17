@@ -16,6 +16,7 @@ import CareerInsights from "./pages/features/CareerInsights";
 import SparkInterest from "./pages/features/SparkInterest";
 import WeeklyQuiz from "./pages/features/WeeklyQuiz";
 import MoralStory from "./pages/features/MoralStory";
+import ParentsChatbot from "./pages/features/ParentsChatbot";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -118,6 +119,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <MoralStory />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/child/:childId/parents-chatbot" 
+              element={
+                <ProtectedRoute>
+                  <ParentsChatbot />
                 </ProtectedRoute>
               } 
             />
