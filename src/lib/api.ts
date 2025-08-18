@@ -43,15 +43,15 @@ class ApiClient {
       // Handle token expiration (401 Unauthorized)
       if (response.status === 401 && retryCount === 0) {
         console.log('Token expired, attempting to refresh...');
-        
+
         // Try to refresh the token by triggering a new auth state
         // This will be handled by the AuthContext
         const authEvent = new CustomEvent('tokenExpired');
         window.dispatchEvent(authEvent);
-        
+
         // Wait a bit for the token to be refreshed
         await new Promise(resolve => setTimeout(resolve, 1000));
-        
+
         // Try the request again with the new token
         token = this.getAuthToken();
         if (token) {
@@ -69,14 +69,14 @@ class ApiClient {
       return data;
     } catch (error) {
       console.error('API request failed:', error);
-      
+
       // If it's an authentication error and we haven't retried yet
       if (error instanceof Error && error.message.includes('Authentication required') && retryCount === 0) {
         // Redirect to login or show login modal
         window.location.href = '/';
         return { success: false, error: 'Authentication required' };
       }
-      
+
       throw error;
     }
   }
@@ -203,6 +203,59 @@ class ApiClient {
     return this.makeRequest(`/career-insights/child/${childId}/career-insights/regenerate`, {
       method: 'POST'
     });
+  }
+
+  // Spark Interest APIs
+  async getSparkInterest(childId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/spark-interest/child/${childId}/spark-interest`);
+  }
+
+  async updateSparkInterest(childId: string, data: { selectedCareerId?: string; customGoal?: string }): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/spark-interest/child/${childId}/spark-interest/update`, {
+      method: 'PATCH',
+      body: JSON.stringify(data)
+    });
+  }
+
+  async completeSparkActivity(childId: string, activityId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/spark-interest/child/${childId}/spark-interest/activity/${activityId}/complete`, {
+      method: 'PATCH'
+    });
+  }
+
+  // Weekly Quiz APIs
+  async getWeeklyQuiz(childId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/weekly-quiz/current/${childId}`);
+  }
+
+  async getWeeklyQuizByWeek(childId: string, weekStartDate: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/weekly-quiz/week/${weekStartDate}/${childId}`);
+  }
+
+  async createWeeklyQuiz(childId: string, data: any): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/weekly-quiz/${childId}`, {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  }
+
+  async submitWeeklyQuiz(childId: string, quizId: string, responses: Array<{ questionId: string; selectedAnswer: string; selectedIndex: number }>): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/weekly-quiz/${childId}/submit`, {
+      method: 'POST',
+      body: JSON.stringify({ quizId, responses })
+    });
+  }
+
+  async getWeeklyQuizHistory(childId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/weekly-quiz/${childId}/history`);
+  }
+
+  async getWeeklyQuizAnalytics(childId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/weekly-quiz/${childId}/analytics`);
+  }
+
+  async getAllWeeklyQuizzes(childId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/weekly-quiz/${childId}/all`);
   }
 
   // Onboarding Questionnaire APIs

@@ -61,62 +61,42 @@ const WeeklyQuiz: React.FC = () => {
       setLoading(true);
       await getValidToken();
       
-      // TODO: Replace with actual API call
-      // const response = await apiClient.getWeeklyQuiz(childId, getCurrentWeek());
+      const response = await apiClient.getWeeklyQuiz(childId!);
       
-      // Mock data for now
-      const mockData: WeeklyQuizData = {
-        id: 'quiz_week_3_2025',
-        week: 'Week 3, 2025',
-        title: 'Weekly Learning Review',
-        description: 'Let\'s review what you\'ve learned this week through fun questions!',
-        timeLimit: 15,
-        questions: [
-          {
-            id: 'q1',
-            question: 'What should you use to measure the height of a tower you built?',
-            options: ['Clock', 'Spoon', 'Ruler', 'Scissors'],
-            correctAnswer: 'Ruler',
-            topic: 'Measurement & Tools',
-            explanation: 'A ruler is the best tool for measuring height and length accurately!'
-          },
-          {
-            id: 'q2',
-            question: 'If you see this pattern: ⭐⭐🌙🌙⭐⭐🌙🌙, what comes next?',
-            options: ['⭐⭐', '🌙🌙', '⭐🌙', '🌙⭐'],
-            correctAnswer: '⭐⭐',
-            topic: 'Patterns & Logic',
-            explanation: 'The pattern repeats every 4 symbols: star, star, moon, moon!'
-          },
-          {
-            id: 'q3',
-            question: 'When someone looks sad, what\'s the best thing to do?',
-            options: ['Walk away', 'Ask what\'s wrong', 'Tell a joke', 'Ignore them'],
-            correctAnswer: 'Ask what\'s wrong',
-            topic: 'Emotional Intelligence',
-            explanation: 'Asking shows you care and want to help them feel better!'
-          },
-          {
-            id: 'q4',
-            question: 'What is 15 + 7?',
-            options: ['20', '21', '22', '23'],
-            correctAnswer: '22',
-            topic: 'Mathematics',
-            explanation: 'Great job! 15 + 7 = 22. You can also think of it as 15 + 5 + 2 = 20 + 2 = 22!'
-          },
-          {
-            id: 'q5',
-            question: 'Which of these helps the environment the most?',
-            options: ['Throwing trash anywhere', 'Wasting water', 'Planting trees', 'Using lots of plastic'],
-            correctAnswer: 'Planting trees',
-            topic: 'Environmental Awareness',
-            explanation: 'Trees clean the air, provide oxygen, and give homes to animals!'
-          }
-        ],
-        status: 'pending'
-      };
-      
-      setQuizData(mockData);
+      if (response.success && response.data) {
+        // Transform API data to match our component interface
+        const apiData = response.data;
+        
+        console.log('📋 Weekly Quiz API Response:', apiData);
+        
+        const transformedData: WeeklyQuizData = {
+          id: apiData.id || `quiz_${Date.now()}`,
+          week: apiData.week || 'Current Week',
+          title: 'Weekly Learning Review',
+          description: 'Let\'s review what you\'ve learned this week through fun questions!',
+          timeLimit: 15,
+          questions: apiData.questions?.map((q: any, index: number) => {
+            console.log(`🔍 Question ${index + 1}:`, q);
+            return {
+              id: q.id || `q${index + 1}`,
+              question: q.question,
+              options: q.options,
+              correctAnswer: q.correctAnswer,
+              selectedAnswer: q.selectedAnswer,
+              topic: q.topic || 'General Knowledge',
+              explanation: q.explanation || 'Great job on this question!'
+            };
+          }) || [],
+          status: apiData.status || 'pending',
+          score: apiData.score,
+          completedAt: apiData.completedAt
+        };
+        
+        console.log('✅ Transformed Quiz Data:', transformedData);
+        setQuizData(transformedData);
+      } else {
+        toast.error(response.error || 'Failed to load this week\'s quiz');
+      }
     } catch (error: any) {
       console.error('Failed to fetch weekly quiz:', error);
       toast.error('Failed to load this week\'s quiz');
@@ -177,6 +157,12 @@ const WeeklyQuiz: React.FC = () => {
   const handleSubmitQuiz = async () => {
     if (!quizData) return;
 
+    const unansweredQuestions = quizData.questions.filter(q => !q.selectedAnswer);
+    if (unansweredQuestions.length > 0) {
+      toast.error('Please answer all questions before submitting!');
+      return;
+    }
+
     try {
       setSubmitting(true);
       await getValidToken();
@@ -187,21 +173,35 @@ const WeeklyQuiz: React.FC = () => {
       ).length;
       const score = Math.round((correctAnswers / quizData.questions.length) * 100);
       
-      // TODO: Replace with actual API call
-      // const result = await apiClient.submitWeeklyQuiz(childId, quizData.id, quizData.questions);
+      // Prepare responses for API with questionId, selectedAnswer, and selectedIndex
+      const responses = quizData.questions.map((q, index) => ({
+        questionId: q.id,
+        selectedAnswer: q.selectedAnswer || '',
+        selectedIndex: index
+      }));
       
-      // Mock success
-      setQuizData(prev => prev ? {
-        ...prev,
-        status: 'completed',
-        score,
-        completedAt: new Date().toISOString()
-      } : null);
+      console.log('📤 Submitting quiz responses:', responses);
       
-      setShowResults(true);
-      setTimeRemaining(null);
+      // Submit to API using the quiz ID (week timestamp)
+      const result = await apiClient.submitWeeklyQuiz(childId!, quizData.id, responses);
       
-      toast.success(`Quiz completed! You scored ${score}%`);
+      console.log('📥 Quiz submission result:', result);
+      
+      if (result.success) {
+        setQuizData(prev => prev ? {
+          ...prev,
+          status: 'completed',
+          score,
+          completedAt: new Date().toISOString()
+        } : null);
+        
+        setShowResults(true);
+        setTimeRemaining(null);
+        
+        toast.success(`Quiz completed! You scored ${score}%`);
+      } else {
+        toast.error(result.error || 'Failed to submit quiz');
+      }
     } catch (error: any) {
       console.error('Failed to submit quiz:', error);
       toast.error('Failed to submit quiz');
@@ -222,9 +222,9 @@ const WeeklyQuiz: React.FC = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const currentQuestion = quizData?.questions[currentQuestionIndex];
-  const isLastQuestion = currentQuestionIndex === quizData!.questions.length - 1;
-  const allQuestionsAnswered = quizData?.questions.every(q => q.selectedAnswer);
+  const currentQuestion = quizData?.questions?.[currentQuestionIndex];
+  const isLastQuestion = currentQuestionIndex === (quizData?.questions?.length || 0) - 1;
+  const allQuestionsAnswered = quizData?.questions?.every(q => q.selectedAnswer) || false;
 
   if (loading) {
     return (
@@ -235,6 +235,36 @@ const WeeklyQuiz: React.FC = () => {
             <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-4" />
             <p className="text-slate-600 font-medium">Loading this week's quiz...</p>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!quizData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-blue-100">
+        <DashboardHeader />
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
+          <div className="mb-6">
+            <Button variant="ghost" onClick={() => navigate(`/child/${childId}`)} className="text-slate-600 hover:text-slate-900">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Child Dashboard
+            </Button>
+          </div>
+          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-md">
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <X className="w-16 h-16 text-red-500 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">No Quiz Available</h3>
+                <p className="text-slate-600 mb-4">
+                  There's no quiz available for this week. Please check back later or contact support.
+                </p>
+                <Button onClick={() => fetchWeeklyQuiz()} className="bg-indigo-600 hover:bg-indigo-700">
+                  Try Again
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
@@ -253,9 +283,7 @@ const WeeklyQuiz: React.FC = () => {
           </Button>
         </div>
 
-        {quizData && (
-          <>
-            {/* Header */}
+        {/* Header */}
             <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-md mb-6">
               <CardHeader className="pb-4">
                 <div className="flex items-start justify-between">
@@ -486,11 +514,9 @@ const WeeklyQuiz: React.FC = () => {
                 </CardContent>
               </Card>
             )}
-          </>
-        )}
-      </div>
-    </div>
-  );
-};
+          </div>
+        </div>
+      );
+    };
 
 export default WeeklyQuiz;

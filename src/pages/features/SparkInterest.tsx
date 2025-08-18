@@ -116,62 +116,18 @@ const SparkInterest: React.FC = () => {
       setLoading(true);
       await getValidToken();
       
-      // TODO: Replace with actual API call
-      // const response = await apiClient.getSparkInterest(childId);
+      const response = await apiClient.getSparkInterest(childId!);
       
-      // Mock data for now
-      const mockData: SparkInterestData = {
-        id: 'spark_child_' + childId,
-        selectedCareer: popularCareers[0], // Pre-selected engineer
-        currentFocus: 'Building foundational engineering skills through hands-on activities',
-        tailoredActivities: [
-          {
-            id: 'activity_1',
-            title: 'Bridge Building Challenge',
-            description: 'Build a bridge using paper and tape that can hold a toy car',
-            duration: 25,
-            difficulty: 'Beginner',
-            completed: true
-          },
-          {
-            id: 'activity_2',
-            title: 'Simple Machine Discovery',
-            description: 'Find and identify 5 simple machines around your house',
-            duration: 15,
-            difficulty: 'Beginner',
-            completed: true
-          },
-          {
-            id: 'activity_3',
-            title: 'Balloon-Powered Car',
-            description: 'Design and build a car that moves using balloon power',
-            duration: 30,
-            difficulty: 'Intermediate',
-            completed: false
-          },
-          {
-            id: 'activity_4',
-            title: 'Tower Stability Test',
-            description: 'Build the tallest tower possible with limited materials',
-            duration: 20,
-            difficulty: 'Intermediate',
-            completed: false
-          }
-        ],
-        progressMetrics: {
-          activitiesCompleted: 2,
-          skillsIntroduced: 4,
-          engagementLevel: 85
-        },
-        status: 'active'
-      };
-      
-      setSparkData(mockData);
-      if (mockData.selectedCareer) {
-        setSelectedCareerPath(mockData.selectedCareer.id);
-      }
-      if (mockData.customGoal) {
-        setCustomGoal(mockData.customGoal);
+      if (response.success) {
+        setSparkData(response.data);
+        if (response.data.selectedCareer) {
+          setSelectedCareerPath(response.data.selectedCareer.id);
+        }
+        if (response.data.customGoal) {
+          setCustomGoal(response.data.customGoal);
+        }
+      } else {
+        toast.error(response.error || 'Failed to load career focus');
       }
     } catch (error: any) {
       console.error('Failed to fetch spark interest:', error);
@@ -191,23 +147,20 @@ const SparkInterest: React.FC = () => {
       setSaving(true);
       await getValidToken();
       
-      const selectedCareer = popularCareers.find(c => c.id === selectedCareerPath);
+      const result = await apiClient.updateSparkInterest(childId!, { 
+        selectedCareerId: selectedCareerPath, 
+        customGoal: customGoal.trim() 
+      });
       
-      // TODO: Replace with actual API call
-      // const result = await apiClient.updateSparkInterest(childId, { selectedCareer, customGoal });
-      
-      // Mock success
-      setSparkData(prev => prev ? {
-        ...prev,
-        selectedCareer,
-        customGoal: customGoal.trim(),
-        currentFocus: selectedCareer ? 
-          `Building foundational ${selectedCareer.name.toLowerCase()} skills through hands-on activities` : 
-          customGoal.trim(),
-        status: 'active'
-      } : null);
-      
-      toast.success('Career focus updated successfully!');
+      if (result.success) {
+        setSparkData(prev => prev ? {
+          ...prev,
+          ...result.data
+        } : null);
+        toast.success('Career focus updated successfully!');
+      } else {
+        toast.error(result.error || 'Failed to save career focus');
+      }
     } catch (error: any) {
       console.error('Failed to save career path:', error);
       toast.error('Failed to save career focus');
