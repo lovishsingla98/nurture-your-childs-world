@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Plus, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { apiClient } from '@/lib/api';
+import OnboardingQuestionnaire from './OnboardingQuestionnaire';
 
 // Child schema validation
 const childSchema = z.object({
@@ -43,9 +44,17 @@ interface ChildFormProps {
   trigger?: React.ReactNode;
 }
 
+interface QuestionAnswer {
+  questionId: string;
+  question: string;
+  answer: string;
+}
+
 const ChildForm: React.FC<ChildFormProps> = ({ onChildAdded, trigger }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showQuestionnaire, setShowQuestionnaire] = useState(false);
+  const [childData, setChildData] = useState<any>(null);
 
   const form = useForm<ChildFormData>({
     resolver: zodResolver(childSchema),
@@ -70,55 +79,88 @@ const ChildForm: React.FC<ChildFormProps> = ({ onChildAdded, trigger }) => {
         age--;
       }
 
-      // Create new child object
-      const newChild = {
-        id: `child_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`, // Generate unique ID
-        displayName: data.displayName,
-        age: age,
-        gender: data.gender,
-        dateOfBirth: data.dateOfBirth,
-        imageURL: '', // Will be set when image upload is implemented
-        // parentId will be set by the backend API
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-
-      // Get current profile to add child to existing children array
+      // Get current profile to check child limit
       const currentProfile = await apiClient.getUserProfile();
-      console.log('Current profile:', currentProfile);
       const currentChildren = currentProfile.data?.children || [];
-      console.log('Current children:', currentChildren);
       
       // Check if adding a child would exceed the limit
       if (currentChildren.length >= 5) {
         toast.error('Maximum of 5 children allowed per parent');
         return;
       }
+
+      // Store child data temporarily for questionnaire
+      const preparedChildData = {
+        displayName: data.displayName,
+        age: age,
+        gender: data.gender,
+        dateOfBirth: data.dateOfBirth,
+      };
+
+      setChildData(preparedChildData);
+      setShowQuestionnaire(true);
+      
+    } catch (error: any) {
+      console.error('Error preparing child data:', error);
+      toast.error(error.message || 'Failed to process child information');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle questionnaire completion
+  const handleQuestionnaireComplete = async (questionnaire: QuestionAnswer[]) => {
+    try {
+      setLoading(true);
+
+      // Create new child object with questionnaire data
+      const newChild = {
+        id: `child_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        displayName: childData.displayName,
+        age: childData.age,
+        gender: childData.gender,
+        dateOfBirth: childData.dateOfBirth,
+        imageURL: '',
+        questionnaire: questionnaire,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      // Get current profile to add child to existing children array
+      const currentProfile = await apiClient.getUserProfile();
+      const currentChildren = currentProfile.data?.children || [];
       
       // Add new child to the array
       const updatedChildren = [...currentChildren, newChild];
-      console.log('Updated children array:', updatedChildren);
 
       // Update profile with new children array
       const response = await apiClient.updateParentProfile({
         children: updatedChildren,
       });
-      console.log('Update response:', response);
 
       if (response.success) {
-        toast.success('Child added successfully!');
+        toast.success('Child onboarding completed successfully!');
         form.reset();
         setOpen(false);
+        setShowQuestionnaire(false);
+        setChildData(null);
         onChildAdded(); // Trigger parent component to refresh
       } else {
-        throw new Error(response.message || 'Failed to add child');
+        throw new Error(response.message || 'Failed to complete onboarding');
       }
     } catch (error: any) {
-      console.error('Error adding child:', error);
-      toast.error(error.message || 'Failed to add child');
+      console.error('Error completing onboarding:', error);
+      toast.error(error.message || 'Failed to complete onboarding');
     } finally {
       setLoading(false);
     }
+  };
+
+  // Handle questionnaire cancellation
+  const handleQuestionnaireCancel = () => {
+    setShowQuestionnaire(false);
+    setChildData(null);
+    setLoading(false);
   };
 
   const calculateAge = (dateOfBirth: string): number => {
@@ -146,10 +188,20 @@ const ChildForm: React.FC<ChildFormProps> = ({ onChildAdded, trigger }) => {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className={showQuestionnaire ? "sm:max-w-4xl max-h-[90vh] overflow-y-auto" : "sm:max-w-[425px]"}>
         <DialogHeader>
-          <DialogTitle>Add New Child</DialogTitle>
+          <DialogTitle>
+            {showQuestionnaire ? 'Child Onboarding Questionnaire' : 'Add New Child'}
+          </DialogTitle>
         </DialogHeader>
+        
+        {showQuestionnaire && childData ? (
+          <OnboardingQuestionnaire
+            childData={childData}
+            onComplete={handleQuestionnaireComplete}
+            onCancel={handleQuestionnaireCancel}
+          />
+        ) : (
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -225,15 +277,16 @@ const ChildForm: React.FC<ChildFormProps> = ({ onChildAdded, trigger }) => {
                 {loading ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Adding...
+                    Processing...
                   </>
                 ) : (
-                  'Add Child'
+                  'Start Onboarding'
                 )}
               </Button>
             </div>
           </form>
         </Form>
+        )}
       </DialogContent>
     </Dialog>
   );

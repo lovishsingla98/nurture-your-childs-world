@@ -204,6 +204,38 @@ class ApiClient {
       method: 'POST'
     });
   }
+
+  // Onboarding Questionnaire APIs
+  async startOnboardingQuestionnaire(childData: {
+    displayName: string;
+    age: number;
+    gender: string;
+    dateOfBirth: string;
+  }): Promise<ApiResponse<{ questionId: string; question: string; type: string; options?: string[] }>> {
+    return this.makeRequest('/onboarding/start', {
+      method: 'POST',
+      body: JSON.stringify(childData)
+    });
+  }
+
+  async getNextQuestion(data: {
+    childData: {
+      displayName: string;
+      age: number;
+      gender: string;
+      dateOfBirth: string;
+    };
+    questionnaire: Array<{
+      questionId: string;
+      question: string;
+      answer: string;
+    }>;
+  }): Promise<ApiResponse<{ questionId: string; question: string; type: string; options?: string[] }>> {
+    return this.makeRequest('/onboarding/next-question', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  }
 }
 
 export const apiClient = new ApiClient();
