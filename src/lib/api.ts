@@ -258,6 +258,24 @@ class ApiClient {
     return this.makeRequest(`/weekly-quiz/${childId}/all`);
   }
 
+  // Moral Story APIs
+  async getMoralStory(childId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/moral-story/child/${childId}/moral-story`);
+  }
+
+  async startMoralStory(childId: string, storyId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/moral-story/child/${childId}/moral-story/${storyId}/start`, {
+      method: 'PATCH'
+    });
+  }
+
+  async completeMoralStory(childId: string, storyId: string, reflections: { [key: string]: string }): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/moral-story/child/${childId}/moral-story/${storyId}/complete`, {
+      method: 'PATCH',
+      body: JSON.stringify({ reflections })
+    });
+  }
+
   // Onboarding Questionnaire APIs
   async startOnboardingQuestionnaire(childData: {
     displayName: string;

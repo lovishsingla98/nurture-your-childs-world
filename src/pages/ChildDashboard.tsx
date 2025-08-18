@@ -108,20 +108,21 @@ const ChildDashboard: React.FC = () => {
     },
     {
       id: 'moral-story',
-      name: 'Bedtime Story',
+      name: 'Moral Story',
       description: 'Values-building stories for bedtime',
       icon: <BookOpen className="w-5 h-5" />,
       status: 'available',
       priority: 'medium'
-    },
-    {
-      id: 'parents-chatbot',
-      name: 'Parents Chatbot',
-      description: 'Get personalized parenting advice and guidance',
-      icon: <HelpCircle className="w-5 h-5" />,
-      status: 'available',
-      priority: 'low'
     }
+    // TODO: Uncomment when parent chatbot feature is ready
+    // {
+    //   id: 'parents-chatbot',
+    //   name: 'Parents Chatbot',
+    //   description: 'Get personalized parenting advice and guidance',
+    //   icon: <HelpCircle className="w-5 h-5" />,
+    //   status: 'available',
+    //   priority: 'low'
+    // }
   ];
 
   const fetchChild = async () => {

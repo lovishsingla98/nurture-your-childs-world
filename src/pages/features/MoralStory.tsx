@@ -64,85 +64,37 @@ const MoralStory: React.FC = () => {
       setLoading(true);
       await getValidToken();
       
-      // TODO: Replace with actual API call
-      // const response = await apiClient.getMoralStory(childId, new Date().toISOString().split('T')[0]);
+      const response = await apiClient.getMoralStory(childId!);
       
-      // Mock data for now
-      const mockData: MoralStoryData = {
-        id: 'story_20250115',
-        title: 'The Little Engineer Who Could',
-        story: `Once upon a time, in a colorful town filled with curious children, there lived a little girl named Maya who loved to build things. Every day, Maya would collect boxes, tubes, and bottle caps to create amazing inventions in her room.
-
-One day, Maya's school announced a special contest: "Build something that helps your community!" Maya was so excited, but when she looked around, she saw her classmates had fancy building sets with perfect pieces. Maya only had her collection of recycled materials.
-
-"I can't win with just old boxes and tubes," Maya thought sadly. She almost decided not to enter the contest.
-
-But then Maya remembered her grandfather's words: "The best inventions come from creative hearts, not expensive parts." So Maya took a deep breath and started building.
-
-She worked for hours, carefully designing a special bird feeder that could be made from things anyone could find at home. When other birds ate, it would ring a little bell made from a bottle cap to call more hungry birds.
-
-On contest day, Maya nervously presented her creation. The judges were amazed! "This is brilliant!" said one judge. "You've shown that creativity and kindness matter more than having the fanciest materials."
-
-Maya won first place, but more importantly, she learned that believing in yourself and using what you have with a generous heart can create wonderful things.
-
-The whole town started making Maya's bird feeders, and soon every neighborhood was filled with happy, well-fed birds and the gentle sound of ringing bottle cap bells.`,
-        targetValues: [
-          {
-            name: 'Perseverance',
-            description: 'Not giving up when things seem difficult',
-            color: 'bg-blue-100 text-blue-700'
-          },
-          {
-            name: 'Creativity',
-            description: 'Using imagination to solve problems',
-            color: 'bg-purple-100 text-purple-700'
-          },
-          {
-            name: 'Self-Confidence',
-            description: 'Believing in your own abilities',
-            color: 'bg-green-100 text-green-700'
-          },
-          {
-            name: 'Resourcefulness',
-            description: 'Making the best use of what you have',
-            color: 'bg-orange-100 text-orange-700'
-          }
-        ],
-        questions: [
-          {
-            id: 'q1',
-            question: 'What did Maya want to do when she saw other kids had fancy building sets?'
-          },
-          {
-            id: 'q2',
-            question: 'What wise words did Maya\'s grandfather tell her?'
-          },
-          {
-            id: 'q3',
-            question: 'How did Maya\'s bird feeder help the community?'
-          },
-          {
-            id: 'q4',
-            question: 'What is one thing you learned from Maya\'s story that you can use in your own life?'
-          }
-        ],
-        ageAppropriate: true,
-        estimatedReadingTime: 5,
-        status: 'unread'
-      };
-      
-      setStoryData(mockData);
+      if (response.success && response.data) {
+        setStoryData(response.data);
+        console.log('Moral story loaded successfully:', response.data);
+      } else {
+        toast.error(response.message || 'Failed to load today\'s moral story');
+      }
     } catch (error: any) {
       console.error('Failed to fetch moral story:', error);
-      toast.error('Failed to load today\'s story');
+      toast.error('Failed to load today\'s moral story');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleStartReading = () => {
-    if (storyData) {
-      setStoryData({ ...storyData, status: 'reading' });
+  const handleStartReading = async () => {
+    if (!storyData || !childId) return;
+    
+    try {
+      const response = await apiClient.startMoralStory(childId, storyData.id);
+      
+      if (response.success && response.data) {
+        setStoryData(response.data);
+        toast.success('Story started! Let\'s begin reading together!');
+      } else {
+        toast.error(response.message || 'Failed to start story');
+      }
+    } catch (error: any) {
+      console.error('Failed to start story:', error);
+      toast.error('Failed to start story');
     }
   };
 
@@ -168,21 +120,14 @@ The whole town started making Maya's bird feeders, and soon every neighborhood w
       setSubmitting(true);
       await getValidToken();
       
-      // TODO: Replace with actual API call
-      // const result = await apiClient.submitStoryReflection(childId, storyData.id, answers);
+      const result = await apiClient.completeMoralStory(childId!, storyData!.id, answers);
       
-      // Mock success
-      setStoryData(prev => prev ? {
-        ...prev,
-        status: 'completed',
-        completedAt: new Date().toISOString(),
-        questions: prev.questions.map(q => ({
-          ...q,
-          answer: answers[q.id]
-        }))
-      } : null);
-      
-      toast.success('Thank you for sharing your thoughts about the story!');
+      if (result.success && result.data) {
+        setStoryData(result.data);
+        toast.success('Thank you for sharing your thoughts about the story!');
+      } else {
+        toast.error(result.message || 'Failed to submit reflection');
+      }
     } catch (error: any) {
       console.error('Failed to submit reflection:', error);
       toast.error('Failed to submit reflection');
