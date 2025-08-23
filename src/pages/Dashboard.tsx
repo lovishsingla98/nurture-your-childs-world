@@ -16,7 +16,8 @@ import {
   Calendar, 
   Heart,
   Star,
-  TrendingUp
+  TrendingUp,
+  Loader2
 } from 'lucide-react';
 
 interface ParentProfile {
@@ -39,6 +40,7 @@ interface Child {
   dateOfBirth: string;
   parentId: string;
   imageURL?: string; // Optional image URL for child profile
+  isOnboarded?: boolean; // Whether the child has completed onboarding
 }
 
 const Dashboard: React.FC = () => {
@@ -83,6 +85,8 @@ const Dashboard: React.FC = () => {
       setLoading(false);
     }
   };
+
+
 
   useEffect(() => {
     if (user) {
@@ -278,18 +282,37 @@ const Dashboard: React.FC = () => {
                             <span className="text-sm text-gray-600">{child.age} years old</span>
                             <span className="text-gray-400">•</span>
                             <span className="text-sm text-gray-600 capitalize">{child.gender}</span>
+                            <span className="text-gray-400">•</span>
+                            <Badge 
+                              variant={child.isOnboarded ? "default" : "secondary"}
+                              className="text-xs"
+                            >
+                              {child.isOnboarded ? "Onboarded" : "Pending"}
+                            </Badge>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => window.location.href = `/child/${child.id}`}
-                            className="hover:bg-purple-50 hover:border-purple-200"
-                          >
-                            <Calendar className="w-4 h-4 mr-2" />
-                            View Dashboard
-                          </Button>
+                          {child.isOnboarded ? (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => window.location.href = `/child/${child.id}`}
+                              className="hover:bg-purple-50 hover:border-purple-200"
+                            >
+                              <Calendar className="w-4 h-4 mr-2" />
+                              View Dashboard
+                            </Button>
+                          ) : (
+                            <Button 
+                              variant="default" 
+                              size="sm"
+                              onClick={() => window.location.href = `/onboarding/${child.id}`}
+                              className="bg-purple-600 hover:bg-purple-700 text-white"
+                            >
+                              <Heart className="w-4 h-4 mr-2" />
+                              Complete Onboarding
+                            </Button>
+                          )}
                         </div>
                       </div>
                     ))}

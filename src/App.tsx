@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import ChildDashboard from "./pages/ChildDashboard";
+import OnboardingPage from "./pages/OnboardingPage";
 import DailyTask from "./pages/features/DailyTask";
 import WeeklyInterest from "./pages/features/WeeklyInterest";
 import WeeklyPotential from "./pages/features/WeeklyPotential";
@@ -63,6 +64,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <ChildDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/onboarding/:childId" 
+              element={
+                <ProtectedRoute>
+                  <OnboardingPage />
                 </ProtectedRoute>
               } 
             />

@@ -277,32 +277,16 @@ class ApiClient {
   }
 
   // Onboarding Questionnaire APIs
-  async startOnboardingQuestionnaire(childData: {
-    displayName: string;
-    age: number;
-    gender: string;
-    dateOfBirth: string;
-  }): Promise<ApiResponse<{ questionId: string; question: string; type: string; options?: string[] }>> {
-    return this.makeRequest('/onboarding/start', {
-      method: 'POST',
-      body: JSON.stringify(childData)
-    });
+  async getOnboardingQuestionnaire(childId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/onboarding-questionnaire/child/${childId}`);
   }
 
-  async getNextQuestion(data: {
-    childData: {
-      displayName: string;
-      age: number;
-      gender: string;
-      dateOfBirth: string;
-    };
-    questionnaire: Array<{
-      questionId: string;
-      question: string;
-      answer: string;
-    }>;
-  }): Promise<ApiResponse<{ questionId: string; question: string; type: string; options?: string[] }>> {
-    return this.makeRequest('/onboarding/next-question', {
+  async submitOnboardingAnswer(childId: string, data: {
+    questionId: string;
+    answer: string;
+    optionId?: string;
+  }): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/onboarding-questionnaire/child/${childId}/answer`, {
       method: 'POST',
       body: JSON.stringify(data)
     });
