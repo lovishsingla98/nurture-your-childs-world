@@ -9,13 +9,13 @@ import { Separator } from '@/components/ui/separator';
 import DashboardHeader from '@/components/site/DashboardHeader';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiClient } from '@/lib/api';
-import { 
-  Calendar, 
-  HelpCircle, 
-  TrendingUp, 
-  Target, 
-  Sparkles, 
-  Brain, 
+import {
+  Calendar,
+  HelpCircle,
+  TrendingUp,
+  Target,
+  Sparkles,
+  Brain,
   BookOpen,
   ArrowLeft,
   Clock,
@@ -29,9 +29,10 @@ interface Child {
   displayName: string;
   age: number;
   gender: string;
-  dateOfBirth: string;
+  dateOfBirth: { seconds: number; nanoseconds: number }; // Firestore Timestamp
   parentId: string;
   imageURL?: string;
+  isOnboarded?: boolean;
 }
 
 interface FeatureStatus {
@@ -129,10 +130,10 @@ const ChildDashboard: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       await getValidToken();
       const response = await apiClient.getUserProfile();
-      
+
       if (response.success && response.data?.children) {
         const foundChild = response.data.children.find((c: Child) => c.id === childId);
         if (foundChild) {
@@ -220,7 +221,7 @@ const ChildDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <DashboardHeader />
-      
+
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Back Navigation */}
         <div className="mb-6">
@@ -274,7 +275,7 @@ const ChildDashboard: React.FC = () => {
         {/* Features Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {features.map((feature) => (
-            <Card 
+            <Card
               key={feature.id}
               className={`group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 bg-white/70 backdrop-blur-md ${
                 feature.status === 'pending' ? 'ring-2 ring-orange-200 shadow-lg' : ''
@@ -298,8 +299,8 @@ const ChildDashboard: React.FC = () => {
                         </CardTitle>
                       </div>
                     </div>
-                    <Badge 
-                      variant="outline" 
+                    <Badge
+                      variant="outline"
                       className={`${getStatusColor(feature.status)} text-xs`}
                     >
                       <span className="flex items-center gap-1">

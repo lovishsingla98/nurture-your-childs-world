@@ -44,7 +44,7 @@ interface OnboardingQuestionnaire {
     displayName: string;
     age: number;
     gender: string;
-    dateOfBirth: string;
+    dateOfBirth: { seconds: number; nanoseconds: number }; // Firestore Timestamp
   };
   questions: OnboardingQuestion[];
   responses: OnboardingResponse[];

@@ -8,12 +8,12 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import ChildForm from '@/components/forms/ChildForm';
 import DashboardHeader from '@/components/site/DashboardHeader';
-import { 
-  User, 
-  Mail, 
-  Shield, 
-  Plus, 
-  Calendar, 
+import {
+  User,
+  Mail,
+  Shield,
+  Plus,
+  Calendar,
   Heart,
   Star,
   TrendingUp,
@@ -37,7 +37,7 @@ interface Child {
   displayName: string;
   age: number;
   gender: string;
-  dateOfBirth: string;
+  dateOfBirth: { seconds: number; nanoseconds: number }; // Firestore Timestamp
   parentId: string;
   imageURL?: string; // Optional image URL for child profile
   isOnboarded?: boolean; // Whether the child has completed onboarding
@@ -53,10 +53,10 @@ const Dashboard: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Ensure we have a valid token before making the request
       await getValidToken();
-      
+
       const response = await apiClient.getUserProfile();
       console.log('Profile response:', response);
       console.log('Children data:', response.data?.children);
@@ -68,7 +68,7 @@ const Dashboard: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Failed to fetch profile:', error);
-      
+
       // Handle specific authentication errors
       if (error.message?.includes('Authentication required') || error.message?.includes('token')) {
         setError('Your session has expired. Please sign in again.');
@@ -104,7 +104,7 @@ const Dashboard: React.FC = () => {
     };
 
     window.addEventListener('tokenExpired', handleTokenExpired);
-    
+
     return () => {
       window.removeEventListener('tokenExpired', handleTokenExpired);
     };
@@ -190,14 +190,14 @@ const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <DashboardHeader />
-      
+
       {/* Child Image Section */}
       <div className="w-full bg-gradient-to-b from-blue-50 to-white py-8">
         <div className="container mx-auto px-4 flex justify-center">
           <div className="relative">
-            <img 
-              src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=400&h=300&fit=crop&crop=face" 
-              alt="Happy child learning" 
+            <img
+              src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=400&h=300&fit=crop&crop=face"
+              alt="Happy child learning"
               className="w-64 h-48 object-cover rounded-lg shadow-lg"
               loading="lazy"
             />
@@ -205,7 +205,7 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       <div className="container mx-auto px-4 pb-12 max-w-6xl">
         <div className="space-y-8">
           {/* Welcome Header */}
@@ -265,7 +265,7 @@ const Dashboard: React.FC = () => {
                       <div className="text-sm text-gray-600">Oldest</div>
                     </div>
                   </div>
-                  
+
                   {/* Children List */}
                   <div className="space-y-3">
                     {profile.children.map((child) => (
@@ -283,7 +283,7 @@ const Dashboard: React.FC = () => {
                             <span className="text-gray-400">•</span>
                             <span className="text-sm text-gray-600 capitalize">{child.gender}</span>
                             <span className="text-gray-400">•</span>
-                            <Badge 
+                            <Badge
                               variant={child.isOnboarded ? "default" : "secondary"}
                               className="text-xs"
                             >
@@ -293,8 +293,8 @@ const Dashboard: React.FC = () => {
                         </div>
                         <div className="flex items-center gap-2">
                           {child.isOnboarded ? (
-                            <Button 
-                              variant="outline" 
+                            <Button
+                              variant="outline"
                               size="sm"
                               onClick={() => window.location.href = `/child/${child.id}`}
                               className="hover:bg-purple-50 hover:border-purple-200"
@@ -303,8 +303,8 @@ const Dashboard: React.FC = () => {
                               View Dashboard
                             </Button>
                           ) : (
-                            <Button 
-                              variant="default" 
+                            <Button
+                              variant="default"
                               size="sm"
                               onClick={() => window.location.href = `/onboarding/${child.id}`}
                               className="bg-purple-600 hover:bg-purple-700 text-white"
@@ -325,12 +325,12 @@ const Dashboard: React.FC = () => {
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">No children added yet</h3>
                   <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                    {profile?.children === undefined 
-                      ? 'Loading children data...' 
+                    {profile?.children === undefined
+                      ? 'Loading children data...'
                       : 'Start by adding your first child to track their development journey. You can add up to 5 children.'
                     }
                   </p>
-                  <ChildForm 
+                  <ChildForm
                     onChildAdded={handleChildAdded}
                     trigger={
                       <Button size="lg" className="bg-purple-600 hover:bg-purple-700">
