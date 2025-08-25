@@ -1,4 +1,12 @@
 // API utility for making authenticated requests to the backend
+import { 
+  OnboardingQuestionnaire, 
+  OnboardingAnswerData, 
+  NextQuestionResponse, 
+  OnboardingAnswerResponse, 
+  Child,
+  DailyTaskResponse
+} from './types';
 
 const API_BASE_URL = 'https://us-central1-nurture-466617.cloudfunctions.net/api';
 
@@ -136,7 +144,7 @@ class ApiClient {
     });
   }
 
-  async addChild(data: { displayName: string; dateOfBirth: string; gender: string }): Promise<ApiResponse<any>> {
+  async addChild(data: { displayName: string; dateOfBirth: string; gender: string }): Promise<ApiResponse<{ child: Child; totalChildren: number; firstQuestion?: NextQuestionResponse }>> {
     return this.makeRequest('/parent/add-child', {
       method: 'POST',
       body: JSON.stringify(data)
@@ -148,7 +156,7 @@ class ApiClient {
   }
 
   // Daily Task APIs
-  async getDailyTask(childId: string): Promise<ApiResponse<any>> {
+  async getDailyTask(childId: string): Promise<ApiResponse<DailyTaskResponse>> {
     return this.makeRequest(`/daily-task/child/${childId}/daily-task`);
   }
 
@@ -284,20 +292,18 @@ class ApiClient {
   }
 
   // Onboarding Questionnaire APIs
-  async getOnboardingQuestionnaire(childId: string): Promise<ApiResponse<any>> {
+  async getOnboardingQuestionnaire(childId: string): Promise<ApiResponse<OnboardingQuestionnaire>> {
     return this.makeRequest(`/onboarding-questionnaire/child/${childId}`);
   }
 
-  async submitOnboardingAnswer(childId: string, data: {
-    questionId: string;
-    answer: string;
-    optionId?: string;
-  }): Promise<ApiResponse<any>> {
+  async submitOnboardingAnswer(childId: string, data: OnboardingAnswerData): Promise<ApiResponse<OnboardingAnswerResponse>> {
     return this.makeRequest(`/onboarding-questionnaire/child/${childId}/answer`, {
       method: 'POST',
       body: JSON.stringify(data)
     });
   }
+
+
 }
 
 export const apiClient = new ApiClient();

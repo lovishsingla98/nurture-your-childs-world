@@ -11,49 +11,13 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Loader2, ArrowRight, CheckCircle, ArrowLeft, User, Calendar, Heart } from 'lucide-react';
 import { toast } from 'sonner';
-
-interface OnboardingQuestion {
-  questionId: string;
-  text: string;
-  type: 'text' | 'multiple_choice' | 'rating';
-  category: string;
-  ageGroup: string;
-  learningDomain: string;
-  options?: Array<{
-    id: string;
-    text: string;
-    value: string;
-  }>;
-  required: boolean;
-  order: number;
-}
-
-interface OnboardingResponse {
-  questionId: string;
-  answer: string;
-  optionId?: string;
-  answeredAt: Date;
-}
-
-interface OnboardingQuestionnaire {
-  questionnaireId: string;
-  parentId: string;
-  childId: string;
-  child: {
-    childId: string;
-    displayName: string;
-    age: number;
-    gender: string;
-    dateOfBirth: { seconds: number; nanoseconds: number }; // Firestore Timestamp
-  };
-  questions: OnboardingQuestion[];
-  responses: OnboardingResponse[];
-  status: 'pending' | 'in_progress' | 'completed';
-  startedAt: Date;
-  completedAt?: Date;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { 
+  OnboardingQuestionnaire, 
+  OnboardingQuestion, 
+  OnboardingResponse,
+  OnboardingAnswerData,
+  NextQuestionResponse 
+} from '@/lib/types';
 
 const OnboardingPage: React.FC = () => {
   const { childId } = useParams<{ childId: string }>();
@@ -158,10 +122,19 @@ const OnboardingPage: React.FC = () => {
         setCurrentAnswer('');
         setSelectedOption('');
 
+        // Check completion status
+        if (response.data?.questionnaireCompleted) {
+          console.log('🎉 Questionnaire completed and child onboarded!');
+          toast.success('Onboarding completed successfully! Your child is now ready to explore.');
+        } else if (response.data?.nextQuestion) {
+          console.log('🎉 Next question auto-generated:', response.data.nextQuestion);
+          toast.success('Answer submitted successfully! Next question generated.');
+        } else {
+          toast.success('Answer submitted successfully!');
+        }
+
         // Fetch updated questionnaire to check status
         await fetchQuestionnaire();
-        
-        toast.success('Answer submitted successfully!');
       } else {
         throw new Error(response.message || 'Failed to submit answer');
       }

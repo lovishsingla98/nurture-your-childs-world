@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import DashboardHeader from '@/components/site/DashboardHeader';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiClient } from '@/lib/api';
+import { DailyTaskResponse } from '@/lib/types';
 import { toast } from 'sonner';
 import { 
   ArrowLeft, 
@@ -20,25 +21,11 @@ import {
   Lightbulb
 } from 'lucide-react';
 
-interface DailyTaskData {
-  id: string;
-  title: string;
-  description: string;
-  domain: string;
-  activityType: string;
-  duration: number;
-  instructions: string[];
-  materials?: string[];
-  status: 'pending' | 'in_progress' | 'completed';
-  response?: string;
-  completedAt?: string;
-}
-
 const DailyTask: React.FC = () => {
   const { childId } = useParams<{ childId: string }>();
   const navigate = useNavigate();
   const { getValidToken } = useAuth();
-  const [taskData, setTaskData] = useState<DailyTaskData | null>(null);
+  const [taskData, setTaskData] = useState<DailyTaskResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [response, setResponse] = useState('');
@@ -68,7 +55,7 @@ const DailyTask: React.FC = () => {
     if (!taskData || !childId) return;
     
     try {
-      const response = await apiClient.startDailyTask(childId, taskData.id);
+      const response = await apiClient.startDailyTask(childId, taskData.taskId);
       
       if (response.success && response.data) {
         setTaskData(response.data);
@@ -99,7 +86,7 @@ const DailyTask: React.FC = () => {
       setSubmitting(true);
       await getValidToken();
       
-      const result = await apiClient.completeDailyTask(childId, taskData.id, response.trim());
+      const result = await apiClient.completeDailyTask(childId, taskData.taskId, response.trim());
       
       if (result.success && result.data) {
         setTaskData(result.data);
@@ -160,9 +147,9 @@ const DailyTask: React.FC = () => {
                       <Calendar className="w-5 h-5 text-indigo-600" />
                       <span className="text-sm font-medium text-slate-600">Today's Daily Task</span>
                     </div>
-                    <CardTitle className="text-2xl text-slate-900 mb-2">{taskData.title}</CardTitle>
+                    <CardTitle className="text-2xl text-slate-900 mb-2">{taskData.data.title}</CardTitle>
                     <CardDescription className="text-base text-slate-600">
-                      {taskData.description}
+                      {taskData.data.description}
                     </CardDescription>
                   </div>
                   <Badge 
@@ -182,19 +169,55 @@ const DailyTask: React.FC = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <div className="flex items-center gap-2 text-slate-600">
                     <Target className="w-4 h-4" />
-                    <span className="text-sm">{taskData.domain}</span>
+                    <span className="text-sm">{taskData.data.domain}</span>
                   </div>
                   <div className="flex items-center gap-2 text-slate-600">
                     <Clock className="w-4 h-4" />
-                    <span className="text-sm">{taskData.duration} minutes</span>
+                    <span className="text-sm">{taskData.data.duration} minutes</span>
                   </div>
                   <div className="flex items-center gap-2 text-slate-600">
                     <Lightbulb className="w-4 h-4" />
-                    <span className="text-sm capitalize">{taskData.activityType}</span>
+                    <span className="text-sm capitalize">{taskData.data.activityType}</span>
                   </div>
+                </div>
+                
+                {/* Additional Task Details */}
+                <div className="space-y-3">
+                  {taskData.data.difficulty && (
+                    <div className="flex items-center gap-2 text-slate-600">
+                      <div className="w-4 h-4 rounded-full bg-yellow-100 flex items-center justify-center">
+                        <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
+                      </div>
+                      <span className="text-sm">Difficulty: <span className="font-medium capitalize">{taskData.data.difficulty}</span></span>
+                    </div>
+                  )}
+                  
+                  {taskData.data.learningObjective && (
+                    <div className="flex items-start gap-2 text-slate-600">
+                      <Target className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <span className="text-sm font-medium">Learning Objective:</span>
+                        <p className="text-sm text-slate-700 mt-1">{taskData.data.learningObjective}</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {taskData.data.longTermPathway && (
+                    <div className="flex items-start gap-2 text-slate-600">
+                      <div className="w-4 h-4 mt-0.5 flex-shrink-0">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M9 18l6-6-6-6"/>
+                        </svg>
+                      </div>
+                      <div>
+                        <span className="text-sm font-medium">Long-term Pathway:</span>
+                        <p className="text-sm text-slate-700 mt-1">{taskData.data.longTermPathway}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -206,7 +229,7 @@ const DailyTask: React.FC = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <ol className="space-y-3">
-                  {taskData.instructions.map((instruction, index) => (
+                  {taskData.data.instructions && taskData.data.instructions.map((instruction, index) => (
                     <li key={index} className="flex gap-3">
                       <span className="flex-shrink-0 w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-sm font-medium">
                         {index + 1}
@@ -216,13 +239,13 @@ const DailyTask: React.FC = () => {
                   ))}
                 </ol>
 
-                {taskData.materials && taskData.materials.length > 0 && (
+                {taskData.data.materials && taskData.data.materials.length > 0 && (
                   <>
                     <Separator className="my-4" />
                     <div>
                       <h4 className="font-medium text-slate-900 mb-2">Materials needed:</h4>
                       <ul className="space-y-1">
-                        {taskData.materials.map((material, index) => (
+                        {taskData.data.materials.map((material, index) => (
                           <li key={index} className="flex items-center gap-2 text-slate-600">
                             <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full" />
                             {material}
