@@ -5,7 +5,8 @@ import {
   NextQuestionResponse, 
   OnboardingAnswerResponse, 
   Child,
-  DailyTaskResponse
+  DailyTaskResponse,
+  WeeklyInterestData
 } from './types';
 
 const API_BASE_URL = 'https://us-central1-nurture-466617.cloudfunctions.net/api';
@@ -174,18 +175,18 @@ class ApiClient {
   }
 
   // Weekly Interest APIs
-  async getWeeklyInterest(childId: string): Promise<ApiResponse<any>> {
+  async getWeeklyInterest(childId: string): Promise<ApiResponse<WeeklyInterestData>> {
     return this.makeRequest(`/weekly-interest/child/${childId}/weekly-interest`);
   }
 
-  async startWeeklyInterest(childId: string): Promise<ApiResponse<any>> {
-    return this.makeRequest(`/weekly-interest/child/${childId}/weekly-interest/start`, {
+  async startWeeklyInterest(childId: string, interestId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/weekly-interest/child/${childId}/weekly-interest/${interestId}/start`, {
       method: 'PATCH'
     });
   }
 
-  async completeWeeklyInterest(childId: string, responses: Array<{ questionId: string; selectedAnswer: string; selectedIndex: number }>): Promise<ApiResponse<any>> {
-    return this.makeRequest(`/weekly-interest/child/${childId}/weekly-interest/complete`, {
+  async completeWeeklyInterest(childId: string, interestId: string, responses: Array<{ questionId: string; selectedAnswer: string; selectedIndex: number }>): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/weekly-interest/child/${childId}/weekly-interest/${interestId}/complete`, {
       method: 'PATCH',
       body: JSON.stringify({ responses })
     });
@@ -196,14 +197,14 @@ class ApiClient {
     return this.makeRequest(`/weekly-potential/child/${childId}/weekly-potential`);
   }
 
-  async startWeeklyPotential(childId: string): Promise<ApiResponse<any>> {
-    return this.makeRequest(`/weekly-potential/child/${childId}/weekly-potential/start`, {
+  async startWeeklyPotential(childId: string, potentialId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/weekly-potential/child/${childId}/weekly-potential/${potentialId}/start`, {
       method: 'PATCH'
     });
   }
 
-  async completeWeeklyPotential(childId: string, responses: Array<{ questionId: string; selectedAnswer: string; selectedIndex: number }>): Promise<ApiResponse<any>> {
-    return this.makeRequest(`/weekly-potential/child/${childId}/weekly-potential/complete`, {
+  async completeWeeklyPotential(childId: string, potentialId: string, responses: Array<{ questionId: string; selectedAnswer: string; selectedIndex: number }>): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/weekly-potential/child/${childId}/weekly-potential/${potentialId}/complete`, {
       method: 'PATCH',
       body: JSON.stringify({ responses })
     });
@@ -247,17 +248,30 @@ class ApiClient {
     return this.makeRequest(`/weekly-quiz/week/${weekStartDate}/${childId}`);
   }
 
-  async createWeeklyQuiz(childId: string, data: any): Promise<ApiResponse<any>> {
-    return this.makeRequest(`/weekly-quiz/${childId}`, {
+  async createWeeklyQuiz(childId: string, quizId: string, data: any): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/weekly-quiz/child/${childId}/weekly-quiz/${quizId}`, {
       method: 'POST',
       body: JSON.stringify(data)
     });
   }
 
+  async startWeeklyQuiz(childId: string, quizId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/weekly-quiz/child/${childId}/weekly-quiz/${quizId}/start`, {
+      method: 'PATCH'
+    });
+  }
+
   async submitWeeklyQuiz(childId: string, quizId: string, responses: Array<{ questionId: string; selectedAnswer: string; selectedIndex: number }>): Promise<ApiResponse<any>> {
-    return this.makeRequest(`/weekly-quiz/${childId}/submit`, {
+    return this.makeRequest(`/weekly-quiz/child/${childId}/weekly-quiz/${quizId}/submit`, {
       method: 'POST',
-      body: JSON.stringify({ quizId, responses })
+      body: JSON.stringify({ responses })
+    });
+  }
+
+  async completeWeeklyQuiz(childId: string, quizId: string, responses: Array<{ questionId: string; selectedAnswer: string; selectedIndex: number }>): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/weekly-quiz/child/${childId}/weekly-quiz/${quizId}/complete`, {
+      method: 'PATCH',
+      body: JSON.stringify({ responses })
     });
   }
 

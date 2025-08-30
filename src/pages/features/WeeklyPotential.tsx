@@ -18,25 +18,7 @@ import {
   ArrowRight,
   Star
 } from 'lucide-react';
-
-interface Question {
-  id: string;
-  question: string;
-  context: string;
-  options: string[];
-  selectedAnswer?: string;
-  selectedIndex?: number;
-}
-
-interface WeeklyPotentialData {
-  id: string;
-  week: string;
-  title: string;
-  description: string;
-  questions: Question[];
-  status: 'pending' | 'in_progress' | 'completed';
-  completedAt?: string;
-}
+import { WeeklyPotentialQuestion, WeeklyPotentialData } from '@/lib/types';
 
 const WeeklyPotential: React.FC = () => {
   const { childId } = useParams<{ childId: string }>();
@@ -82,7 +64,7 @@ const WeeklyPotential: React.FC = () => {
     // Start the assessment if this is the first answer
     if (potentialData.status === 'pending') {
       try {
-        await apiClient.startWeeklyPotential(childId!);
+        await apiClient.startWeeklyPotential(childId!, potentialData.id);
       } catch (error) {
         console.error('Failed to start weekly potential:', error);
       }
@@ -121,7 +103,7 @@ const WeeklyPotential: React.FC = () => {
         selectedIndex: q.selectedIndex!
       }));
       
-      const result = await apiClient.completeWeeklyPotential(childId!, responses);
+      const result = await apiClient.completeWeeklyPotential(childId!, potentialData.id, responses);
       
       if (result.success) {
         setPotentialData(prev => prev ? {

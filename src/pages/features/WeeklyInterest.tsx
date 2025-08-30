@@ -9,6 +9,7 @@ import DashboardHeader from '@/components/site/DashboardHeader';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiClient } from '@/lib/api';
 import { toast } from 'sonner';
+import { WeeklyInterestData, WeeklyInterestQuestion } from '@/lib/types';
 import { 
   ArrowLeft, 
   HelpCircle, 
@@ -18,23 +19,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 
-interface Question {
-  id: string;
-  question: string;
-  options: string[];
-  selectedAnswer?: string;
-  selectedIndex?: number;
-}
-
-interface WeeklyInterestData {
-  id: string;
-  week: string;
-  title: string;
-  description: string;
-  questions: Question[];
-  status: 'pending' | 'in_progress' | 'completed';
-  completedAt?: string;
-}
+// Using types from @/lib/types instead of local interfaces
 
 const WeeklyInterest: React.FC = () => {
   const { childId } = useParams<{ childId: string }>();
@@ -50,11 +35,16 @@ const WeeklyInterest: React.FC = () => {
       setLoading(true);
       await getValidToken();
       
+      console.log('Fetching weekly interest for childId:', childId);
       const response = await apiClient.getWeeklyInterest(childId!);
       
+      console.log('API Response:', response);
+      
       if (response.success && response.data) {
+        console.log('Setting interest data:', response.data);
         setInterestData(response.data);
       } else {
+        console.error('API returned error:', response.error);
         toast.error(response.error || 'Failed to load this week\'s questions');
       }
     } catch (error: any) {
@@ -76,7 +66,7 @@ const WeeklyInterest: React.FC = () => {
     if (interestData.status === 'pending') {
       try {
         await getValidToken();
-        const startResponse = await apiClient.startWeeklyInterest(childId!);
+        const startResponse = await apiClient.startWeeklyInterest(childId!, interestData.id);
         
         if (startResponse.success) {
           setInterestData({
@@ -133,7 +123,7 @@ const WeeklyInterest: React.FC = () => {
         selectedIndex: q.selectedIndex!
       }));
       
-      const result = await apiClient.completeWeeklyInterest(childId!, responses);
+      const result = await apiClient.completeWeeklyInterest(childId!, interestData.id, responses);
       
       if (result.success) {
         setInterestData(prev => prev ? {
@@ -177,6 +167,23 @@ const WeeklyInterest: React.FC = () => {
   const currentQuestion = interestData?.questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === interestData!.questions.length - 1;
   const allQuestionsAnswered = interestData?.questions.every(q => q.selectedAnswer);
+
+  // Debug logging
+  console.log('Component state:', {
+    loading,
+    interestData: interestData ? {
+      id: interestData.id,
+      title: interestData.title,
+      status: interestData.status,
+      questionsCount: interestData.questions?.length,
+      currentQuestionIndex,
+      currentQuestion: currentQuestion ? {
+        id: currentQuestion.id,
+        question: currentQuestion.question,
+        optionsCount: currentQuestion.options?.length
+      } : null
+    } : null
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-100">

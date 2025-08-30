@@ -40,7 +40,7 @@ interface FeatureStatus {
   name: string;
   description: string;
   icon: React.ReactNode;
-  status: 'completed' | 'pending' | 'available';
+  status: 'completed' | 'pending' | 'available' | 'coming-soon';
   priority: 'high' | 'medium' | 'low';
   lastCompleted?: string;
   streak?: number;
@@ -87,7 +87,7 @@ const ChildDashboard: React.FC = () => {
       name: 'Career Insights',
       description: 'Explore future career possibilities',
       icon: <Target className="w-5 h-5" />,
-      status: 'available',
+      status: 'coming-soon',
       priority: 'low'
     },
     {
@@ -95,7 +95,7 @@ const ChildDashboard: React.FC = () => {
       name: 'Spark Interest',
       description: 'Nurture specific talents and interests',
       icon: <Sparkles className="w-5 h-5" />,
-      status: 'available',
+      status: 'coming-soon',
       priority: 'low'
     },
     {
@@ -112,7 +112,7 @@ const ChildDashboard: React.FC = () => {
       name: 'Moral Story',
       description: 'Values-building stories for bedtime',
       icon: <BookOpen className="w-5 h-5" />,
-      status: 'available',
+      status: 'coming-soon',
       priority: 'medium'
     }
     // TODO: Uncomment when parent chatbot feature is ready
@@ -162,6 +162,7 @@ const ChildDashboard: React.FC = () => {
     switch (status) {
       case 'completed': return 'text-green-600 bg-green-50 border-green-200';
       case 'pending': return 'text-orange-600 bg-orange-50 border-orange-200';
+      case 'coming-soon': return 'text-gray-600 bg-gray-50 border-gray-200';
       default: return 'text-blue-600 bg-blue-50 border-blue-200';
     }
   };
@@ -170,6 +171,7 @@ const ChildDashboard: React.FC = () => {
     switch (status) {
       case 'completed': return <CheckCircle className="w-4 h-4" />;
       case 'pending': return <AlertCircle className="w-4 h-4" />;
+      case 'coming-soon': return <Clock className="w-4 h-4" />;
       default: return <Clock className="w-4 h-4" />;
     }
   };
@@ -277,55 +279,96 @@ const ChildDashboard: React.FC = () => {
           {features.map((feature) => (
             <Card
               key={feature.id}
-              className={`group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 bg-white/70 backdrop-blur-md ${
+              className={`group transition-all duration-300 border-0 bg-white/70 backdrop-blur-md ${
                 feature.status === 'pending' ? 'ring-2 ring-orange-200 shadow-lg' : ''
+              } ${
+                feature.status === 'coming-soon' 
+                  ? 'cursor-not-allowed opacity-60' 
+                  : 'cursor-pointer hover:shadow-xl hover:-translate-y-1'
               }`}
             >
-              <Link to={`/child/${childId}/${feature.id}`} className="block h-full">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${
-                        feature.status === 'completed' ? 'bg-green-100 text-green-600' :
-                        feature.status === 'pending' ? 'bg-orange-100 text-orange-600' :
-                        'bg-indigo-100 text-indigo-600'
-                      }`}>
-                        {feature.icon}
+              {feature.status === 'coming-soon' ? (
+                <div className="block h-full">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-gray-100 text-gray-600">
+                          {feature.icon}
+                        </div>
+                        <div className="relative">
+                          <div className={`absolute -top-1 -left-1 w-2 h-2 rounded-full ${getPriorityDot(feature.priority)}`} />
+                          <CardTitle className="text-lg font-semibold text-slate-900">
+                            {feature.name}
+                          </CardTitle>
+                        </div>
                       </div>
-                      <div className="relative">
-                        <div className={`absolute -top-1 -left-1 w-2 h-2 rounded-full ${getPriorityDot(feature.priority)}`} />
-                        <CardTitle className="text-lg font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">
-                          {feature.name}
-                        </CardTitle>
-                      </div>
+                      <Badge
+                        variant="outline"
+                        className={`${getStatusColor(feature.status)} text-xs`}
+                      >
+                        <span className="flex items-center gap-1">
+                          {getStatusIcon(feature.status)}
+                          coming soon
+                        </span>
+                      </Badge>
                     </div>
-                    <Badge
-                      variant="outline"
-                      className={`${getStatusColor(feature.status)} text-xs`}
-                    >
-                      <span className="flex items-center gap-1">
-                        {getStatusIcon(feature.status)}
-                        {feature.status}
-                      </span>
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-slate-600 mb-4">
-                    {feature.description}
-                  </CardDescription>
-                  {feature.lastCompleted && (
-                    <p className="text-xs text-slate-500">
-                      Last completed: {feature.lastCompleted}
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription className="text-slate-600 mb-4">
+                      {feature.description}
+                    </CardDescription>
+                    <p className="text-xs text-gray-500 mt-2">
+                      Coming Soon
                     </p>
-                  )}
-                  {feature.streak && feature.status === 'pending' && (
-                    <p className="text-xs text-orange-600 font-medium">
-                      🔥 Current streak: {feature.streak} days
-                    </p>
-                  )}
-                </CardContent>
-              </Link>
+                  </CardContent>
+                </div>
+              ) : (
+                <Link to={`/child/${childId}/${feature.id}`} className="block h-full">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-lg ${
+                          feature.status === 'completed' ? 'bg-green-100 text-green-600' :
+                          feature.status === 'pending' ? 'bg-orange-100 text-orange-600' :
+                          'bg-indigo-100 text-indigo-600'
+                        }`}>
+                          {feature.icon}
+                        </div>
+                        <div className="relative">
+                          <div className={`absolute -top-1 -left-1 w-2 h-2 rounded-full ${getPriorityDot(feature.priority)}`} />
+                          <CardTitle className="text-lg font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">
+                            {feature.name}
+                          </CardTitle>
+                        </div>
+                      </div>
+                      <Badge
+                        variant="outline"
+                        className={`${getStatusColor(feature.status)} text-xs`}
+                      >
+                        <span className="flex items-center gap-1">
+                          {getStatusIcon(feature.status)}
+                          {feature.status}
+                        </span>
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription className="text-slate-600 mb-4">
+                      {feature.description}
+                    </CardDescription>
+                    {feature.lastCompleted && (
+                      <p className="text-xs text-slate-500">
+                        Last completed: {feature.lastCompleted}
+                      </p>
+                    )}
+                    {feature.streak && feature.status === 'pending' && (
+                      <p className="text-xs text-orange-600 font-medium">
+                        🔥 Current streak: {feature.streak} days
+                      </p>
+                    )}
+                  </CardContent>
+                </Link>
+              )}
             </Card>
           ))}
         </div>

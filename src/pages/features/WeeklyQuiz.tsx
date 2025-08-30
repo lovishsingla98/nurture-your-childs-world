@@ -21,29 +21,7 @@ import {
   Timer,
   Star
 } from 'lucide-react';
-
-interface QuizQuestion {
-  id: string;
-  question: string;
-  options: string[];
-  correctAnswer: string;
-  selectedAnswer?: string;
-  explanation?: string;
-  topic: string;
-}
-
-interface WeeklyQuizData {
-  id: string;
-  week: string;
-  title: string;
-  description: string;
-  questions: QuizQuestion[];
-  timeLimit: number; // in minutes
-  status: 'pending' | 'in_progress' | 'completed';
-  score?: number;
-  completedAt?: string;
-  timeRemaining?: number;
-}
+import { QuizQuestion, WeeklyQuizData } from '@/lib/types';
 
 const WeeklyQuiz: React.FC = () => {
   const { childId } = useParams<{ childId: string }>();
@@ -81,7 +59,10 @@ const WeeklyQuiz: React.FC = () => {
               id: q.id || `q${index + 1}`,
               question: q.question,
               options: q.options,
-              correctAnswer: q.correctAnswer,
+              answer: {
+                value: q.answer.value,
+                index: q.answer.index
+              },
               selectedAnswer: q.selectedAnswer,
               topic: q.topic || 'General Knowledge',
               explanation: q.explanation || 'Great job on this question!'
@@ -169,7 +150,7 @@ const WeeklyQuiz: React.FC = () => {
       
       // Calculate score
       const correctAnswers = quizData.questions.filter(q => 
-        q.selectedAnswer === q.correctAnswer
+        q.selectedAnswer === q.answer.value
       ).length;
       const score = Math.round((correctAnswers / quizData.questions.length) * 100);
       
@@ -183,7 +164,7 @@ const WeeklyQuiz: React.FC = () => {
       console.log('📤 Submitting quiz responses:', responses);
       
       // Submit to API using the quiz ID (week timestamp)
-      const result = await apiClient.submitWeeklyQuiz(childId!, quizData.id, responses);
+      const result = await apiClient.completeWeeklyQuiz(childId!, quizData.id, responses);
       
       console.log('📥 Quiz submission result:', result);
       
@@ -467,7 +448,7 @@ const WeeklyQuiz: React.FC = () => {
                     <h3 className="text-2xl font-semibold text-green-900 mb-2">Quiz Complete! 🎉</h3>
                     <div className="text-4xl font-bold text-green-600 mb-2">{quizData.score}%</div>
                     <p className="text-green-700">
-                      You got {quizData.questions.filter(q => q.selectedAnswer === q.correctAnswer).length} out of {quizData.questions.length} questions correct!
+                      You got {quizData.questions.filter(q => q.selectedAnswer === q.answer.value).length} out of {quizData.questions.length} questions correct!
                     </p>
                   </div>
 
@@ -475,7 +456,7 @@ const WeeklyQuiz: React.FC = () => {
                   <div className="space-y-4">
                     <h4 className="font-semibold text-slate-900 mb-3">Review Your Answers</h4>
                     {quizData.questions.map((question, index) => {
-                      const isCorrect = question.selectedAnswer === question.correctAnswer;
+                      const isCorrect = question.selectedAnswer === question.answer.value;
                       return (
                         <div key={question.id} className="bg-white/70 p-4 rounded-lg">
                           <div className="flex items-start gap-3">
@@ -496,7 +477,7 @@ const WeeklyQuiz: React.FC = () => {
                                 {!isCorrect && (
                                   <div>
                                     <span className="text-slate-600">Correct answer: </span>
-                                    <span className="text-green-700 font-medium">{question.correctAnswer}</span>
+                                    <span className="text-green-700 font-medium">{question.answer.value}</span>
                                   </div>
                                 )}
                               </div>
