@@ -59,47 +59,56 @@ const Index = () => {
 
       <main>
         {/* Hero */}
-        <section className="hero-veil pt-0 ">
+        <section className="hero-veil pt-0">
           <Header />
-          <div className="container grid gap-4 md:grid-cols-2 items-center py-10 md:py-20">
-            <div className="space-y-6 depth-layer-2">
-              <h1 className="text-4xl md:text-6xl font-bold leading-tight ">
-                Nurture your child's curiosity with an AI co‑pilot
-              </h1>
-              <p className="text-lg text-muted-foreground max-w-prose">
-                Daily activities, gentle guidance, and meaningful insights — personalized by LLMs and designed with child psychology at the core.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Button size="lg" onClick={handleJoinNow} disabled={loading} className="bg-gradient-to-r from-purple-600 to-green-500 hover:from-purple-700 hover:to-green-600 text-white font-semibold px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                  {loading ? "Signing in..." : "Join Now"}
-                </Button>
-                <Button asChild size="lg" variant="soft"><a href="#features">Explore Features</a></Button>
-              </div>
-              <div className="text-xs text-muted-foreground">Ages 3–12 • Built with privacy and safety first</div>
-            </div>
-            <div className="flex justify-center md:justify-end depth-layer-3">
-              <ParallaxEffect intensity={0.05} className="w-full">
-                <div className="relative w-full hero-image-3d" style={{ background: 'transparent' }}>
-                  <img 
-                    src={childParentRobotHero}
-                    alt="Child and parent with AI robot co-pilot learning together" 
-                    className="w-full h-auto" 
-                    loading="lazy"
-                    style={{ background: 'transparent' }}
-                  />
+          <div className="container px-4 sm:px-6 lg:px-8">
+            <div className="grid gap-8 lg:grid-cols-2 items-center py-8 sm:py-12 md:py-16 lg:py-20">
+              <div className="space-y-4 sm:space-y-6 depth-layer-2 text-center lg:text-left">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+                  Nurture your child's curiosity with an AI co‑pilot
+                </h1>
+                <p className="text-base sm:text-lg text-muted-foreground max-w-prose mx-auto lg:mx-0">
+                  Daily activities, gentle guidance, and meaningful insights — personalized by LLMs and designed with child psychology at the core.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+                  <Button 
+                    size="lg" 
+                    onClick={handleJoinNow} 
+                    disabled={loading} 
+                    className="bg-gradient-to-r from-purple-600 to-green-500 hover:from-purple-700 hover:to-green-600 text-white font-semibold px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 w-full sm:w-auto"
+                  >
+                    {loading ? "Signing in..." : "Join Now"}
+                  </Button>
+                  <Button asChild size="lg" variant="soft" className="w-full sm:w-auto">
+                    <a href="#features">Explore Features</a>
+                  </Button>
                 </div>
-              </ParallaxEffect>
+                <div className="text-xs sm:text-sm text-muted-foreground">Ages 3–12 • Built with privacy and safety first</div>
+              </div>
+              <div className="flex justify-center depth-layer-3 order-first lg:order-last">
+                <ParallaxEffect intensity={0.05} className="w-full max-w-md lg:max-w-full">
+                  <div className="relative w-full hero-image-3d" style={{ background: 'transparent' }}>
+                    <img 
+                      src={childParentRobotHero}
+                      alt="Child and parent with AI robot co-pilot learning together" 
+                      className="w-full h-auto" 
+                      loading="lazy"
+                      style={{ background: 'transparent' }}
+                    />
+                  </div>
+                </ParallaxEffect>
+              </div>
             </div>
           </div>
         </section>
 
         {/* Features */}
-        <section id="features" className="container mt-20 ">
-          <div className="text-center mb-10 depth-layer-1">
-            <h2 className="text-3xl md:text-4xl font-bold ">What makes Nurture different</h2>
-            <p className="text-muted-foreground mt-2">Emotionally intelligent, LLM‑powered guidance for parents and delightful learning for kids.</p>
+        <section id="features" className="container px-4 sm:px-6 lg:px-8 mt-12 sm:mt-16 md:mt-20">
+          <div className="text-center mb-8 sm:mb-10 depth-layer-1">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">What makes Nurture different</h2>
+            <p className="text-sm sm:text-base text-muted-foreground mt-2">Emotionally intelligent, LLM‑powered guidance for parents and delightful learning for kids.</p>
           </div>
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
             {[{
               icon: <Sparkles className="text-primary icon-3d" />, title: "Daily Dynamic Plans", desc: "Fresh, tailored activities every day — no scripts, only personalization."
             },{
@@ -108,10 +117,10 @@ const Index = () => {
               icon: <Baby className="text-primary icon-3d" />, title: "Kid‑Friendly Fun", desc: "Whimsical UI, story‑led prompts, soft encouragement — never judgment."
             }].map((f, i) => (
               <Card key={i} className="glass-card depth-layer-2">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-3">{f.icon}{f.title}</CardTitle>
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl">{f.icon}{f.title}</CardTitle>
                 </CardHeader>
-                <CardContent className="text-muted-foreground">{f.desc}</CardContent>
+                <CardContent className="text-sm sm:text-base text-muted-foreground">{f.desc}</CardContent>
               </Card>
             ))}
           </div>
@@ -120,13 +129,13 @@ const Index = () => {
         <FeatureSlides />
 
         {/* Testimonials */}
-        <section id="testimonials" className="container mt-20 ">
-          <h2 className="text-3xl font-bold text-center mb-10 ">What early parents say</h2>
-          <div className="grid gap-6 md:grid-cols-3">
+        <section id="testimonials" className="container px-4 sm:px-6 lg:px-8 mt-12 sm:mt-16 md:mt-20">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-10">What early parents say</h2>
+          <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
             {["It feels like a gentle coach in my pocket.", "My 6‑year‑old asks for today’s task — huge win!", "Finally, insights that make sense without guilt."]
               .map((t, i) => (
                 <Card key={i} className="glass-card depth-layer-2">
-                  <CardContent className="pt-6">
+                  <CardContent className="pt-4 sm:pt-6">
                     <p className="text-base">“{t}”</p>
                     <p className="text-xs text-muted-foreground mt-3">— Parent {i+1}</p>
                   </CardContent>
@@ -136,36 +145,42 @@ const Index = () => {
         </section>
 
         {/* Safety */}
-        <section className="container mt-20 ">
-                      <Card className="glass-card depth-layer-2">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2"><ShieldCheck className="text-primary icon-3d" /> Privacy first</CardTitle>
+        <section className="container px-4 sm:px-6 lg:px-8 mt-12 sm:mt-16 md:mt-20">
+          <Card className="glass-card depth-layer-2">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                <ShieldCheck className="text-primary icon-3d" /> Privacy first
+              </CardTitle>
             </CardHeader>
-            <CardContent className="text-muted-foreground">
+            <CardContent className="text-sm sm:text-base text-muted-foreground">
               Nurture follows strict data minimization and parental consent. Prompts use anonymization by default. Learn more in our upcoming whitepaper.
             </CardContent>
           </Card>
         </section>
 
         {/* Waitlist & Feedback */}
-        <section id="waitlist" className="container mt-20 grid gap-10 md:grid-cols-2 ">
-          <div className="">
-            <h3 className="text-2xl font-bold mb-2 ">Join the beta waitlist</h3>
-            <p className="text-muted-foreground mb-6">Be first to try Nurture and help shape the future of AI‑supported parenting.</p>
-            <WaitlistForm />
-          </div>
-          <div id="feedback" className="">
-            <h3 className="text-2xl font-bold mb-2 ">Have feedback or ideas?</h3>
-            <p className="text-muted-foreground mb-6">Tell us what would make Nurture truly valuable for your family.</p>
-            <FeedbackForm />
+        <section id="waitlist" className="container px-4 sm:px-6 lg:px-8 mt-12 sm:mt-16 md:mt-20">
+          <div className="grid gap-8 sm:gap-10 lg:grid-cols-2">
+            <div>
+              <h3 className="text-xl sm:text-2xl font-bold mb-2">Join the beta waitlist</h3>
+              <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">Be first to try Nurture and help shape the future of AI‑supported parenting.</p>
+              <WaitlistForm />
+            </div>
+            <div id="feedback">
+              <h3 className="text-xl sm:text-2xl font-bold mb-2">Have feedback or ideas?</h3>
+              <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">Tell us what would make Nurture truly valuable for your family.</p>
+              <FeedbackForm />
+            </div>
           </div>
         </section>
 
         {/* CTA */}
-        <section className="container mt-20 text-center ">
-          <h3 className="text-2xl md:text-3xl font-bold mb-4 ">Parenting, supported — not replaced.</h3>
-          <p className="text-muted-foreground mb-6">Join thousands of parents discovering joyful, personalized learning.</p>
-          <Button asChild size="lg" variant="hero"><a href="#waitlist">Get Early Access</a></Button>
+        <section className="container px-4 sm:px-6 lg:px-8 mt-12 sm:mt-16 md:mt-20 text-center">
+          <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4">Parenting, supported — not replaced.</h3>
+          <p className="text-sm sm:text-base text-muted-foreground mb-6">Join thousands of parents discovering joyful, personalized learning.</p>
+          <Button asChild size="lg" variant="hero" className="w-full sm:w-auto">
+            <a href="#waitlist">Get Early Access</a>
+          </Button>
         </section>
       </main>
 

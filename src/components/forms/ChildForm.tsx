@@ -118,12 +118,12 @@ const ChildForm: React.FC<ChildFormProps> = ({ onChildAdded, trigger }) => {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="w-[95vw] max-w-[425px] mx-auto">
         <DialogHeader>
-          <DialogTitle>Add New Child</DialogTitle>
+          <DialogTitle className="text-lg sm:text-xl">Add New Child</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 sm:space-y-4">
             <FormField
               control={form.control}
               name="displayName"
@@ -184,16 +184,17 @@ const ChildForm: React.FC<ChildFormProps> = ({ onChildAdded, trigger }) => {
               )}
             />
 
-            <div className="flex justify-end space-x-2 pt-4">
+            <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 pt-3 sm:pt-4">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setOpen(false)}
                 disabled={loading}
+                className="w-full sm:w-auto order-2 sm:order-1"
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={loading}>
+              <Button type="submit" disabled={loading} className="w-full sm:w-auto order-1 sm:order-2">
                 {loading ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
