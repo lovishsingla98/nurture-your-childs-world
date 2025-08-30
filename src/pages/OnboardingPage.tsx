@@ -18,6 +18,7 @@ import {
   OnboardingAnswerData,
   NextQuestionResponse 
 } from '@/lib/types';
+import OnboardingLoadingScreen from '@/components/forms/OnboardingLoadingScreen';
 
 const OnboardingPage: React.FC = () => {
   const { childId } = useParams<{ childId: string }>();
@@ -232,6 +233,13 @@ const OnboardingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+      {/* Loading Screen - shows when generating next question */}
+      <OnboardingLoadingScreen 
+        isLoading={submitting}
+        currentQuestionNumber={currentQuestionIndex + 1}
+        totalQuestions={questionnaire.questions.length}
+      />
+      
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-4">
