@@ -1,22 +1,21 @@
-# Welcome to your Lovable project
+# Nurture - AI Co-pilot for Modern Parenting
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/03a5e0ff-95d5-4dcb-b2e2-8d4c14bb6aae
+**Company**: Cortiq Labs  
+**App Name**: Nurture
+
+## About Nurture
+
+Nurture is an AI co-pilot for modern parenting, providing personalized learning activities for children ages 3-12. The app offers daily tasks, weekly questionnaires, career insights, and moral stories to support child development.
 
 ## How can I edit this code?
 
 There are several ways of editing your application.
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/03a5e0ff-95d5-4dcb-b2e2-8d4c14bb6aae) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
 **Use your preferred IDE**
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Clone this repo and work locally with your preferred IDE.
 
 The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
@@ -62,12 +61,16 @@ This project is built with:
 
 ## How can I deploy this project?
 
-Simply open [Lovable](https://lovable.dev/projects/03a5e0ff-95d5-4dcb-b2e2-8d4c14bb6aae) and click on Share -> Publish.
+This project can be deployed to any hosting platform that supports static sites:
 
-## Can I connect a custom domain to my Lovable project?
+- **Vercel**: Connect your GitHub repo and deploy automatically
+- **Netlify**: Drag and drop the `dist` folder or connect your repo
+- **GitHub Pages**: Enable GitHub Pages in your repository settings
+- **AWS S3 + CloudFront**: Upload the built files to S3
+- **GCP Cloud Storage**: Upload the built files to Cloud Storage
 
-Yes, you can!
+## Deployment Steps
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+1. Build the project: `npm run build`
+2. Deploy the `dist` folder to your chosen hosting platform
+3. Configure your domain if needed
