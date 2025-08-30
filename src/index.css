@@ -117,24 +117,52 @@ All colors MUST be HSL.
 }
 
 @layer components {
+  /* 3D Button Effects */
   .btn-hero {
     background-image: var(--gradient-hero);
     color: hsl(var(--primary-foreground));
     box-shadow: var(--shadow-elev-1);
-    transition: var(--transition-smooth, all 0.3s ease);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-style: preserve-3d;
+    perspective: 1000px;
   }
   .btn-hero:hover {
     filter: brightness(1.05);
-    box-shadow: 0 14px 40px -12px hsl(var(--primary)/0.35);
+    box-shadow: 0 20px 50px -15px hsl(var(--primary)/0.4);
+    transform: translateY(-4px) rotateX(5deg) rotateY(2deg);
   }
+  .btn-hero:active {
+    transform: translateY(-2px) rotateX(2deg) rotateY(1deg);
+    transition: all 0.1s ease;
+  }
+
+  /* 3D Card Effects */
   .glass-card {
     background: hsl(var(--card) / 0.7);
     backdrop-filter: saturate(140%) blur(12px);
     border: 1px solid hsl(var(--border));
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    box-shadow: 
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
+  .glass-card:hover {
+    transform: translateY(-8px) rotateX(8deg) rotateY(4deg);
+    box-shadow: 
+      0 25px 50px -12px rgba(0, 0, 0, 0.25),
+      0 0 0 1px rgba(255, 255, 255, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+
+  /* 3D Hero Section */
   .hero-veil {
     position: relative;
     isolation: isolate;
+    transform-style: preserve-3d;
+    perspective: 1000px;
   }
   .hero-veil::before {
     content: "";
@@ -144,5 +172,208 @@ All colors MUST be HSL.
     background: radial-gradient(800px 300px at 15% 0%, hsl(var(--primary)/0.4), transparent 60%);
     pointer-events: none;
     z-index: -1;
+    animation: float 6s ease-in-out infinite;
   }
+
+  /* 3D Image Effects */
+  .hero-image-3d {
+    transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+  .hero-image-3d:hover {
+    transform: translateZ(20px) rotateX(5deg) rotateY(-5deg);
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
+  }
+
+  /* 3D Text Effects */
+  .text-3d {
+    text-shadow: 
+      0 1px 0 rgba(255, 255, 255, 0.1),
+      0 2px 0 rgba(0, 0, 0, 0.1),
+      0 3px 0 rgba(0, 0, 0, 0.1),
+      0 4px 0 rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+  .text-3d:hover {
+    transform: translateY(-2px);
+    text-shadow: 
+      0 2px 0 rgba(255, 255, 255, 0.1),
+      0 4px 0 rgba(0, 0, 0, 0.1),
+      0 6px 0 rgba(0, 0, 0, 0.1),
+      0 8px 0 rgba(0, 0, 0, 0.1);
+  }
+
+  /* 3D Icon Effects */
+  .icon-3d {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-style: preserve-3d;
+  }
+  .icon-3d:hover {
+    transform: translateZ(10px) rotateY(15deg) scale(1.1);
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.2));
+  }
+
+  /* 3D Form Effects */
+  .form-3d {
+    transition: all 0.3s ease;
+    transform-style: preserve-3d;
+  }
+  .form-3d:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  }
+
+  /* 3D Section Effects */
+  .section-3d {
+    transition: all 0.5s ease;
+    transform-style: preserve-3d;
+  }
+  .section-3d:hover {
+    transform: translateZ(5px);
+  }
+
+  /* Floating Animation */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotateX(0deg); }
+    50% { transform: translateY(-10px) rotateX(2deg); }
+  }
+
+  /* 3D Parallax Effect */
+  .parallax-3d {
+    transition: transform 0.1s ease-out;
+    will-change: transform;
+  }
+
+  /* 3D Depth Layers */
+  .depth-layer-1 { transform: translateZ(10px); }
+  .depth-layer-2 { transform: translateZ(20px); }
+  .depth-layer-3 { transform: translateZ(30px); }
+
+  /* 3D Glow Effects */
+  .glow-3d {
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+  }
+  .glow-3d:hover {
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+    transform: scale(1.02);
+  }
+}
+
+  /* 3D Input Effects */
+  .input-3d {
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-style: preserve-3d;
+  }
+  .input-3d:focus {
+    transform: translateZ(5px);
+    box-shadow: 
+      0 0 0 2px rgba(139, 92, 246, 0.2),
+      0 8px 25px -5px rgba(0, 0, 0, 0.1);
+  }
+  .input-3d:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.1);
+  }
+
+  /* 3D Button Variants */
+  .btn-3d-soft {
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-style: preserve-3d;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  .btn-3d-soft:hover {
+    transform: translateY(-3px) rotateX(3deg);
+    box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.15);
+  }
+
+  /* 3D Badge Effects */
+  .badge-3d {
+    transition: all 0.3s ease;
+    transform-style: preserve-3d;
+  }
+  .badge-3d:hover {
+    transform: translateZ(5px) scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  /* 3D Loading Animation */
+  @keyframes spin3d {
+    0% { transform: rotateY(0deg) rotateX(0deg); }
+    100% { transform: rotateY(360deg) rotateX(360deg); }
+  }
+  .loading-3d {
+    animation: spin3d 2s linear infinite;
+    transform-style: preserve-3d;
+  }
+
+  /* 3D Pulse Effect */
+  @keyframes pulse3d {
+    0%, 100% { 
+      transform: scale(1) translateZ(0px);
+      box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4);
+    }
+    50% { 
+      transform: scale(1.05) translateZ(5px);
+      box-shadow: 0 0 0 10px rgba(139, 92, 246, 0);
+    }
+  }
+  .pulse-3d {
+    animation: pulse3d 2s infinite;
+  }
+
+  /* 3D Tilt Effect */
+  .tilt-3d {
+    transition: all 0.3s ease;
+    transform-style: preserve-3d;
+  }
+  .tilt-3d:hover {
+    transform: perspective(1000px) rotateX(10deg) rotateY(10deg);
+  }
+
+  /* 3D Shadow Layers */
+  .shadow-3d-1 {
+    box-shadow: 
+      0 1px 3px rgba(0, 0, 0, 0.12),
+      0 1px 2px rgba(0, 0, 0, 0.24);
+  }
+  .shadow-3d-2 {
+    box-shadow: 
+      0 3px 6px rgba(0, 0, 0, 0.16),
+      0 3px 6px rgba(0, 0, 0, 0.23);
+  }
+  .shadow-3d-3 {
+    box-shadow: 
+      0 10px 20px rgba(0, 0, 0, 0.19),
+      0 6px 6px rgba(0, 0, 0, 0.23);
+  }
+  .shadow-3d-4 {
+    box-shadow: 
+      0 14px 28px rgba(0, 0, 0, 0.25),
+      0 10px 10px rgba(0, 0, 0, 0.22);
+  }
+
+/* Subtle 3D Effects - Toned Down */
+.glass-card {
+  transition: all 0.2s ease;
+}
+.glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.btn-hero {
+  transition: all 0.2s ease;
+}
+.btn-hero:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.15);
+}
+
+.icon-3d {
+  transition: all 0.2s ease;
+}
+.icon-3d:hover {
+  transform: scale(1.05);
 }
