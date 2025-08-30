@@ -31,11 +31,11 @@ const FeedbackForm = () => {
   };
 
   return (
-    <form onSubmit={onSubmit} className="grid gap-3">
+    <form onSubmit={onSubmit} className="grid gap-3 ">
       <Input placeholder="Your name" value={name} onChange={e => setName(e.target.value)} />
       <Input type="email" placeholder="Email address" value={email} onChange={e => setEmail(e.target.value)} />
       <Textarea placeholder="Share your thoughts..." value={message} onChange={e => setMessage(e.target.value)} required />
-      <Button type="submit" variant="soft" disabled={loading}>{loading ? "Sending..." : "Send Feedback"}</Button>
+      <Button type="submit" variant="soft" disabled={loading} className="">{loading ? "Sending..." : "Send Feedback"}</Button>
     </form>
   );
 };
