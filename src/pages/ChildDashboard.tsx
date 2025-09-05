@@ -95,7 +95,7 @@ const ChildDashboard: React.FC = () => {
       name: 'Spark Interest',
       description: 'Nurture specific talents and interests',
       icon: <Sparkles className="w-5 h-5" />,
-      status: 'coming-soon',
+      status: 'available',
       priority: 'low'
     },
     {

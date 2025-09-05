@@ -202,3 +202,28 @@ export interface DailyTaskResponse {
   completedAt?: string;
   updatedAt?: string;
 }
+
+// Spark Interest Types - Matching Backend Schema
+export interface CareerPath {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  skills: string[];
+  activities: string[];
+}
+
+export interface SparkInterestData {
+  selectedCareer?: CareerPath;
+  customGoal?: string;
+}
+
+export interface SparkInterest {
+  id: string;
+  childId: string;
+  parentId: string;
+  data: SparkInterestData;
+  date: string;
+  createdAt: string;
+  updatedAt: string;
+}

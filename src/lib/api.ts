@@ -1,12 +1,13 @@
 // API utility for making authenticated requests to the backend
-import { 
-  OnboardingQuestionnaire, 
-  OnboardingAnswerData, 
-  NextQuestionResponse, 
-  OnboardingAnswerResponse, 
+import {
+  OnboardingQuestionnaire,
+  OnboardingAnswerData,
+  NextQuestionResponse,
+  OnboardingAnswerResponse,
   Child,
   DailyTaskResponse,
-  WeeklyInterestData
+  WeeklyInterestData,
+  SparkInterest,
 } from './types';
 
 const API_BASE_URL = 'https://us-central1-nurture-466617.cloudfunctions.net/api';
@@ -222,22 +223,18 @@ class ApiClient {
   }
 
   // Spark Interest APIs
-  async getSparkInterest(childId: string): Promise<ApiResponse<any>> {
+  async getSparkInterest(childId: string): Promise<ApiResponse<SparkInterest>> {
     return this.makeRequest(`/spark-interest/child/${childId}/spark-interest`);
   }
 
-  async updateSparkInterest(childId: string, data: { selectedCareerId?: string; customGoal?: string }): Promise<ApiResponse<any>> {
+  async createSparkInterest(childId: string, data: { selectedCareerId?: string; customGoal?: string }): Promise<ApiResponse<SparkInterest>> {
     return this.makeRequest(`/spark-interest/child/${childId}/spark-interest/update`, {
       method: 'PATCH',
       body: JSON.stringify(data)
     });
   }
 
-  async completeSparkActivity(childId: string, activityId: string): Promise<ApiResponse<any>> {
-    return this.makeRequest(`/spark-interest/child/${childId}/spark-interest/activity/${activityId}/complete`, {
-      method: 'PATCH'
-    });
-  }
+
 
   // Weekly Quiz APIs
   async getWeeklyQuiz(childId: string): Promise<ApiResponse<any>> {
