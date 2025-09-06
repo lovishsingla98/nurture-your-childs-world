@@ -64,7 +64,7 @@ const WeeklyPotential: React.FC = () => {
     // Start the assessment if this is the first answer
     if (potentialData.status === 'pending') {
       try {
-        await apiClient.startWeeklyPotential(childId!, potentialData.id);
+        await apiClient.startWeeklyPotential(childId!, potentialData.potentialId);
       } catch (error) {
         console.error('Failed to start weekly potential:', error);
       }
@@ -103,7 +103,7 @@ const WeeklyPotential: React.FC = () => {
         selectedIndex: q.selectedIndex!
       }));
       
-      const result = await apiClient.completeWeeklyPotential(childId!, potentialData.id, responses);
+      const result = await apiClient.completeWeeklyPotential(childId!, potentialData.potentialId, responses);
       
       if (result.success) {
         setPotentialData(prev => prev ? {

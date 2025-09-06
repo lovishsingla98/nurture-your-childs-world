@@ -100,7 +100,7 @@ export interface OnboardingAnswerResponse {
   childOnboarded: boolean;
 }
 
-// Weekly Interest Types
+// Weekly Interest Types - Matching Backend Schema
 export interface WeeklyInterestQuestion {
   id: string;
   question: string;
@@ -109,14 +109,24 @@ export interface WeeklyInterestQuestion {
   selectedIndex?: number;
 }
 
+export interface WeeklyInterestResponse {
+  questionId: string;
+  selectedAnswer: string;
+  selectedIndex: number;
+}
+
 export interface WeeklyInterestData {
-  id: string;
+  interestId: string;
   week: string;
   title: string;
   description: string;
   questions: WeeklyInterestQuestion[];
   status: 'pending' | 'in_progress' | 'completed';
+  childId: string;
+  parentId: string;
+  responses?: WeeklyInterestResponse[];
   completedAt?: string;
+  updatedAt?: string;
 }
 
 // Weekly Quiz Types - Matching Backend Schema
@@ -135,7 +145,7 @@ export interface QuizQuestion {
 }
 
 export interface WeeklyQuizData {
-  id: string;
+  quizId: string;
   week: string;
   title: string;
   description: string;
@@ -143,8 +153,12 @@ export interface WeeklyQuizData {
   timeLimit?: number; // in minutes
   status: 'pending' | 'in_progress' | 'completed';
   score?: number;
+  childId: string;
+  parentId: string;
   completedAt?: string;
   timeRemaining?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // Weekly Potential Types - Matching Backend Schema
@@ -158,13 +172,16 @@ export interface WeeklyPotentialQuestion {
 }
 
 export interface WeeklyPotentialData {
-  id: string;
+  potentialId: string;
   week: string;
   title: string;
   description: string;
   questions: WeeklyPotentialQuestion[];
   status: 'pending' | 'in_progress' | 'completed';
+  childId: string;
+  parentId: string;
   completedAt?: string;
+  updatedAt?: string;
 }
 
 // Daily Task Types - Matching Backend Schema

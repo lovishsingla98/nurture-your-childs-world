@@ -48,11 +48,13 @@ const WeeklyQuiz: React.FC = () => {
         console.log('📋 Weekly Quiz API Response:', apiData);
         
         const transformedData: WeeklyQuizData = {
-          id: apiData.id || `quiz_${Date.now()}`,
+          quizId: apiData.quizId || `quiz_${Date.now()}`,
           week: apiData.week || 'Current Week',
           title: 'Weekly Learning Review',
           description: 'Let\'s review what you\'ve learned this week through fun questions!',
           timeLimit: 15,
+          childId: apiData.childId || childId || '',
+          parentId: apiData.parentId || '',
           questions: apiData.questions?.map((q: any, index: number) => {
             console.log(`🔍 Question ${index + 1}:`, q);
             return {
@@ -164,7 +166,7 @@ const WeeklyQuiz: React.FC = () => {
       console.log('📤 Submitting quiz responses:', responses);
       
       // Submit to API using the quiz ID (week timestamp)
-      const result = await apiClient.completeWeeklyQuiz(childId!, quizData.id, responses);
+      const result = await apiClient.completeWeeklyQuiz(childId!, quizData.quizId, responses);
       
       console.log('📥 Quiz submission result:', result);
       

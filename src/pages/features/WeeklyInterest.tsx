@@ -66,7 +66,7 @@ const WeeklyInterest: React.FC = () => {
     if (interestData.status === 'pending') {
       try {
         await getValidToken();
-        const startResponse = await apiClient.startWeeklyInterest(childId!, interestData.id);
+        const startResponse = await apiClient.startWeeklyInterest(childId!, interestData.interestId);
         
         if (startResponse.success) {
           setInterestData({
@@ -123,7 +123,7 @@ const WeeklyInterest: React.FC = () => {
         selectedIndex: q.selectedIndex!
       }));
       
-      const result = await apiClient.completeWeeklyInterest(childId!, interestData.id, responses);
+      const result = await apiClient.completeWeeklyInterest(childId!, interestData.interestId, responses);
       
       if (result.success) {
         setInterestData(prev => prev ? {
@@ -172,7 +172,7 @@ const WeeklyInterest: React.FC = () => {
   console.log('Component state:', {
     loading,
     interestData: interestData ? {
-      id: interestData.id,
+      interestId: interestData.interestId,
       title: interestData.title,
       status: interestData.status,
       questionsCount: interestData.questions?.length,
