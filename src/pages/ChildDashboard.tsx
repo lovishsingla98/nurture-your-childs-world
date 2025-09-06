@@ -87,7 +87,7 @@ const ChildDashboard: React.FC = () => {
       name: 'Career Insights',
       description: 'Explore future career possibilities',
       icon: <Target className="w-5 h-5" />,
-      status: 'coming-soon',
+      status: 'available',
       priority: 'low'
     },
     {

@@ -63,15 +63,47 @@ const CareerInsights: React.FC = () => {
       const response = await apiClient.getCareerInsights(childId!);
       
       if (response.success) {
-        setInsightsData(response.data);
+        if (response.data) {
+          // Ensure all required fields exist with proper fallbacks
+          const data = {
+            ...response.data,
+            topMatches: response.data.topMatches || [],
+            overallProfile: {
+              dominantInterests: response.data.overallProfile?.dominantInterests || [],
+              strongestSkills: response.data.overallProfile?.strongestSkills || [],
+              learningStyle: response.data.overallProfile?.learningStyle || '',
+              personalityTraits: response.data.overallProfile?.personalityTraits || []
+            },
+            recommendations: response.data.recommendations || []
+          };
+          setInsightsData(data);
+        } else {
+          // No career insights document exists yet - set empty state
+          setInsightsData({
+            id: 'latest',
+            generatedAt: new Date().toISOString(),
+            childAge: 0,
+            topMatches: [],
+            overallProfile: {
+              dominantInterests: [],
+              strongestSkills: [],
+              learningStyle: '',
+              personalityTraits: []
+            },
+            recommendations: [],
+            status: 'loading',
+            refreshAvailable: true,
+            nextRefreshAvailableOn: Date.now()
+          });
+        }
       } else {
         toast.error(response.error || 'Failed to load career insights');
-        setInsightsData(prev => prev ? { ...prev, status: 'error' } : null);
+        setInsightsData(null);
       }
     } catch (error: any) {
       console.error('Failed to fetch career insights:', error);
       toast.error('Failed to load career insights');
-      setInsightsData(prev => prev ? { ...prev, status: 'error' } : null);
+      setInsightsData(null);
     } finally {
       setLoading(false);
     }
@@ -129,6 +161,43 @@ const CareerInsights: React.FC = () => {
     );
   }
 
+  if (!insightsData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50 to-orange-100">
+        <DashboardHeader />
+        <div className="container mx-auto px-4 py-8 max-w-6xl">
+          {/* Back Navigation */}
+          <div className="mb-6">
+            <Button variant="ghost" onClick={() => navigate(`/child/${childId}`)} className="text-slate-600 hover:text-slate-900">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Child Dashboard
+            </Button>
+          </div>
+
+          {/* Error State */}
+          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-md">
+            <CardContent className="p-8 text-center">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Target className="w-8 h-8 text-red-600" />
+              </div>
+              <h4 className="text-lg font-semibold text-slate-900 mb-2">Unable to Load Career Insights</h4>
+              <p className="text-slate-600 mb-4">
+                There was an error loading career insights. Please try again or contact support if the problem persists.
+              </p>
+              <Button 
+                onClick={fetchCareerInsights}
+                className="bg-amber-600 hover:bg-amber-700"
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Try Again
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-amber-50 to-orange-100">
       <DashboardHeader />
@@ -155,12 +224,15 @@ const CareerInsights: React.FC = () => {
                     </div>
                     <CardTitle className="text-2xl text-slate-900 mb-2">Future Possibilities</CardTitle>
                     <CardDescription className="text-base text-slate-600">
-                      Based on interests, strengths, and learning patterns, here are potential career paths that might suit your child.
+                      {insightsData.status === 'loading' || !insightsData.topMatches || insightsData.topMatches.length === 0
+                        ? 'Career insights are being prepared. Generate insights to discover potential career paths.'
+                        : 'Based on interests, strengths, and learning patterns, here are potential career paths that might suit your child.'
+                      }
                     </CardDescription>
                   </div>
                   <div className="text-right">
                     <Badge variant="secondary" className="mb-2">
-                      Age {insightsData.childAge}
+                      Age {insightsData.childAge || 'N/A'}
                     </Badge>
                     <p className="text-xs text-slate-500">
                       Last updated: {new Date(insightsData.generatedAt).toLocaleDateString()}
@@ -180,7 +252,7 @@ const CareerInsights: React.FC = () => {
                       ) : (
                         <>
                           <RefreshCw className="w-3 h-3 mr-2" />
-                          Update
+                          {!insightsData.topMatches || insightsData.topMatches.length === 0 ? 'Generate Insights' : 'Update'}
                         </>
                       )}
                     </Button>
@@ -201,7 +273,37 @@ const CareerInsights: React.FC = () => {
                 Top Career Matches
               </h3>
               
-              {insightsData.topMatches.map((career, index) => (
+              {!insightsData.topMatches || insightsData.topMatches.length === 0 ? (
+                <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-md">
+                  <CardContent className="p-8 text-center">
+                    <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Target className="w-8 h-8 text-amber-600" />
+                    </div>
+                    <h4 className="text-lg font-semibold text-slate-900 mb-2">No Career Insights Yet</h4>
+                    <p className="text-slate-600 mb-4">
+                      Career insights haven't been generated yet. Click "Generate Insights" to discover potential career paths based on your child's learning patterns.
+                    </p>
+                    <Button 
+                      onClick={handleRegenerateInsights}
+                      disabled={regenerating}
+                      className="bg-amber-600 hover:bg-amber-700"
+                    >
+                      {regenerating ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <Lightbulb className="w-4 h-4 mr-2" />
+                          Generate Insights
+                        </>
+                      )}
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                insightsData.topMatches.map((career, index) => (
                 <Card key={index} className="border-0 shadow-xl bg-white/80 backdrop-blur-md">
                   <CardHeader className="pb-4">
                     <div className="flex items-start justify-between">
@@ -271,88 +373,109 @@ const CareerInsights: React.FC = () => {
                     </div>
                   </CardContent>
                 </Card>
-              ))}
+                ))
+              )}
             </div>
 
             {/* Overall Profile */}
-            <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-md mb-6">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Users className="w-5 h-5 text-slate-600" />
-                  Learning Profile
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <h5 className="font-medium text-slate-900 mb-2">Dominant Interests</h5>
-                    <div className="flex flex-wrap gap-2">
-                      {insightsData.overallProfile.dominantInterests.map((interest, i) => (
-                        <Badge key={i} variant="secondary" className="bg-amber-100 text-amber-700">
-                          {interest}
-                        </Badge>
-                      ))}
+            {insightsData.topMatches && insightsData.topMatches.length > 0 && (
+              <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-md mb-6">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Users className="w-5 h-5 text-slate-600" />
+                    Learning Profile
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div>
+                      <h5 className="font-medium text-slate-900 mb-2">Dominant Interests</h5>
+                      <div className="flex flex-wrap gap-2">
+                        {insightsData.overallProfile.dominantInterests && insightsData.overallProfile.dominantInterests.length > 0 ? (
+                          insightsData.overallProfile.dominantInterests.map((interest, i) => (
+                            <Badge key={i} variant="secondary" className="bg-amber-100 text-amber-700">
+                              {interest}
+                            </Badge>
+                          ))
+                        ) : (
+                          <p className="text-slate-500 text-sm">No interests identified yet</p>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h5 className="font-medium text-slate-900 mb-2">Strongest Skills</h5>
+                      <div className="flex flex-wrap gap-2">
+                        {insightsData.overallProfile.strongestSkills && insightsData.overallProfile.strongestSkills.length > 0 ? (
+                          insightsData.overallProfile.strongestSkills.map((skill, i) => (
+                            <Badge key={i} variant="secondary" className="bg-green-100 text-green-700">
+                              {skill}
+                            </Badge>
+                          ))
+                        ) : (
+                          <p className="text-slate-500 text-sm">No skills identified yet</p>
+                        )}
+                      </div>
                     </div>
                   </div>
                   
-                  <div>
-                    <h5 className="font-medium text-slate-900 mb-2">Strongest Skills</h5>
-                    <div className="flex flex-wrap gap-2">
-                      {insightsData.overallProfile.strongestSkills.map((skill, i) => (
-                        <Badge key={i} variant="secondary" className="bg-green-100 text-green-700">
-                          {skill}
-                        </Badge>
-                      ))}
+                  <div className="space-y-4">
+                    <div>
+                      <h5 className="font-medium text-slate-900 mb-2">Learning Style</h5>
+                      <p className="text-slate-700 p-3 bg-blue-50 rounded-lg text-sm">
+                        {insightsData.overallProfile.learningStyle || 'Learning style analysis pending'}
+                      </p>
+                    </div>
+                    
+                    <div>
+                      <h5 className="font-medium text-slate-900 mb-2">Personality Traits</h5>
+                      <div className="flex flex-wrap gap-2">
+                        {insightsData.overallProfile.personalityTraits && insightsData.overallProfile.personalityTraits.length > 0 ? (
+                          insightsData.overallProfile.personalityTraits.map((trait, i) => (
+                            <Badge key={i} variant="secondary" className="bg-purple-100 text-purple-700">
+                              {trait}
+                            </Badge>
+                          ))
+                        ) : (
+                          <p className="text-slate-500 text-sm">No traits identified yet</p>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-                
-                <div className="space-y-4">
-                  <div>
-                    <h5 className="font-medium text-slate-900 mb-2">Learning Style</h5>
-                    <p className="text-slate-700 p-3 bg-blue-50 rounded-lg text-sm">
-                      {insightsData.overallProfile.learningStyle}
-                    </p>
-                  </div>
-                  
-                  <div>
-                    <h5 className="font-medium text-slate-900 mb-2">Personality Traits</h5>
-                    <div className="flex flex-wrap gap-2">
-                      {insightsData.overallProfile.personalityTraits.map((trait, i) => (
-                        <Badge key={i} variant="secondary" className="bg-purple-100 text-purple-700">
-                          {trait}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Recommendations */}
-            <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-md">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Heart className="w-5 h-5 text-red-500" />
-                  Personalized Recommendations
-                </CardTitle>
-                <CardDescription>
-                  Ways to nurture your child's potential and interests
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  {insightsData.recommendations.map((recommendation, i) => (
-                    <li key={i} className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
-                      <div className="w-6 h-6 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0 mt-0.5">
-                        {i + 1}
-                      </div>
-                      <span className="text-slate-700">{recommendation}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
+            {insightsData.topMatches && insightsData.topMatches.length > 0 && (
+              <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-md">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Heart className="w-5 h-5 text-red-500" />
+                    Personalized Recommendations
+                  </CardTitle>
+                  <CardDescription>
+                    Ways to nurture your child's potential and interests
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {insightsData.recommendations && insightsData.recommendations.length > 0 ? (
+                    <ul className="space-y-3">
+                      {insightsData.recommendations.map((recommendation, i) => (
+                        <li key={i} className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
+                          <div className="w-6 h-6 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0 mt-0.5">
+                            {i + 1}
+                          </div>
+                          <span className="text-slate-700">{recommendation}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-slate-500 text-center py-8">No recommendations available yet</p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
           </>
         )}
       </div>
