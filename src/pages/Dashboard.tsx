@@ -4,6 +4,7 @@ import { apiClient } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import ChildForm from '@/components/forms/ChildForm';
+import ChildManagement from '@/components/forms/ChildManagement';
 import DashboardHeader from '@/components/site/DashboardHeader';
 import {
   Plus,
@@ -41,6 +42,7 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddChild, setShowAddChild] = useState(false);
+  const [showManageProfiles, setShowManageProfiles] = useState(false);
 
   const retryWithBackoff = async (fn: () => Promise<any>, maxRetries = 5) => {
     for (let attempt = 0; attempt < maxRetries; attempt++) {
@@ -121,6 +123,10 @@ const Dashboard: React.FC = () => {
   const handleChildAdded = () => {
     fetchProfile(); // Refresh the profile data
     setShowAddChild(false);
+  };
+
+  const handleChildUpdated = () => {
+    fetchProfile(); // Refresh the profile data
   };
 
 
@@ -296,7 +302,9 @@ const Dashboard: React.FC = () => {
           <Button
             variant="outline"
             className="text-gray-600 hover:text-gray-900 mt-6"
+            onClick={() => setShowManageProfiles(true)}
           >
+            <Settings className="w-4 h-4 mr-2" />
             Manage Profiles
           </Button>
         )}
@@ -324,6 +332,15 @@ const Dashboard: React.FC = () => {
             />
           </div>
         </div>
+      )}
+
+      {/* Manage Profiles Modal */}
+      {showManageProfiles && profile?.children && (
+        <ChildManagement
+          children={profile.children}
+          onChildUpdated={handleChildUpdated}
+          onClose={() => setShowManageProfiles(false)}
+        />
       )}
     </div>
   );
