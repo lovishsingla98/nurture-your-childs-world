@@ -14,8 +14,6 @@ import {
   Calendar,
   HelpCircle,
   TrendingUp,
-  Target,
-  Sparkles,
   Brain,
   BookOpen,
   ArrowLeft,
@@ -97,24 +95,6 @@ const ChildDashboard: React.FC = () => {
         status: activities.weeklyPotential.status,
         priority: activities.weeklyPotential.priority,
         lastCompleted: activities.weeklyPotential.lastCompleted ? formatRelativeTime(activities.weeklyPotential.lastCompleted) : (hasRealData ? 'Not completed yet' : '')
-      },
-      {
-        id: 'career-insights',
-        name: 'Career Insights',
-        description: 'Explore future career possibilities',
-        icon: <Target className="w-5 h-5" />,
-        status: activities.careerInsights.status,
-        priority: activities.careerInsights.priority,
-        lastCompleted: activities.careerInsights.lastCompleted ? formatRelativeTime(activities.careerInsights.lastCompleted) : (hasRealData ? 'Not completed yet' : '')
-      },
-      {
-        id: 'spark-interest',
-        name: 'Spark Interest',
-        description: 'Nurture specific talents and interests',
-        icon: <Sparkles className="w-5 h-5" />,
-        status: activities.sparkInterest.status,
-        priority: activities.sparkInterest.priority,
-        lastCompleted: activities.sparkInterest.lastCompleted ? formatRelativeTime(activities.sparkInterest.lastCompleted) : (hasRealData ? 'Not completed yet' : '')
       },
       {
         id: 'weekly-quiz',
@@ -474,32 +454,6 @@ const ChildDashboard: React.FC = () => {
           ))}
         </div>
 
-        {/* Quick Stats */}
-        <Card className="border-0 shadow-xl bg-white/70 backdrop-blur-md mt-8">
-          <CardHeader>
-            <CardTitle className="text-lg">Weekly Overview</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600 mb-1">6</div>
-                <div className="text-sm text-slate-500">Tasks Completed</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-indigo-600 mb-1">5</div>
-                <div className="text-sm text-slate-500">Day Streak</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600 mb-1">3</div>
-                <div className="text-sm text-slate-500">New Interests</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-orange-600 mb-1">2</div>
-                <div className="text-sm text-slate-500">Pending Items</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
