@@ -8,10 +8,7 @@ const MobileMenu = () => {
 
   const navItems = [
     { href: "#features", label: "Features" },
-    { href: "#parents", label: "Parents" },
-    { href: "#kids", label: "Kids" },
     { href: "#testimonials", label: "Testimonials" },
-    { href: "#faq", label: "FAQ" },
   ];
 
   return (
@@ -37,7 +34,7 @@ const MobileMenu = () => {
           <div className="pt-4 border-t space-y-3">
             <Button asChild variant="soft" className="w-full">
               <a href="#feedback" onClick={() => setOpen(false)}>
-                Give Feedback
+                Feedback
               </a>
             </Button>
             <Button asChild variant="hero" className="w-full">

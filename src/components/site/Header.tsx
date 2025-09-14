@@ -19,14 +19,11 @@ const Header = () => {
         </Link>
         <nav className="hidden lg:flex items-center gap-4 xl:gap-6 text-sm">
           <a href="#features" className="hover:text-primary transition-colors">Features</a>
-          <a href="#parents" className="hover:text-primary transition-colors">Parents</a>
-          <a href="#kids" className="hover:text-primary transition-colors">Kids</a>
           <a href="#testimonials" className="hover:text-primary transition-colors">Testimonials</a>
-          <a href="#faq" className="hover:text-primary transition-colors">FAQ</a>
         </nav>
         <div className="flex items-center gap-1 sm:gap-2">
-          <Button asChild variant="soft" size="sm" className="hidden sm:flex text-xs sm:text-sm">
-            <a href="#feedback">Give Feedback</a>
+          <Button asChild variant="soft" size="sm" className="text-xs sm:text-sm">
+            <a href="#feedback">Feedback</a>
           </Button>
           <Button asChild variant="hero" size="sm" className="text-xs sm:text-sm px-2 sm:px-3">
             <a href="#waitlist">Join Waitlist</a>

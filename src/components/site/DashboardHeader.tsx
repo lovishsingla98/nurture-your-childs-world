@@ -15,12 +15,12 @@ const DashboardHeader = () => {
         </Link>
         <nav className="hidden md:flex items-center gap-6 text-sm">
           <a href="/#features" className="hover:text-primary transition-colors">Features</a>
-          <a href="/#parents" className="hover:text-primary transition-colors">Parents</a>
-          <a href="/#kids" className="hover:text-primary transition-colors">Kids</a>
           <a href="/#testimonials" className="hover:text-primary transition-colors">Testimonials</a>
-          <a href="/#faq" className="hover:text-primary transition-colors">FAQ</a>
         </nav>
         <div className="flex items-center gap-2">
+          <Button asChild variant="soft" size="sm" className="text-xs sm:text-sm">
+            <a href="/#feedback">Feedback</a>
+          </Button>
           <AuthButtons />
         </div>
       </div>

@@ -22,7 +22,7 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// Route wrapper that redirects authenticated users to dashboard
+// Route wrapper that allows both authenticated and unauthenticated users to access public content
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
   
@@ -34,11 +34,7 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
   
-  if (user) {
-    window.location.href = '/dashboard';
-    return null;
-  }
-  
+  // Allow both authenticated and unauthenticated users to access the homepage
   return <>{children}</>;
 };
 

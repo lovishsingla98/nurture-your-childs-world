@@ -14,7 +14,7 @@ import { toast } from "sonner";
 
 const Index = () => {
   const canonical = typeof window !== 'undefined' ? window.location.href : 'https://nurture.cortiq.labs';
-  const { signInWithGoogle, loading } = useAuth();
+  const { signInWithGoogle, loading, user } = useAuth();
 
   const handleJoinNow = async () => {
     // Track CTA click
@@ -74,17 +74,34 @@ const Index = () => {
                   Daily activities, gentle guidance, and meaningful insights — personalized by LLMs and designed with child psychology at the core.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
-                  <Button 
-                    size="lg" 
-                    onClick={handleJoinNow} 
-                    disabled={loading} 
-                    className="bg-gradient-to-r from-purple-600 to-green-500 hover:from-purple-700 hover:to-green-600 text-white font-semibold px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 w-full sm:w-auto"
-                  >
-                    {loading ? "Signing in..." : "Join Now"}
-                  </Button>
-                  <Button asChild size="lg" variant="soft" className="w-full sm:w-auto">
-                    <a href="#features">Explore Features</a>
-                  </Button>
+                  {user ? (
+                    <>
+                      <Button 
+                        asChild
+                        size="lg" 
+                        className="bg-gradient-to-r from-purple-600 to-green-500 hover:from-purple-700 hover:to-green-600 text-white font-semibold px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 w-full sm:w-auto"
+                      >
+                        <a href="/dashboard">Go to Dashboard</a>
+                      </Button>
+                      <Button asChild size="lg" variant="soft" className="w-full sm:w-auto">
+                        <a href="#features">Explore Features</a>
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button 
+                        size="lg" 
+                        onClick={handleJoinNow} 
+                        disabled={loading} 
+                        className="bg-gradient-to-r from-purple-600 to-green-500 hover:from-purple-700 hover:to-green-600 text-white font-semibold px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 w-full sm:w-auto"
+                      >
+                        {loading ? "Signing in..." : "Join Now"}
+                      </Button>
+                      <Button asChild size="lg" variant="soft" className="w-full sm:w-auto">
+                        <a href="#features">Explore Features</a>
+                      </Button>
+                    </>
+                  )}
                 </div>
                 <div className="text-xs sm:text-sm text-muted-foreground">Ages 3–12 • Built with privacy and safety first</div>
               </div>
@@ -164,11 +181,15 @@ const Index = () => {
         {/* Waitlist & Feedback */}
         <section id="waitlist" className="container px-4 sm:px-6 lg:px-8 mt-12 sm:mt-16 md:mt-20">
           <div className="grid gap-8 sm:gap-10 lg:grid-cols-2">
-            <div>
-              <h3 className="text-xl sm:text-2xl font-bold mb-2">Join the beta waitlist</h3>
-              <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">Be first to try Nurture and help shape the future of AI‑supported parenting.</p>
-              <WaitlistForm />
-            </div>
+            {/* Waitlist - Only show for unauthenticated users */}
+            {!user && (
+              <div>
+                <h3 className="text-xl sm:text-2xl font-bold mb-2">Join the beta waitlist</h3>
+                <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">Be first to try Nurture and help shape the future of AI‑supported parenting.</p>
+                <WaitlistForm />
+              </div>
+            )}
+            {/* Feedback - Always show */}
             <div id="feedback">
               <h3 className="text-xl sm:text-2xl font-bold mb-2">Have feedback or ideas?</h3>
               <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">Tell us what would make Nurture truly valuable for your family.</p>
@@ -180,9 +201,13 @@ const Index = () => {
         {/* CTA */}
         <section className="container px-4 sm:px-6 lg:px-8 mt-12 sm:mt-16 md:mt-20 text-center">
           <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4">Parenting, supported — not replaced.</h3>
-          <p className="text-sm sm:text-base text-muted-foreground mb-6">Join thousands of parents discovering joyful, personalized learning.</p>
+          <p className="text-sm sm:text-base text-muted-foreground mb-6">
+            {user ? "Continue your journey with personalized learning for your children." : "Join thousands of parents discovering joyful, personalized learning."}
+          </p>
           <Button asChild size="lg" variant="hero" className="w-full sm:w-auto">
-            <a href="#waitlist">Get Early Access</a>
+            <a href={user ? "/dashboard" : "#waitlist"}>
+              {user ? "Go to Dashboard" : "Get Early Access"}
+            </a>
           </Button>
         </section>
       </main>
