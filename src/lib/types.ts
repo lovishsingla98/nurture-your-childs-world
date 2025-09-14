@@ -244,3 +244,40 @@ export interface SparkInterest {
   createdAt: string;
   updatedAt: string;
 }
+
+// Dashboard Types
+export interface ActivityStatus {
+  status: 'completed' | 'pending' | 'available' | 'coming-soon';
+  lastCompleted?: string;
+  streak?: number;
+  priority: 'high' | 'medium' | 'low';
+}
+
+export interface ChildStreak {
+  current: number;
+  longest: number;
+  lastActivityDate?: string;
+}
+
+export interface DashboardChild {
+  id: string;
+  displayName: string;
+  age: number;
+  gender: string;
+  imageURL?: string;
+  streak: ChildStreak;
+}
+
+export interface DashboardActivities {
+  dailyTask: ActivityStatus;
+  weeklyInterest: ActivityStatus;
+  weeklyPotential: ActivityStatus;
+  weeklyQuiz: ActivityStatus;
+  careerInsights: ActivityStatus;
+  sparkInterest: ActivityStatus;
+}
+
+export interface DashboardData {
+  child: DashboardChild;
+  activities: DashboardActivities;
+}

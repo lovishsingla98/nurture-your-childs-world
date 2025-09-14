@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import DashboardHeader from '@/components/site/DashboardHeader';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiClient } from '@/lib/api';
+import { DashboardData, ActivityStatus } from '@/lib/types';
 import {
   Calendar,
   HelpCircle,
@@ -23,17 +24,6 @@ import {
   AlertCircle,
   Star
 } from 'lucide-react';
-
-interface Child {
-  id: string;
-  displayName: string;
-  age: number;
-  gender: string;
-  dateOfBirth: { seconds: number; nanoseconds: number }; // Firestore Timestamp
-  parentId: string;
-  imageURL?: string;
-  isOnboarded?: boolean;
-}
 
 interface FeatureStatus {
   id: string;
@@ -50,103 +40,196 @@ const ChildDashboard: React.FC = () => {
   const { childId } = useParams<{ childId: string }>();
   const navigate = useNavigate();
   const { user, getValidToken } = useAuth();
-  const [child, setChild] = useState<Child | null>(null);
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const features: FeatureStatus[] = [
-    {
-      id: 'daily-task',
-      name: 'Daily Task',
-      description: 'Complete today\'s personalized learning activity',
-      icon: <Calendar className="w-5 h-5" />,
-      status: 'pending',
-      priority: 'high',
-      streak: 5
-    },
-    {
-      id: 'weekly-interest',
-      name: 'Weekly Interest',
-      description: 'Discover what sparks curiosity this week',
-      icon: <HelpCircle className="w-5 h-5" />,
-      status: 'available',
-      priority: 'medium',
-      lastCompleted: '2 days ago'
-    },
-    {
-      id: 'weekly-potential',
-      name: 'Weekly Potential',
-      description: 'Assess natural strengths and abilities',
-      icon: <TrendingUp className="w-5 h-5" />,
-      status: 'available',
-      priority: 'medium',
-      lastCompleted: '2 days ago'
-    },
-    {
-      id: 'career-insights',
-      name: 'Career Insights',
-      description: 'Explore future career possibilities',
-      icon: <Target className="w-5 h-5" />,
-      status: 'available',
-      priority: 'low'
-    },
-    {
-      id: 'spark-interest',
-      name: 'Spark Interest',
-      description: 'Nurture specific talents and interests',
-      icon: <Sparkles className="w-5 h-5" />,
-      status: 'available',
-      priority: 'low'
-    },
-    {
-      id: 'weekly-quiz',
-      name: 'Weekly Quiz',
-      description: 'Review and reinforce learning',
-      icon: <Brain className="w-5 h-5" />,
-      status: 'completed',
-      priority: 'medium',
-      lastCompleted: 'Yesterday'
-    },
-    {
-      id: 'moral-story',
-      name: 'Moral Story',
-      description: 'Values-building stories for bedtime',
-      icon: <BookOpen className="w-5 h-5" />,
-      status: 'coming-soon',
-      priority: 'medium'
-    }
-    // TODO: Uncomment when parent chatbot feature is ready
-    // {
-    //   id: 'parents-chatbot',
-    //   name: 'Parents Chatbot',
-    //   description: 'Get personalized parenting advice and guidance',
-    //   icon: <HelpCircle className="w-5 h-5" />,
-    //   status: 'available',
-    //   priority: 'low'
-    // }
-  ];
+  // Helper function to format relative time
+  const formatRelativeTime = (dateString?: string): string => {
+    if (!dateString) return '';
+    
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 24) return `${diffInHours} hours ago`;
+    if (diffInHours < 48) return 'Yesterday';
+    if (diffInHours < 168) return `${Math.floor(diffInHours / 24)} days ago`;
+    return `${Math.floor(diffInHours / 24)} days ago`;
+  };
 
-  const fetchChild = async () => {
+  // Create features array from dashboard data
+  const getFeatures = (): FeatureStatus[] => {
+    if (!dashboardData) return [];
+
+    const { activities } = dashboardData;
+    const hasRealData = activities.dailyTask.streak !== undefined || 
+                       activities.weeklyInterest.lastCompleted !== undefined ||
+                       activities.weeklyPotential.lastCompleted !== undefined ||
+                       activities.weeklyQuiz.lastCompleted !== undefined;
+
+    return [
+      {
+        id: 'daily-task',
+        name: 'Daily Task',
+        description: 'Complete today\'s personalized learning activity',
+        icon: <Calendar className="w-5 h-5" />,
+        status: activities.dailyTask.status,
+        priority: activities.dailyTask.priority,
+        streak: activities.dailyTask.streak,
+        lastCompleted: activities.dailyTask.lastCompleted ? formatRelativeTime(activities.dailyTask.lastCompleted) : (hasRealData ? 'Not completed yet' : '')
+      },
+      {
+        id: 'weekly-interest',
+        name: 'Weekly Interest',
+        description: 'Discover what sparks curiosity this week',
+        icon: <HelpCircle className="w-5 h-5" />,
+        status: activities.weeklyInterest.status,
+        priority: activities.weeklyInterest.priority,
+        lastCompleted: activities.weeklyInterest.lastCompleted ? formatRelativeTime(activities.weeklyInterest.lastCompleted) : (hasRealData ? 'Not completed yet' : '')
+      },
+      {
+        id: 'weekly-potential',
+        name: 'Weekly Potential',
+        description: 'Assess natural strengths and abilities',
+        icon: <TrendingUp className="w-5 h-5" />,
+        status: activities.weeklyPotential.status,
+        priority: activities.weeklyPotential.priority,
+        lastCompleted: activities.weeklyPotential.lastCompleted ? formatRelativeTime(activities.weeklyPotential.lastCompleted) : (hasRealData ? 'Not completed yet' : '')
+      },
+      {
+        id: 'career-insights',
+        name: 'Career Insights',
+        description: 'Explore future career possibilities',
+        icon: <Target className="w-5 h-5" />,
+        status: activities.careerInsights.status,
+        priority: activities.careerInsights.priority,
+        lastCompleted: activities.careerInsights.lastCompleted ? formatRelativeTime(activities.careerInsights.lastCompleted) : (hasRealData ? 'Not completed yet' : '')
+      },
+      {
+        id: 'spark-interest',
+        name: 'Spark Interest',
+        description: 'Nurture specific talents and interests',
+        icon: <Sparkles className="w-5 h-5" />,
+        status: activities.sparkInterest.status,
+        priority: activities.sparkInterest.priority,
+        lastCompleted: activities.sparkInterest.lastCompleted ? formatRelativeTime(activities.sparkInterest.lastCompleted) : (hasRealData ? 'Not completed yet' : '')
+      },
+      {
+        id: 'weekly-quiz',
+        name: 'Weekly Quiz',
+        description: 'Review and reinforce learning',
+        icon: <Brain className="w-5 h-5" />,
+        status: activities.weeklyQuiz.status,
+        priority: activities.weeklyQuiz.priority,
+        lastCompleted: activities.weeklyQuiz.lastCompleted ? formatRelativeTime(activities.weeklyQuiz.lastCompleted) : (hasRealData ? 'Not completed yet' : '')
+      },
+      {
+        id: 'moral-story',
+        name: 'Moral Story',
+        description: 'Values-building stories for bedtime',
+        icon: <BookOpen className="w-5 h-5" />,
+        status: 'coming-soon',
+        priority: 'medium'
+      }
+    ];
+  };
+
+  const features = getFeatures();
+
+  const fetchDashboardData = async () => {
     try {
       setLoading(true);
       setError(null);
 
       await getValidToken();
-      const response = await apiClient.getUserProfile();
-
-      if (response.success && response.data?.children) {
-        const foundChild = response.data.children.find((c: Child) => c.id === childId);
-        if (foundChild) {
-          setChild(foundChild);
-        } else {
-          setError('Child not found');
-        }
-      } else {
-        setError('Failed to load child data');
+      
+      // Try to get dashboard data first
+      const dashboardResponse = await apiClient.getChildDashboardData(childId!);
+      
+      if (dashboardResponse.success && dashboardResponse.data) {
+        setDashboardData(dashboardResponse.data);
+        return;
       }
+
+      // If dashboard data fails, fallback to basic child data
+      console.log('Dashboard data not available, falling back to basic child data');
+      const profileResponse = await apiClient.getUserProfile();
+      
+      if (profileResponse.success && profileResponse.data?.children) {
+        const foundChild = profileResponse.data.children.find((c: any) => c.id === childId);
+        if (foundChild) {
+          // Create a minimal dashboard data structure with basic child info
+          const fallbackData: DashboardData = {
+            child: {
+              id: foundChild.id,
+              displayName: foundChild.displayName,
+              age: foundChild.age,
+              gender: foundChild.gender || 'unknown',
+              imageURL: foundChild.imageURL,
+              streak: {
+                current: 0,
+                longest: 0,
+                lastActivityDate: undefined
+              }
+            },
+            activities: {
+              dailyTask: { status: 'available', priority: 'high' },
+              weeklyInterest: { status: 'available', priority: 'medium' },
+              weeklyPotential: { status: 'available', priority: 'medium' },
+              weeklyQuiz: { status: 'available', priority: 'medium' },
+              careerInsights: { status: 'available', priority: 'low' },
+              sparkInterest: { status: 'available', priority: 'low' }
+            }
+          };
+          setDashboardData(fallbackData);
+          return;
+        }
+      }
+
+      // If both fail, show error
+      setError('Unable to load child data');
     } catch (error: any) {
-      console.error('Failed to fetch child:', error);
-      setError(error.message || 'Failed to load child data');
+      console.error('Failed to fetch dashboard data:', error);
+      
+      // Try fallback even if dashboard API fails
+      try {
+        const profileResponse = await apiClient.getUserProfile();
+        if (profileResponse.success && profileResponse.data?.children) {
+          const foundChild = profileResponse.data.children.find((c: any) => c.id === childId);
+          if (foundChild) {
+            const fallbackData: DashboardData = {
+              child: {
+                id: foundChild.id,
+                displayName: foundChild.displayName,
+                age: foundChild.age,
+                gender: foundChild.gender || 'unknown',
+                imageURL: foundChild.imageURL,
+                streak: {
+                  current: 0,
+                  longest: 0,
+                  lastActivityDate: undefined
+                }
+              },
+              activities: {
+                dailyTask: { status: 'available', priority: 'high' },
+                weeklyInterest: { status: 'available', priority: 'medium' },
+                weeklyPotential: { status: 'available', priority: 'medium' },
+                weeklyQuiz: { status: 'available', priority: 'medium' },
+                careerInsights: { status: 'available', priority: 'low' },
+                sparkInterest: { status: 'available', priority: 'low' }
+              }
+            };
+            setDashboardData(fallbackData);
+            return;
+          }
+        }
+      } catch (fallbackError) {
+        console.error('Fallback also failed:', fallbackError);
+      }
+      
+      setError('Unable to load child data');
     } finally {
       setLoading(false);
     }
@@ -154,7 +237,7 @@ const ChildDashboard: React.FC = () => {
 
   useEffect(() => {
     if (user && childId) {
-      fetchChild();
+      fetchDashboardData();
     }
   }, [user, childId]);
 
@@ -198,7 +281,7 @@ const ChildDashboard: React.FC = () => {
     );
   }
 
-  if (error || !child) {
+  if (error && !dashboardData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
         <DashboardHeader />
@@ -206,8 +289,8 @@ const ChildDashboard: React.FC = () => {
           <Card className="border-red-200 bg-red-50/50">
             <CardContent className="pt-8 pb-8">
               <div className="text-center">
-                <h2 className="text-xl font-semibold text-red-800 mb-2">Child Not Found</h2>
-                <p className="text-red-600 mb-6">{error || 'Unable to load child data'}</p>
+                <h2 className="text-xl font-semibold text-red-800 mb-2">Unable to Load Child Data</h2>
+                <p className="text-red-600 mb-6">{error}</p>
                 <Button onClick={() => navigate('/dashboard')}>
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Back to Dashboard
@@ -215,6 +298,20 @@ const ChildDashboard: React.FC = () => {
               </div>
             </CardContent>
           </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (!dashboardData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+        <DashboardHeader />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-gray-600 font-medium">Loading child dashboard...</p>
+          </div>
         </div>
       </div>
     );
@@ -238,20 +335,20 @@ const ChildDashboard: React.FC = () => {
           <CardContent className="p-8">
             <div className="flex items-center gap-6">
               <Avatar className="h-24 w-24 border-4 border-indigo-200 shadow-lg">
-                <AvatarImage src={child.imageURL} alt={child.displayName} />
+                <AvatarImage src={dashboardData.child.imageURL} alt={dashboardData.child.displayName} />
                 <AvatarFallback className="bg-indigo-100 text-indigo-700 text-2xl font-bold">
-                  {child.displayName.charAt(0).toUpperCase()}
+                  {dashboardData.child.displayName.charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <h1 className="text-3xl font-bold text-slate-900 mb-2">{child.displayName}</h1>
+                <h1 className="text-3xl font-bold text-slate-900 mb-2">{dashboardData.child.displayName}</h1>
                 <div className="flex items-center gap-4 text-slate-600 mb-4">
                   <span className="flex items-center gap-2">
                     <Star className="w-4 h-4" />
-                    {child.age} years old
+                    {dashboardData.child.age} years old
                   </span>
                   <Separator orientation="vertical" className="h-4" />
-                  <span className="capitalize">{child.gender}</span>
+                  <span className="capitalize">{dashboardData.child.gender}</span>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="text-sm">
@@ -260,15 +357,19 @@ const ChildDashboard: React.FC = () => {
                   </div>
                   <div className="text-sm">
                     <span className="text-slate-500">Current Streak</span>
-                    <div className="text-lg font-bold text-indigo-600">5 days</div>
+                    <div className="text-lg font-bold text-indigo-600">
+                      {dashboardData.child.streak.current > 0 ? `${dashboardData.child.streak.current} days` : 'No streak yet'}
+                    </div>
                   </div>
                 </div>
               </div>
               <div className="text-right">
                 <Badge variant="secondary" className="mb-2">
-                  Active Learner
+                  {dashboardData.child.streak.current > 0 ? 'Active Learner' : 'New Learner'}
                 </Badge>
-                <p className="text-sm text-slate-500">Last activity: Today</p>
+                <p className="text-sm text-slate-500">
+                  Last activity: {dashboardData.child.streak.lastActivityDate ? formatRelativeTime(dashboardData.child.streak.lastActivityDate) : 'No activity yet'}
+                </p>
               </div>
             </div>
           </CardContent>

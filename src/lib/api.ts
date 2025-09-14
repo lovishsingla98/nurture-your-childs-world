@@ -11,6 +11,7 @@ import {
 } from './types';
 
 const API_BASE_URL = 'https://us-central1-nurture-466617.cloudfunctions.net/api';
+// const API_BASE_URL = 'http://127.0.0.1:5001/nurture-466617/us-central1/api';
 
 interface ApiResponse<T = any> {
   success: boolean;
@@ -312,6 +313,11 @@ class ApiClient {
       method: 'POST',
       body: JSON.stringify(data)
     });
+  }
+
+  // Dashboard APIs
+  async getChildDashboardData(childId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/parent/child/${childId}/dashboard-data`);
   }
 
 
