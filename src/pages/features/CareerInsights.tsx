@@ -17,7 +17,8 @@ import {
   Heart,
   Lightbulb,
   Users,
-  RefreshCw
+  RefreshCw,
+  AlertTriangle
 } from 'lucide-react';
 
 interface CareerMatch {
@@ -59,6 +60,40 @@ const CareerInsights: React.FC = () => {
   const [insightsData, setInsightsData] = useState<CareerInsightsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [regenerating, setRegenerating] = useState(false);
+  const [activityData, setActivityData] = useState<any>(null);
+  const [showInsufficientDataBanner, setShowInsufficientDataBanner] = useState(false);
+
+  const fetchActivityData = async () => {
+    try {
+      await getValidToken();
+      const response = await apiClient.getChildDashboardData(childId!);
+      
+      if (response.success && response.data) {
+        setActivityData(response.data);
+        checkActivityRequirements(response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching activity data:', error);
+    }
+  };
+
+  const checkActivityRequirements = (data: any) => {
+    const activities = data.activities;
+    
+    // Check requirements:
+    // 1. 7 daily tasks (we'll assume if daily task streak is >= 7)
+    // 2. 1 weekly interest questionnaire
+    // 3. 1 weekly potential questionnaire  
+    // 4. 1 weekly quiz
+    
+    const dailyTasksCompleted = activities.dailyTask.streak >= 7;
+    const weeklyInterestCompleted = activities.weeklyInterest.lastCompleted !== undefined;
+    const weeklyPotentialCompleted = activities.weeklyPotential.lastCompleted !== undefined;
+    const weeklyQuizCompleted = activities.weeklyQuiz.lastCompleted !== undefined;
+    
+    const hasInsufficientData = !(dailyTasksCompleted && weeklyInterestCompleted && weeklyPotentialCompleted && weeklyQuizCompleted);
+    setShowInsufficientDataBanner(hasInsufficientData);
+  };
 
   const fetchCareerInsights = async () => {
     try {
@@ -156,6 +191,7 @@ const CareerInsights: React.FC = () => {
   useEffect(() => {
     if (childId) {
       fetchCareerInsights();
+      fetchActivityData();
     }
   }, [childId]);
 
@@ -233,6 +269,23 @@ const CareerInsights: React.FC = () => {
             Back to Admin Dashboard
           </Button>
         </div>
+
+        {/* Insufficient Data Banner */}
+        {showInsufficientDataBanner && activityData && (
+          <Card className="border-orange-200 bg-orange-50 mb-6">
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-orange-800 mb-1">More Data Needed for Sharper Insights</h3>
+                  <p className="text-orange-700 text-sm">
+                    We’ve generated early career insights for {activityData.child.displayName} based on the tasks completed so far. While these are helpful, completing more daily action items will make the results much more accurate and reliable.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {insightsData && (
           <>

@@ -191,10 +191,10 @@ const Dashboard: React.FC = () => {
       <DashboardHeader />
 
       {/* Main Content */}
-      <div className="flex flex-col items-center justify-center min-h-screen px-6 pt-20">
+      <div className="flex flex-col items-center justify-center min-h-screen px-6 pt-2">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-6xl font-light text-gray-900 mb-4">
-            Choose Your Child
+            Who’s Learning Today?
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Select a child to continue their learning journey
