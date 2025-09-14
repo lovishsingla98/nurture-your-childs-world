@@ -106,6 +106,7 @@ const Dashboard: React.FC = () => {
     setShowAddChild(false);
   };
 
+
   const handleChildSelect = (child: Child) => {
     if (child.isOnboarded) {
       window.location.href = `/child/${child.id}`;
@@ -203,38 +204,55 @@ const Dashboard: React.FC = () => {
         {/* Profile Cards */}
         <div className="flex flex-wrap justify-center gap-6 mb-8 max-w-4xl">
           {profile?.children && Array.isArray(profile.children) && profile.children.length > 0 ? (
-            profile.children.map((child, index) => (
+            <>
+              {/* Child Profile Cards */}
+              {profile.children.map((child, index) => (
+                <div
+                  key={child.id}
+                  onClick={() => handleChildSelect(child)}
+                  className="group cursor-pointer transition-transform hover:scale-105"
+                >
+                  <div className="w-32 h-32 md:w-40 md:h-40 rounded-lg overflow-hidden mb-3 border-2 border-transparent group-hover:border-blue-500 transition-colors shadow-lg">
+                    {child.imageURL ? (
+                      <img
+                        src={child.imageURL}
+                        alt={child.displayName}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className={`w-full h-full ${getChildAvatarColor(index)} flex items-center justify-center`}>
+                        <span className="text-white text-4xl md:text-5xl font-bold">
+                          {child.displayName.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-center">
+                    <p className="text-gray-900 text-lg font-medium">{child.displayName}</p>
+                    <p className="text-gray-600 text-sm">
+                      {child.age} years old
+                      {!child.isOnboarded && (
+                        <span className="block text-orange-500 text-xs mt-1">Setup Required</span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              ))}
+              
+              {/* Admin Card */}
               <div
-                key={child.id}
-                onClick={() => handleChildSelect(child)}
+                onClick={() => window.location.href = '/admin'}
                 className="group cursor-pointer transition-transform hover:scale-105"
               >
-                <div className="w-32 h-32 md:w-40 md:h-40 rounded-lg overflow-hidden mb-3 border-2 border-transparent group-hover:border-blue-500 transition-colors shadow-lg">
-                  {child.imageURL ? (
-                    <img
-                      src={child.imageURL}
-                      alt={child.displayName}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className={`w-full h-full ${getChildAvatarColor(index)} flex items-center justify-center`}>
-                      <span className="text-white text-4xl md:text-5xl font-bold">
-                        {child.displayName.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                  )}
+                <div className="w-32 h-32 md:w-40 md:h-40 rounded-lg overflow-hidden mb-3 border-2 border-transparent group-hover:border-purple-500 transition-colors shadow-lg bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center">
+                  <span className="text-white text-4xl md:text-5xl font-bold">A</span>
                 </div>
                 <div className="text-center">
-                  <p className="text-gray-900 text-lg font-medium">{child.displayName}</p>
-                  <p className="text-gray-600 text-sm">
-                    {child.age} years old
-                    {!child.isOnboarded && (
-                      <span className="block text-orange-500 text-xs mt-1">Setup Required</span>
-                    )}
-                  </p>
+                  <p className="text-gray-900 text-lg font-medium">Admin</p>
+                  <p className="text-gray-600 text-sm">View Insights & Manage</p>
                 </div>
               </div>
-            ))
+            </>
           ) : (
             <div className="text-center">
               <div className="w-32 h-32 md:w-40 md:h-40 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center mb-3">
@@ -265,6 +283,7 @@ const Dashboard: React.FC = () => {
             Manage Profiles
           </Button>
         )}
+
       </div>
 
       {/* Add Child Modal */}

@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import ChildDashboard from "./pages/ChildDashboard";
 import OnboardingPage from "./pages/OnboardingPage";
+import AdminPage from "./pages/AdminPage";
 import DailyTask from "./pages/features/DailyTask";
 import WeeklyInterest from "./pages/features/WeeklyInterest";
 import WeeklyPotential from "./pages/features/WeeklyPotential";
@@ -68,6 +69,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <OnboardingPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin" 
+              element={
+                <ProtectedRoute>
+                  <AdminPage />
                 </ProtectedRoute>
               } 
             />
