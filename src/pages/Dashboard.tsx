@@ -42,6 +42,20 @@ const Dashboard: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showAddChild, setShowAddChild] = useState(false);
 
+  const retryWithBackoff = async (fn: () => Promise<any>, maxRetries = 5) => {
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        return await fn();
+      } catch (error) {
+        if (attempt === maxRetries - 1) throw error;
+        
+        const delay = Math.min(500 * Math.pow(2, attempt), 2000);
+        console.log(`Retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  };
+
   const fetchProfile = async () => {
     try {
       setLoading(true);
@@ -50,7 +64,10 @@ const Dashboard: React.FC = () => {
       // Ensure we have a valid token before making the request
       await getValidToken();
 
-      const response = await apiClient.getUserProfile();
+      const response = await retryWithBackoff(async () => {
+        return await apiClient.getUserProfile();
+      });
+      
       console.log('Profile response:', response);
       console.log('Children data:', response.data?.children);
       if (response.success && response.data) {
