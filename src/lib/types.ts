@@ -138,7 +138,6 @@ export interface QuizQuestion {
     value: string;
     index: number;
   };
-  selectedAnswer?: string;
   topic?: string;
   explanation?: string;
   mappedDomain?: string;
@@ -150,6 +149,11 @@ export interface WeeklyQuizData {
   title: string;
   description: string;
   questions: QuizQuestion[];
+  responses?: Array<{
+    questionId: string;
+    selectedAnswer: string;
+    selectedIndex: number;
+  }>;
   timeLimit?: number; // in minutes
   status: 'pending' | 'in_progress' | 'completed';
   score?: number;

@@ -46,6 +46,7 @@ const WeeklyQuiz: React.FC = () => {
         const apiData = response.data;
         
         console.log('📋 Weekly Quiz API Response:', apiData);
+        console.log('📋 Responses from backend:', apiData.responses);
         
         const transformedData: WeeklyQuizData = {
           quizId: apiData.quizId || `quiz_${Date.now()}`,
@@ -65,17 +66,18 @@ const WeeklyQuiz: React.FC = () => {
                 value: q.answer.value,
                 index: q.answer.index
               },
-              selectedAnswer: q.selectedAnswer,
               topic: q.topic || 'General Knowledge',
               explanation: q.explanation || 'Great job on this question!'
             };
           }) || [],
+          responses: apiData.responses || undefined, // Include responses from backend
           status: apiData.status || 'pending',
           score: apiData.score,
           completedAt: apiData.completedAt
         };
         
         console.log('✅ Transformed Quiz Data:', transformedData);
+        console.log('✅ Transformed Responses:', transformedData.responses);
         setQuizData(transformedData);
       } else {
         toast.error(response.error || 'Failed to load this week\'s quiz');
@@ -115,13 +117,23 @@ const WeeklyQuiz: React.FC = () => {
   const handleAnswerSelect = (questionId: string, answer: string) => {
     if (!quizData) return;
     
-    const updatedQuestions = quizData.questions.map(q => 
-      q.id === questionId ? { ...q, selectedAnswer: answer } : q
-    );
+    const question = quizData.questions.find(q => q.id === questionId);
+    if (!question) return;
+    
+    const selectedIndex = question.options.findIndex(option => option === answer);
+    
+    // Update or add response
+    const existingResponses = quizData.responses || [];
+    const updatedResponses = existingResponses.filter(r => r.questionId !== questionId);
+    updatedResponses.push({
+      questionId,
+      selectedAnswer: answer,
+      selectedIndex
+    });
     
     setQuizData({
       ...quizData,
-      questions: updatedQuestions
+      responses: updatedResponses
     });
   };
 
@@ -140,7 +152,12 @@ const WeeklyQuiz: React.FC = () => {
   const handleSubmitQuiz = async () => {
     if (!quizData) return;
 
-    const unansweredQuestions = quizData.questions.filter(q => !q.selectedAnswer);
+    // Check if all questions are answered
+    const responses = quizData.responses || [];
+    const unansweredQuestions = quizData.questions.filter(q => 
+      !responses.find(r => r.questionId === q.id)
+    );
+    
     if (unansweredQuestions.length > 0) {
       toast.error('Please answer all questions before submitting!');
       return;
@@ -150,19 +167,6 @@ const WeeklyQuiz: React.FC = () => {
       setSubmitting(true);
       await getValidToken();
       
-      // Calculate score
-      const correctAnswers = quizData.questions.filter(q => 
-        q.selectedAnswer === q.answer.value
-      ).length;
-      const score = Math.round((correctAnswers / quizData.questions.length) * 100);
-      
-      // Prepare responses for API with questionId, selectedAnswer, and selectedIndex
-      const responses = quizData.questions.map((q, index) => ({
-        questionId: q.id,
-        selectedAnswer: q.selectedAnswer || '',
-        selectedIndex: index
-      }));
-      
       console.log('📤 Submitting quiz responses:', responses);
       
       // Submit to API using the quiz ID (week timestamp)
@@ -171,17 +175,30 @@ const WeeklyQuiz: React.FC = () => {
       console.log('📥 Quiz submission result:', result);
       
       if (result.success) {
+        // Calculate score from responses
+        let correctAnswers = 0;
+        responses.forEach(response => {
+          const question = quizData.questions.find(q => q.id === response.questionId);
+          if (question) {
+            const correctAnswerIndex = question.options.findIndex(option => option === question.answer.value);
+            if (response.selectedIndex === correctAnswerIndex) {
+              correctAnswers++;
+            }
+          }
+        });
+        const calculatedScore = Math.round((correctAnswers / responses.length) * 100);
+        
         setQuizData(prev => prev ? {
           ...prev,
           status: 'completed',
-          score,
+          score: calculatedScore,
           completedAt: new Date().toISOString()
         } : null);
         
         setShowResults(true);
         setTimeRemaining(null);
         
-        toast.success(`Quiz completed! You scored ${score}%`);
+        toast.success(`Quiz completed! You scored ${calculatedScore}%`);
       } else {
         toast.error(result.error || 'Failed to submit quiz');
       }
@@ -207,7 +224,9 @@ const WeeklyQuiz: React.FC = () => {
 
   const currentQuestion = quizData?.questions?.[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === (quizData?.questions?.length || 0) - 1;
-  const allQuestionsAnswered = quizData?.questions?.every(q => q.selectedAnswer) || false;
+  const allQuestionsAnswered = quizData?.questions?.every(q => 
+    quizData?.responses?.find(r => r.questionId === q.id)
+  ) || false;
 
   if (loading) {
     return (
@@ -362,7 +381,7 @@ const WeeklyQuiz: React.FC = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <RadioGroup 
-                    value={currentQuestion.selectedAnswer || ''} 
+                    value={quizData.responses?.find(r => r.questionId === currentQuestion.id)?.selectedAnswer || ''} 
                     onValueChange={(value) => handleAnswerSelect(currentQuestion.id, value)}
                   >
                     {currentQuestion.options.map((option, index) => (
@@ -401,7 +420,7 @@ const WeeklyQuiz: React.FC = () => {
                           key={index}
                           className={`w-3 h-3 rounded-full transition-colors cursor-pointer ${
                             index === currentQuestionIndex ? 'bg-indigo-600' :
-                            quizData.questions[index].selectedAnswer ? 'bg-green-500' :
+                            quizData.responses?.find(r => r.questionId === quizData.questions[index].id) ? 'bg-green-500' :
                             'bg-slate-300'
                           }`}
                           onClick={() => setCurrentQuestionIndex(index)}
@@ -442,23 +461,39 @@ const WeeklyQuiz: React.FC = () => {
             )}
 
             {/* Results */}
-            {(quizData.status === 'completed' || showResults) && (
-              <Card className="border-0 shadow-xl bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
-                <CardContent className="pt-6">
-                  <div className="text-center mb-6">
-                    <Trophy className="w-16 h-16 text-green-600 mx-auto mb-4" />
-                    <h3 className="text-2xl font-semibold text-green-900 mb-2">Quiz Complete! 🎉</h3>
-                    <div className="text-4xl font-bold text-green-600 mb-2">{quizData.score}%</div>
-                    <p className="text-green-700">
-                      You got {quizData.questions.filter(q => q.selectedAnswer === q.answer.value).length} out of {quizData.questions.length} questions correct!
-                    </p>
-                  </div>
+            {(quizData.status === 'completed' || showResults) && (() => {
+              // Calculate correct answers and percentage
+              const correctAnswers = quizData.responses?.filter(r => {
+                const question = quizData.questions.find(q => q.id === r.questionId);
+                if (!question) return false;
+                const correctAnswerIndex = question.options.findIndex(option => option === question.answer.value);
+                return r.selectedIndex === correctAnswerIndex;
+              }).length || 0;
+              
+              const totalQuestions = quizData.questions.length;
+              const percentage = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
+              
+              return (
+                <Card className="border-0 shadow-xl bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+                  <CardContent className="pt-6">
+                    <div className="text-center mb-6">
+                      <Trophy className="w-16 h-16 text-green-600 mx-auto mb-4" />
+                      <h3 className="text-2xl font-semibold text-green-900 mb-2">Quiz Complete! 🎉</h3>
+                      <div className="text-4xl font-bold text-green-600 mb-2">{percentage}%</div>
+                      <p className="text-green-700">
+                        You got {correctAnswers} out of {totalQuestions} questions correct!
+                      </p>
+                    </div>
 
                   {/* Question Review */}
                   <div className="space-y-4">
                     <h4 className="font-semibold text-slate-900 mb-3">Review Your Answers</h4>
                     {quizData.questions.map((question, index) => {
-                      const isCorrect = question.selectedAnswer === question.answer.value;
+                      const response = quizData.responses?.find(r => r.questionId === question.id);
+                      const isCorrect = response ? (() => {
+                        const correctAnswerIndex = question.options.findIndex(option => option === question.answer.value);
+                        return response.selectedIndex === correctAnswerIndex;
+                      })() : false;
                       return (
                         <div key={question.id} className="bg-white/70 p-4 rounded-lg">
                           <div className="flex items-start gap-3">
@@ -473,7 +508,7 @@ const WeeklyQuiz: React.FC = () => {
                                 <div>
                                   <span className="text-slate-600">Your answer: </span>
                                   <span className={isCorrect ? 'text-green-700 font-medium' : 'text-red-700'}>
-                                    {question.selectedAnswer || 'No answer'}
+                                    {response?.selectedAnswer || 'No answer'}
                                   </span>
                                 </div>
                                 {!isCorrect && (
@@ -496,7 +531,8 @@ const WeeklyQuiz: React.FC = () => {
                   </div>
                 </CardContent>
               </Card>
-            )}
+              );
+            })()}
           </div>
         </div>
       );
