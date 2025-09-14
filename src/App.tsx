@@ -22,7 +22,7 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// Route wrapper that redirects authenticated users to dashboard only if they access root
+// Route wrapper that redirects authenticated users to dashboard
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
   
@@ -34,8 +34,7 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
   
-  // Only redirect to dashboard if user comes to root URL
-  if (user && window.location.pathname === '/') {
+  if (user) {
     window.location.href = '/dashboard';
     return null;
   }
@@ -52,7 +51,6 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<PublicRoute><Index /></PublicRoute>} />
-            <Route path="/home" element={<Index />} />
             <Route 
               path="/dashboard" 
               element={

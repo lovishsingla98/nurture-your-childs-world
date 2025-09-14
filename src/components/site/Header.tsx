@@ -10,7 +10,7 @@ const Header = () => {
   return (
     <header className="w-full py-3 sm:py-4 md:py-6 bg-transparent">
       <div className="container px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4">
-        <Link to="/home" className="flex items-center gap-2 sm:gap-3" aria-label="Nurture home">
+        <Link to="#" className="flex items-center gap-2 sm:gap-3" aria-label="Nurture home">
           <img src="/Nurture_Logo.png" alt="Nurture logo" className="h-8 w-8 sm:h-9 sm:w-9" loading="lazy" />
           <div className="flex flex-col leading-tight">
             <span className="text-base sm:text-lg font-semibold">Nurture</span>

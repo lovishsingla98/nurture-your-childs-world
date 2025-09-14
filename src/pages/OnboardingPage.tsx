@@ -310,12 +310,7 @@ const OnboardingPage: React.FC = () => {
                   </ul>
                 </div>
                 <Button 
-                  onClick={() => {
-                    // Small delay to ensure any pending state updates are complete
-                    setTimeout(() => {
-                      navigate(`/child/${childId}`);
-                    }, 100);
-                  }}
+                  onClick={() => navigate(`/child/${childId}`)}
                   className="bg-purple-600 hover:bg-purple-700 text-white"
                   size="lg"
                 >
