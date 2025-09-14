@@ -18,9 +18,10 @@ const Index = () => {
 
   const handleJoinNow = async () => {
     // Track CTA click
-    if (typeof window !== "undefined" && window.gtag) {
-      window.gtag("event", "cta_click", { event_category: "engagement", event_label: "join_now_hero" });
-    }    try {
+    if (typeof window !== "undefined" && (window as any).gtag) {
+      (window as any).gtag("event", "cta_click", { event_category: "engagement", event_label: "join_now_hero" });
+    }
+    try {
       await signInWithGoogle();
       toast.success("Successfully signed in with Google!");
     } catch (error: any) {

@@ -315,6 +315,27 @@ class ApiClient {
   }
 
 
+  // TODO: Add child management APIs when backend is ready
+  async updateChild(childId: string, data: { displayName: string; dateOfBirth: string; gender: string }): Promise<ApiResponse<any>> {
+    // TODO: Implement when backend endpoint is ready
+    throw new Error('updateChild API not yet implemented - backend endpoint pending');
+  }
+
+  async getDashboardStats(childId: string): Promise<ApiResponse<any>> {
+    // TODO: Implement when backend endpoint is ready
+    throw new Error('getDashboardStats API not yet implemented - backend endpoint pending');
+  }
+
+  async getDailyTaskStreak(childId: string): Promise<ApiResponse<any>> {
+    // TODO: Implement when backend endpoint is ready
+    throw new Error('getDailyTaskStreak API not yet implemented - backend endpoint pending');
+  }
+
+  async getWeeklyProgress(childId: string): Promise<ApiResponse<any>> {
+    // TODO: Implement when backend endpoint is ready
+    throw new Error('getWeeklyProgress API not yet implemented - backend endpoint pending');
+  }
+
 }
 
 export const apiClient = new ApiClient();

@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import DashboardHeader from '@/components/site/DashboardHeader';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiClient } from '@/lib/api';
+import EditChildForm from '@/components/forms/EditChildForm';
 import {
   Calendar,
   HelpCircle,
@@ -21,7 +22,8 @@ import {
   Clock,
   CheckCircle,
   AlertCircle,
-  Star
+  Star,
+  Settings
 } from 'lucide-react';
 
 interface Child {
@@ -53,6 +55,7 @@ const ChildDashboard: React.FC = () => {
   const [child, setChild] = useState<Child | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [dashboardData, setDashboardData] = useState<any>(null);
 
   const features: FeatureStatus[] = [
     {
@@ -60,27 +63,27 @@ const ChildDashboard: React.FC = () => {
       name: 'Daily Task',
       description: 'Complete today\'s personalized learning activity',
       icon: <Calendar className="w-5 h-5" />,
-      status: 'pending',
+      status: 'pending', // TODO: Get from backend API
       priority: 'high',
-      streak: 5
+      streak: dashboardData?.dailyTaskStreak || null // TODO: Get from backend API
     },
     {
       id: 'weekly-interest',
       name: 'Weekly Interest',
       description: 'Discover what sparks curiosity this week',
       icon: <HelpCircle className="w-5 h-5" />,
-      status: 'available',
+      status: 'available', // TODO: Get from backend API
       priority: 'medium',
-      lastCompleted: '2 days ago'
+      lastCompleted: dashboardData?.weeklyInterestLastCompleted || null // TODO: Get from backend API
     },
     {
       id: 'weekly-potential',
       name: 'Weekly Potential',
       description: 'Assess natural strengths and abilities',
       icon: <TrendingUp className="w-5 h-5" />,
-      status: 'available',
+      status: 'available', // TODO: Get from backend API
       priority: 'medium',
-      lastCompleted: '2 days ago'
+      lastCompleted: dashboardData?.weeklyPotentialLastCompleted || null // TODO: Get from backend API
     },
     {
       id: 'career-insights',
@@ -103,9 +106,9 @@ const ChildDashboard: React.FC = () => {
       name: 'Weekly Quiz',
       description: 'Review and reinforce learning',
       icon: <Brain className="w-5 h-5" />,
-      status: 'completed',
+      status: dashboardData?.weeklyQuizStatus || 'available', // TODO: Get from backend API
       priority: 'medium',
-      lastCompleted: 'Yesterday'
+      lastCompleted: dashboardData?.weeklyQuizLastCompleted || null // TODO: Get from backend API
     },
     {
       id: 'moral-story',
@@ -138,6 +141,8 @@ const ChildDashboard: React.FC = () => {
         const foundChild = response.data.children.find((c: Child) => c.id === childId);
         if (foundChild) {
           setChild(foundChild);
+          // TODO: Fetch dashboard-specific data from backend
+          await fetchDashboardData(foundChild.id);
         } else {
           setError('Child not found');
         }
@@ -149,6 +154,32 @@ const ChildDashboard: React.FC = () => {
       setError(error.message || 'Failed to load child data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchDashboardData = async (childId: string) => {
+    try {
+      // TODO: Replace with actual API calls when backend endpoints are ready
+      console.log('TODO: Fetch dashboard data for child:', childId);
+      
+      // Mock data structure - replace with actual API calls
+      const mockData = {
+        dailyTaskStreak: null, // TODO: await apiClient.getDailyTaskStreak(childId)
+        weeklyInterestLastCompleted: null, // TODO: await apiClient.getWeeklyInterestStatus(childId)
+        weeklyPotentialLastCompleted: null, // TODO: await apiClient.getWeeklyPotentialStatus(childId)
+        weeklyQuizStatus: 'available', // TODO: await apiClient.getWeeklyQuizStatus(childId)
+        weeklyQuizLastCompleted: null, // TODO: await apiClient.getWeeklyQuizStatus(childId)
+        weeklyProgress: null, // TODO: await apiClient.getWeeklyProgress(childId)
+        currentStreak: null, // TODO: await apiClient.getCurrentStreak(childId)
+        tasksCompleted: null, // TODO: await apiClient.getTasksCompleted(childId)
+        newInterests: null, // TODO: await apiClient.getNewInterests(childId)
+        pendingItems: null, // TODO: await apiClient.getPendingItems(childId)
+      };
+      
+      setDashboardData(mockData);
+    } catch (error) {
+      console.error('Failed to fetch dashboard data:', error);
+      // Don't set error state for dashboard data - just log it
     }
   };
 
@@ -256,19 +287,41 @@ const ChildDashboard: React.FC = () => {
                 <div className="flex items-center gap-4">
                   <div className="text-sm">
                     <span className="text-slate-500">Weekly Progress</span>
-                    <Progress value={75} className="w-32 mt-1" />
+                    {dashboardData?.weeklyProgress ? (
+                      <Progress value={dashboardData.weeklyProgress} className="w-32 mt-1" />
+                    ) : (
+                      <div className="w-32 mt-1 text-xs text-gray-500 bg-gray-100 rounded p-1">
+                        Backend API pending
+                      </div>
+                    )}
                   </div>
                   <div className="text-sm">
                     <span className="text-slate-500">Current Streak</span>
-                    <div className="text-lg font-bold text-indigo-600">5 days</div>
+                    {dashboardData?.currentStreak ? (
+                      <div className="text-lg font-bold text-indigo-600">{dashboardData.currentStreak} days</div>
+                    ) : (
+                      <div className="text-xs text-gray-500 bg-gray-100 rounded p-1">
+                        Backend API pending
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
-              <div className="text-right">
+              <div className="text-right space-y-2">
                 <Badge variant="secondary" className="mb-2">
                   Active Learner
                 </Badge>
                 <p className="text-sm text-slate-500">Last activity: Today</p>
+                <EditChildForm 
+                  child={child} 
+                  onChildUpdated={fetchChild}
+                  trigger={
+                    <Button variant="outline" size="sm">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Edit Details
+                    </Button>
+                  }
+                />
               </div>
             </div>
           </CardContent>
@@ -356,14 +409,22 @@ const ChildDashboard: React.FC = () => {
                     <CardDescription className="text-slate-600 mb-4">
                       {feature.description}
                     </CardDescription>
-                    {feature.lastCompleted && (
+                    {feature.lastCompleted ? (
                       <p className="text-xs text-slate-500">
                         Last completed: {feature.lastCompleted}
                       </p>
+                    ) : (feature.id === 'weekly-interest' || feature.id === 'weekly-potential' || feature.id === 'weekly-quiz') && (
+                      <p className="text-xs text-gray-500 bg-gray-100 rounded p-1 mt-2">
+                        Backend API pending for completion status
+                      </p>
                     )}
-                    {feature.streak && feature.status === 'pending' && (
+                    {feature.streak ? (
                       <p className="text-xs text-orange-600 font-medium">
                         🔥 Current streak: {feature.streak} days
+                      </p>
+                    ) : feature.id === 'daily-task' && (
+                      <p className="text-xs text-gray-500 bg-gray-100 rounded p-1 mt-2">
+                        Backend API pending for streak data
                       </p>
                     )}
                   </CardContent>
@@ -381,19 +442,35 @@ const ChildDashboard: React.FC = () => {
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-600 mb-1">6</div>
+                {dashboardData?.tasksCompleted ? (
+                  <div className="text-2xl font-bold text-green-600 mb-1">{dashboardData.tasksCompleted}</div>
+                ) : (
+                  <div className="text-sm text-gray-500 bg-gray-100 rounded p-2 mb-1">API pending</div>
+                )}
                 <div className="text-sm text-slate-500">Tasks Completed</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-indigo-600 mb-1">5</div>
+                {dashboardData?.currentStreak ? (
+                  <div className="text-2xl font-bold text-indigo-600 mb-1">{dashboardData.currentStreak}</div>
+                ) : (
+                  <div className="text-sm text-gray-500 bg-gray-100 rounded p-2 mb-1">API pending</div>
+                )}
                 <div className="text-sm text-slate-500">Day Streak</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600 mb-1">3</div>
+                {dashboardData?.newInterests ? (
+                  <div className="text-2xl font-bold text-purple-600 mb-1">{dashboardData.newInterests}</div>
+                ) : (
+                  <div className="text-sm text-gray-500 bg-gray-100 rounded p-2 mb-1">API pending</div>
+                )}
                 <div className="text-sm text-slate-500">New Interests</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-orange-600 mb-1">2</div>
+                {dashboardData?.pendingItems ? (
+                  <div className="text-2xl font-bold text-orange-600 mb-1">{dashboardData.pendingItems}</div>
+                ) : (
+                  <div className="text-sm text-gray-500 bg-gray-100 rounded p-2 mb-1">API pending</div>
+                )}
                 <div className="text-sm text-slate-500">Pending Items</div>
               </div>
             </div>
