@@ -191,9 +191,9 @@ const CareerInsights: React.FC = () => {
         <div className="container mx-auto px-4 py-8 max-w-6xl">
           {/* Back Navigation */}
           <div className="mb-6">
-            <Button variant="ghost" onClick={() => navigate(`/child/${childId}`)} className="text-slate-600 hover:text-slate-900">
+            <Button variant="ghost" onClick={() => navigate('/admin')} className="text-slate-600 hover:text-slate-900">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Child Dashboard
+              Back to Admin Dashboard
             </Button>
           </div>
 
@@ -228,9 +228,9 @@ const CareerInsights: React.FC = () => {
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Back Navigation */}
         <div className="mb-6">
-          <Button variant="ghost" onClick={() => navigate(`/child/${childId}`)} className="text-slate-600 hover:text-slate-900">
+          <Button variant="ghost" onClick={() => navigate('/admin')} className="text-slate-600 hover:text-slate-900">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Child Dashboard
+            Back to Admin Dashboard
           </Button>
         </div>
 
