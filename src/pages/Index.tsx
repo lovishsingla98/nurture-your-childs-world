@@ -17,7 +17,10 @@ const Index = () => {
   const { signInWithGoogle, loading } = useAuth();
 
   const handleJoinNow = async () => {
-    try {
+    // Track CTA click
+    if (typeof window !== "undefined" && window.gtag) {
+      window.gtag("event", "cta_click", { event_category: "engagement", event_label: "join_now_hero" });
+    }    try {
       await signInWithGoogle();
       toast.success("Successfully signed in with Google!");
     } catch (error: any) {
@@ -65,7 +68,7 @@ const Index = () => {
             <div className="grid gap-8 lg:grid-cols-2 items-center py-8 sm:py-12 md:py-16 lg:py-20">
               <div className="space-y-4 sm:space-y-6 depth-layer-2 text-center lg:text-left">
                 <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-                  Nurture your child's curiosity with an AI co‑pilot
+                  AI Co-pilot for Modern Parenting — Personalized daily activities for ages 3–12
                 </h1>
                 <p className="text-base sm:text-lg text-muted-foreground max-w-prose mx-auto lg:mx-0">
                   Daily activities, gentle guidance, and meaningful insights — personalized by LLMs and designed with child psychology at the core.
