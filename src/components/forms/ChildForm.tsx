@@ -77,8 +77,8 @@ const ChildForm: React.FC<ChildFormProps> = ({ onChildAdded, trigger }) => {
         setOpen(false);
         onChildAdded(); // Trigger parent component to refresh
         
-        // Navigate to child dashboard for onboarding
-        window.location.href = `/child/${response.data.child.id}/onboarding`;
+        // Navigate to onboarding page for the new child
+        window.location.href = `/onboarding/${response.data.child.id}`;
       } else {
         throw new Error(response.message || 'Failed to add child');
       }
