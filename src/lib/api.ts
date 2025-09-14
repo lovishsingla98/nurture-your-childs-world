@@ -154,6 +154,20 @@ class ApiClient {
     });
   }
 
+  async editChild(data: { childId: string; displayName?: string; dateOfBirth?: string; gender?: string }): Promise<ApiResponse<any>> {
+    return this.makeRequest('/parent/edit-child', {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
+  }
+
+  async archiveChild(childId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest('/parent/archive-child', {
+      method: 'POST',
+      body: JSON.stringify({ childId })
+    });
+  }
+
   async getChildren(): Promise<ApiResponse<any[]>> {
     return this.makeRequest('/children');
   }
