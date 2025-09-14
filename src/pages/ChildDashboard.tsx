@@ -57,6 +57,35 @@ const ChildDashboard: React.FC = () => {
     return `${Math.floor(diffInHours / 24)} days ago`;
   };
 
+  // Helper function to calculate weekly progress based on daily tasks
+  const calculateWeeklyProgress = (): number => {
+    if (!dashboardData) return 0;
+    
+    const now = new Date();
+    const currentDay = now.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    
+    // Calculate the start of the current week (Sunday)
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - currentDay);
+    startOfWeek.setHours(0, 0, 0, 0);
+    
+    // Calculate the end of the current week (Saturday)
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+    
+    // For now, we'll use the daily task streak as a proxy for weekly progress
+    // In a real implementation, you'd need to fetch daily task completion data for the week
+    const currentStreak = dashboardData.child.streak.current;
+    const daysInWeek = 7;
+    
+    // Calculate progress based on streak, but cap it at the number of days passed in the current week
+    const daysPassedInWeek = Math.min(currentDay + 1, daysInWeek); // +1 because getDay() is 0-indexed
+    const weeklyProgress = Math.min(currentStreak, daysPassedInWeek);
+    
+    return Math.round((weeklyProgress / daysInWeek) * 100);
+  };
+
   // Create features array from dashboard data
   const getFeatures = (): FeatureStatus[] => {
     if (!dashboardData) return [];
@@ -303,10 +332,28 @@ const ChildDashboard: React.FC = () => {
 
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Back Navigation */}
-        <div className="mb-6">
+        <div className="mb-6 flex items-center justify-between">
           <Button variant="ghost" onClick={() => navigate('/dashboard')} className="text-slate-600 hover:text-slate-900">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Dashboard
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={fetchDashboardData} 
+            disabled={loading}
+            className="text-slate-600 hover:text-slate-900"
+          >
+            {loading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin mr-2" />
+                Refreshing...
+              </>
+            ) : (
+              <>
+                <div className="w-4 h-4 mr-2">↻</div>
+                Refresh
+              </>
+            )}
           </Button>
         </div>
 
@@ -333,7 +380,7 @@ const ChildDashboard: React.FC = () => {
                 <div className="flex items-center gap-4">
                   <div className="text-sm">
                     <span className="text-slate-500">Weekly Progress</span>
-                    <Progress value={75} className="w-32 mt-1" />
+                    <Progress value={calculateWeeklyProgress()} className="w-32 mt-1" />
                   </div>
                   <div className="text-sm">
                     <span className="text-slate-500">Current Streak</span>

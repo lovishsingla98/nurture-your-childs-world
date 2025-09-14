@@ -6,7 +6,7 @@ import { Progress } from '@/components/ui/progress';
 interface OnboardingLoadingScreenProps {
   isLoading: boolean;
   currentQuestionNumber: number;
-  totalQuestions: number;
+  totalQuestions?: number; // Made optional since we'll hardcode to 10
 }
 
 const funFacts = [
@@ -25,7 +25,7 @@ const funFacts = [
 const OnboardingLoadingScreen: React.FC<OnboardingLoadingScreenProps> = ({
   isLoading,
   currentQuestionNumber,
-  totalQuestions
+  totalQuestions = 10 // Hardcoded to 10 questions
 }) => {
   const [currentFactIndex, setCurrentFactIndex] = useState(0);
   const [brainFillProgress, setBrainFillProgress] = useState(0);

@@ -88,7 +88,8 @@ const OnboardingPage: React.FC = () => {
 
   const getProgressPercentage = (): number => {
     if (!questionnaire) return 0;
-    return Math.round((questionnaire.responses.length / questionnaire.questions.length) * 100);
+    const totalQuestions = 10; // Hardcoded total questions
+    return Math.round((questionnaire.responses.length / totalQuestions) * 100);
   };
 
   const handleAnswerSubmit = async () => {
@@ -230,6 +231,9 @@ const OnboardingPage: React.FC = () => {
   const isLastQuestion = currentQuestionIndex === questionnaire.questions.length - 1;
   const isFirstQuestion = currentQuestionIndex === 0;
   const isCompleted = currentQuestionIndex === -1;
+  
+  // Check if this is truly the last question (reached 10 questions or questionnaire completed)
+  const isTrulyLastQuestion = questionnaire.responses.length >= 9 || questionnaire.status === 'completed';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
@@ -237,7 +241,6 @@ const OnboardingPage: React.FC = () => {
       <OnboardingLoadingScreen 
         isLoading={submitting}
         currentQuestionNumber={currentQuestionIndex + 1}
-        totalQuestions={questionnaire.questions.length}
       />
       
       {/* Header */}
@@ -276,7 +279,7 @@ const OnboardingPage: React.FC = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-gray-700">
-              Progress: {questionnaire.responses.length} of {questionnaire.questions.length} questions
+              Progress: {questionnaire.responses.length} of 10 questions
             </span>
             <span className="text-sm text-gray-500">{getProgressPercentage()}%</span>
           </div>
@@ -334,7 +337,7 @@ const OnboardingPage: React.FC = () => {
                     </div>
                     <div>
                       <CardTitle className="text-lg">
-                        Question {currentQuestionIndex + 1} of {questionnaire.questions.length}
+                        Question {currentQuestionIndex + 1} of 10
                       </CardTitle>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge variant="outline" className="text-xs">
@@ -440,7 +443,7 @@ const OnboardingPage: React.FC = () => {
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         Submitting...
                       </>
-                    ) : isLastQuestion ? (
+                    ) : isTrulyLastQuestion ? (
                       <>
                         <CheckCircle className="w-4 h-4 mr-2" />
                         Complete Onboarding
