@@ -31,7 +31,10 @@ interface CareerMatch {
 }
 
 interface CareerInsightsData {
-  id: string;
+  insightId: string;
+  date: string;
+  childId: string;
+  parentId: string;
   generatedAt: string;
   childAge: number;
   topMatches: CareerMatch[];
@@ -45,6 +48,8 @@ interface CareerInsightsData {
   status: 'loading' | 'available' | 'error';
   refreshAvailable?: boolean;
   nextRefreshAvailableOn?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 const CareerInsights: React.FC = () => {
@@ -64,23 +69,39 @@ const CareerInsights: React.FC = () => {
       
       if (response.success) {
         if (response.data) {
-          // Ensure all required fields exist with proper fallbacks
-          const data = {
-            ...response.data,
-            topMatches: response.data.topMatches || [],
+          // Backend returns top-level metadata and nested `data` payload
+          const raw = response.data as any;
+          const payload = raw?.data || {};
+
+          const data: CareerInsightsData = {
+            insightId: raw?.insightId || '',
+            date: raw?.date || new Date().toISOString(),
+            childId: raw?.childId || '',
+            parentId: raw?.parentId || '',
+            generatedAt: raw?.generatedAt || new Date().toISOString(),
+            childAge: payload?.childAge ?? 0,
+            topMatches: payload?.topMatches || [],
             overallProfile: {
-              dominantInterests: response.data.overallProfile?.dominantInterests || [],
-              strongestSkills: response.data.overallProfile?.strongestSkills || [],
-              learningStyle: response.data.overallProfile?.learningStyle || '',
-              personalityTraits: response.data.overallProfile?.personalityTraits || []
+              dominantInterests: payload?.overallProfile?.dominantInterests || [],
+              strongestSkills: payload?.overallProfile?.strongestSkills || [],
+              learningStyle: payload?.overallProfile?.learningStyle || '',
+              personalityTraits: payload?.overallProfile?.personalityTraits || []
             },
-            recommendations: response.data.recommendations || []
+            recommendations: payload?.recommendations || [],
+            status: payload?.status || 'loading',
+            refreshAvailable: payload?.refreshAvailable ?? true,
+            nextRefreshAvailableOn: payload?.nextRefreshAvailableOn ?? Date.now(),
+            createdAt: raw?.createdAt,
+            updatedAt: raw?.updatedAt
           };
           setInsightsData(data);
         } else {
           // No career insights document exists yet - set empty state
           setInsightsData({
-            id: 'latest',
+            insightId: `insight_${Date.now()}`,
+            date: new Date().toISOString(),
+            childId: childId || '',
+            parentId: '',
             generatedAt: new Date().toISOString(),
             childAge: 0,
             topMatches: [],
@@ -93,7 +114,9 @@ const CareerInsights: React.FC = () => {
             recommendations: [],
             status: 'loading',
             refreshAvailable: true,
-            nextRefreshAvailableOn: Date.now()
+            nextRefreshAvailableOn: Date.now(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
           });
         }
       } else {
