@@ -42,11 +42,12 @@ type ChildFormData = z.infer<typeof childSchema>;
 interface ChildFormProps {
   onChildAdded: () => void;
   trigger?: React.ReactNode;
+  isModal?: boolean; // New prop to indicate if it's used in a modal
 }
 
 // Removed QuestionAnswer interface - no longer using hardcoded questionnaire
 
-const ChildForm: React.FC<ChildFormProps> = ({ onChildAdded, trigger }) => {
+const ChildForm: React.FC<ChildFormProps> = ({ onChildAdded, trigger, isModal = false }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   // Removed unused state variables - no longer using hardcoded questionnaire
@@ -108,22 +109,9 @@ const ChildForm: React.FC<ChildFormProps> = ({ onChildAdded, trigger }) => {
     return Math.max(0, Math.min(18, age));
   };
 
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger || (
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Child
-          </Button>
-        )}
-      </DialogTrigger>
-      <DialogContent className="w-[95vw] max-w-[425px] mx-auto">
-        <DialogHeader>
-          <DialogTitle className="text-lg sm:text-xl">Add New Child</DialogTitle>
-        </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 sm:space-y-4">
+  const formContent = (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3 sm:space-y-4">
             <FormField
               control={form.control}
               name="displayName"
@@ -184,29 +172,52 @@ const ChildForm: React.FC<ChildFormProps> = ({ onChildAdded, trigger }) => {
               )}
             />
 
-            <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 pt-3 sm:pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setOpen(false)}
-                disabled={loading}
-                className="w-full sm:w-auto order-2 sm:order-1"
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={loading} className="w-full sm:w-auto order-1 sm:order-2">
-                {loading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  'Add Child'
-                )}
-              </Button>
-            </div>
-          </form>
-        </Form>
+        <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 pt-3 sm:pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setOpen(false)}
+            disabled={loading}
+            className="w-full sm:w-auto order-2 sm:order-1"
+          >
+            Cancel
+          </Button>
+          <Button type="submit" disabled={loading} className="w-full sm:w-auto order-1 sm:order-2">
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              'Add Child'
+            )}
+          </Button>
+        </div>
+      </form>
+    </Form>
+  );
+
+  // If used in modal, just return the form content
+  if (isModal) {
+    return formContent;
+  }
+
+  // Otherwise, wrap in Dialog
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        {trigger || (
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Child
+          </Button>
+        )}
+      </DialogTrigger>
+      <DialogContent className="w-[95vw] max-w-[425px] mx-auto">
+        <DialogHeader>
+          <DialogTitle className="text-lg sm:text-xl">Add New Child</DialogTitle>
+        </DialogHeader>
+        {formContent}
       </DialogContent>
     </Dialog>
   );

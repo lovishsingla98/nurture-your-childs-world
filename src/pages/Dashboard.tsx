@@ -1,23 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiClient } from '@/lib/api';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import ChildForm from '@/components/forms/ChildForm';
 import DashboardHeader from '@/components/site/DashboardHeader';
 import {
-  User,
-  Mail,
-  Shield,
   Plus,
-  Calendar,
-  Heart,
-  Star,
-  TrendingUp,
-  Loader2
+  Settings,
+  Loader2,
+  User
 } from 'lucide-react';
 
 interface ParentProfile {
@@ -48,6 +40,7 @@ const Dashboard: React.FC = () => {
   const [profile, setProfile] = useState<ParentProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showAddChild, setShowAddChild] = useState(false);
 
   const fetchProfile = async () => {
     try {
@@ -86,8 +79,6 @@ const Dashboard: React.FC = () => {
     }
   };
 
-
-
   useEffect(() => {
     if (user) {
       fetchProfile();
@@ -112,17 +103,37 @@ const Dashboard: React.FC = () => {
 
   const handleChildAdded = () => {
     fetchProfile(); // Refresh the profile data
+    setShowAddChild(false);
+  };
+
+  const handleChildSelect = (child: Child) => {
+    if (child.isOnboarded) {
+      window.location.href = `/child/${child.id}`;
+    } else {
+      window.location.href = `/onboarding/${child.id}`;
+    }
+  };
+
+  const getChildAvatarColor = (index: number) => {
+    const colors = [
+      'bg-red-500',
+      'bg-blue-500', 
+      'bg-green-500',
+      'bg-purple-500',
+      'bg-yellow-500',
+      'bg-pink-500',
+      'bg-indigo-500',
+      'bg-orange-500'
+    ];
+    return colors[index % colors.length];
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-        <DashboardHeader />
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center">
-            <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-gray-600 font-medium">Loading your dashboard...</p>
-          </div>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-700 font-medium">Loading profiles...</p>
         </div>
       </div>
     );
@@ -130,34 +141,27 @@ const Dashboard: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-        <DashboardHeader />
-        <div className="container mx-auto px-4 py-12 max-w-4xl">
-          <Card className="border-red-200 bg-red-50/50">
-            <CardContent className="pt-8 pb-8">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Shield className="w-8 h-8 text-red-600" />
-                </div>
-                <h2 className="text-xl font-semibold text-red-800 mb-2">
-                  {error.includes('session') || error.includes('expired') ? 'Session Expired' : 'Something went wrong'}
-                </h2>
-                <p className="text-red-600 mb-6">{error}</p>
-                {error.includes('session') || error.includes('expired') ? (
-                  <div className="space-y-3">
-                    <p className="text-sm text-gray-600">Redirecting to login page...</p>
-                    <Button onClick={() => window.location.href = '/'} className="bg-red-600 hover:bg-red-700">
-                      Go to Login
-                    </Button>
-                  </div>
-                ) : (
-                  <Button onClick={() => window.location.reload()} className="bg-red-600 hover:bg-red-700">
-                    Try Again
-                  </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <User className="w-8 h-8 text-white" />
+          </div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            {error.includes('session') || error.includes('expired') ? 'Session Expired' : 'Something went wrong'}
+          </h2>
+          <p className="text-gray-600 mb-6">{error}</p>
+          {error.includes('session') || error.includes('expired') ? (
+            <div className="space-y-3">
+              <p className="text-sm text-gray-500">Redirecting to login page...</p>
+              <Button onClick={() => window.location.href = '/'} className="bg-red-600 hover:bg-red-700">
+                Go to Login
+              </Button>
+            </div>
+          ) : (
+            <Button onClick={() => window.location.reload()} className="bg-red-600 hover:bg-red-700">
+              Try Again
+            </Button>
+          )}
         </div>
       </div>
     );
@@ -165,188 +169,126 @@ const Dashboard: React.FC = () => {
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-        <DashboardHeader />
-        <div className="container mx-auto px-4 py-12 max-w-4xl">
-          <Card>
-            <CardContent className="pt-8 pb-8">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <User className="w-8 h-8 text-gray-600" />
-                </div>
-                <h2 className="text-xl font-semibold text-gray-800 mb-2">Profile not found</h2>
-                <p className="text-gray-600 mb-6">We couldn't load your profile information</p>
-                <Button onClick={() => window.location.reload()}>
-                  Refresh Page
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center mx-auto mb-4">
+            <User className="w-8 h-8 text-gray-600" />
+          </div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Profile not found</h2>
+          <p className="text-gray-600 mb-6">We couldn't load your profile information</p>
+          <Button onClick={() => window.location.reload()} className="bg-gray-600 hover:bg-gray-700">
+            Refresh Page
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-white">
+      {/* Header */}
       <DashboardHeader />
 
-      {/* Child Image Section */}
-      <div className="w-full bg-gradient-to-b from-blue-50 to-white py-8">
-        <div className="container mx-auto px-4 flex justify-center">
-          <div className="relative">
-            <img
-              src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=400&h=300&fit=crop&crop=face"
-              alt="Happy child learning"
-              className="w-64 h-48 object-cover rounded-lg shadow-lg"
-              loading="lazy"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg"></div>
-          </div>
+      {/* Main Content */}
+      <div className="flex flex-col items-center justify-center min-h-screen px-6 pt-20">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-6xl font-light text-gray-900 mb-4">
+            Choose Your Child
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Select a child to continue their learning journey
+          </p>
         </div>
-      </div>
 
-      <div className="container mx-auto px-4 pb-12 max-w-6xl">
-        <div className="space-y-8">
-          {/* Welcome Header */}
-          <div className="text-center">
-            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3">
-              Welcome back,{' '}
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                {user?.displayName?.split(' ')[0] || 'Parent'}
-              </span>
-              !
-            </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Track your children's development journey and create meaningful learning experiences together.
-            </p>
-          </div>
-
-          {/* Children Section */}
-          <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-purple-100 rounded-lg">
-                    <Heart className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">Your Children</CardTitle>
-                    <CardDescription>
-                      Manage your children's profiles and development tracking
-                      {profile?.children && (
-                        <span className="text-purple-600 font-medium"> ({profile.children.length}/5)</span>
-                      )}
-                    </CardDescription>
-                  </div>
+        {/* Profile Cards */}
+        <div className="flex flex-wrap justify-center gap-6 mb-8 max-w-4xl">
+          {profile?.children && Array.isArray(profile.children) && profile.children.length > 0 ? (
+            profile.children.map((child, index) => (
+              <div
+                key={child.id}
+                onClick={() => handleChildSelect(child)}
+                className="group cursor-pointer transition-transform hover:scale-105"
+              >
+                <div className="w-32 h-32 md:w-40 md:h-40 rounded-lg overflow-hidden mb-3 border-2 border-transparent group-hover:border-blue-500 transition-colors shadow-lg">
+                  {child.imageURL ? (
+                    <img
+                      src={child.imageURL}
+                      alt={child.displayName}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className={`w-full h-full ${getChildAvatarColor(index)} flex items-center justify-center`}>
+                      <span className="text-white text-4xl md:text-5xl font-bold">
+                        {child.displayName.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  )}
                 </div>
-                <ChildForm onChildAdded={handleChildAdded} />
-              </div>
-            </CardHeader>
-            <CardContent>
-              {profile?.children && Array.isArray(profile.children) && profile.children.length > 0 ? (
-                <div>
-                  {/* Quick Stats Row */}
-                  <div className="grid grid-cols-3 gap-4 mb-6">
-                    <div className="text-center p-3 bg-blue-50 rounded-lg">
-                      <div className="text-2xl font-bold text-blue-600">{profile.children.length}</div>
-                      <div className="text-sm text-gray-600">Total Children</div>
-                    </div>
-                    <div className="text-center p-3 bg-green-50 rounded-lg">
-                      <div className="text-2xl font-bold text-green-600">
-                        {Math.round(profile.children.reduce((sum, child) => sum + child.age, 0) / profile.children.length)}
-                      </div>
-                      <div className="text-sm text-gray-600">Average Age</div>
-                    </div>
-                    <div className="text-center p-3 bg-purple-50 rounded-lg">
-                      <div className="text-2xl font-bold text-purple-600">
-                        {Math.max(...profile.children.map(c => c.age))}
-                      </div>
-                      <div className="text-sm text-gray-600">Oldest</div>
-                    </div>
-                  </div>
-
-                  {/* Children List */}
-                  <div className="space-y-3">
-                    {profile.children.map((child) => (
-                      <div key={child.id} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <Avatar className="h-12 w-12 border-2 border-purple-200">
-                          <AvatarImage src={child.imageURL} alt={child.displayName} />
-                          <AvatarFallback className="bg-purple-100 text-purple-600 font-semibold">
-                            {child.displayName.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 truncate">{child.displayName}</h3>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-sm text-gray-600">{child.age} years old</span>
-                            <span className="text-gray-400">•</span>
-                            <span className="text-sm text-gray-600 capitalize">{child.gender}</span>
-                            <span className="text-gray-400">•</span>
-                            <Badge
-                              variant={child.isOnboarded ? "default" : "secondary"}
-                              className="text-xs"
-                            >
-                              {child.isOnboarded ? "Onboarded" : "Pending"}
-                            </Badge>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {child.isOnboarded ? (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => window.location.href = `/child/${child.id}`}
-                              className="hover:bg-purple-50 hover:border-purple-200"
-                            >
-                              <Calendar className="w-4 h-4 mr-2" />
-                              View Dashboard
-                            </Button>
-                          ) : (
-                            <Button
-                              variant="default"
-                              size="sm"
-                              onClick={() => window.location.href = `/onboarding/${child.id}`}
-                              className="bg-purple-600 hover:bg-purple-700 text-white"
-                            >
-                              <Heart className="w-4 h-4 mr-2" />
-                              Complete Onboarding
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Plus className="w-8 h-8 text-purple-600" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No children added yet</h3>
-                  <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                    {profile?.children === undefined
-                      ? 'Loading children data...'
-                      : 'Start by adding your first child to track their development journey. You can add up to 5 children.'
-                    }
+                <div className="text-center">
+                  <p className="text-gray-900 text-lg font-medium">{child.displayName}</p>
+                  <p className="text-gray-600 text-sm">
+                    {child.age} years old
+                    {!child.isOnboarded && (
+                      <span className="block text-orange-500 text-xs mt-1">Setup Required</span>
+                    )}
                   </p>
-                  <ChildForm
-                    onChildAdded={handleChildAdded}
-                    trigger={
-                      <Button size="lg" className="bg-purple-600 hover:bg-purple-700">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Your First Child
-                      </Button>
-                    }
-                  />
                 </div>
-              )}
-            </CardContent>
-          </Card>
-
-
+              </div>
+            ))
+          ) : (
+            <div className="text-center">
+              <div className="w-32 h-32 md:w-40 md:h-40 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center mb-3">
+                <Plus className="w-12 h-12 text-gray-400" />
+              </div>
+              <p className="text-gray-600 text-lg">No children yet</p>
+            </div>
+          )}
         </div>
+
+        {/* Add Child Button */}
+        {profile?.children && profile.children.length < 5 && (
+          <Button
+            onClick={() => setShowAddChild(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Child
+          </Button>
+        )}
+
+        {/* Manage Profiles Button */}
+        {profile?.children && profile.children.length > 0 && (
+          <Button
+            variant="outline"
+            className="text-gray-600 hover:text-gray-900 mt-6"
+          >
+            Manage Profiles
+          </Button>
+        )}
       </div>
+
+      {/* Add Child Modal */}
+      {showAddChild && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-xl">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold text-gray-900">Add New Child</h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowAddChild(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ×
+              </Button>
+            </div>
+            <ChildForm 
+              onChildAdded={handleChildAdded}
+              isModal={true}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
