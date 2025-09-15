@@ -32,6 +32,22 @@ const OnboardingPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showTyping, setShowTyping] = useState(false);
+  const facts = [
+    '🧠 Did you know? Children ask an average of 73 questions per day!',
+    '✨ Short, consistent routines build stronger long‑term habits.',
+    '💡 Open‑ended questions spark curiosity better than yes/no questions.',
+    '🎯 Tiny progress daily > giant leaps rarely. Keep it playful!',
+    '🌟 Short breaks can improve focus and memory in kids.',
+  ];
+  const [factIndex, setFactIndex] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setFactIndex((i) => (i + 1) % facts.length);
+    }, 12000);
+    return () => clearInterval(id);
+  }, []);
 
   useEffect(() => {
     if (childId && user) {
@@ -92,28 +108,33 @@ const OnboardingPage: React.FC = () => {
     return Math.round((questionnaire.responses.length / totalQuestions) * 100);
   };
 
-  const handleAnswerSubmit = async () => {
+  const handleAnswerSubmit = async (clickedOptionId?: string) => {
     const currentQuestion = getCurrentQuestion();
     if (!currentQuestion || !childId) return;
 
+    // Determine effective answer based on click or current state
+    const effectiveOptionId = clickedOptionId || selectedOption;
+    const effectiveText = currentAnswer;
+
     // Validate answer
-    if (currentQuestion.required && !currentAnswer && !selectedOption) {
+    if (currentQuestion.required && !effectiveText && !effectiveOptionId) {
       toast.error('Please provide an answer to continue');
       return;
     }
 
     try {
       setSubmitting(true);
+      setShowTyping(true);
       
       await getValidToken();
       
       const answerData = {
         questionId: currentQuestion.questionId,
-        answer: currentQuestion.type === 'multiple_choice' || currentQuestion.type === 'rating' 
-          ? selectedOption 
-          : currentAnswer,
-        optionId: currentQuestion.type === 'multiple_choice' || currentQuestion.type === 'rating' 
-          ? selectedOption 
+        answer: currentQuestion.type === 'multiple_choice' || currentQuestion.type === 'rating'
+          ? (effectiveOptionId || '')
+          : effectiveText,
+        optionId: currentQuestion.type === 'multiple_choice' || currentQuestion.type === 'rating'
+          ? (effectiveOptionId || '')
           : undefined
       };
 
@@ -145,6 +166,8 @@ const OnboardingPage: React.FC = () => {
       toast.error(error.message || 'Failed to submit answer');
     } finally {
       setSubmitting(false);
+      // Keep typing for a brief moment to mimic chat typing effect
+      setTimeout(() => setShowTyping(false), 400);
     }
   };
 
@@ -238,10 +261,7 @@ const OnboardingPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
       {/* Loading Screen - shows when generating next question */}
-      <OnboardingLoadingScreen 
-        isLoading={submitting}
-        currentQuestionNumber={currentQuestionIndex + 1}
-      />
+      {/* Replace full-screen loader with inline typing indicator UI */}
       
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
@@ -289,7 +309,7 @@ const OnboardingPage: React.FC = () => {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           {isCompleted ? (
             <Card className="shadow-lg">
               <CardContent className="text-center p-8">
@@ -328,141 +348,176 @@ const OnboardingPage: React.FC = () => {
               </CardContent>
             </Card>
           ) : currentQuestion && (
-            <Card className="shadow-lg">
-              <CardHeader className="pb-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-purple-100 rounded-lg">
-                      <Calendar className="w-5 h-5 text-purple-600" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg">
-                        Question {currentQuestionIndex + 1} of 10
-                      </CardTitle>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Badge variant="outline" className="text-xs">
-                          {currentQuestion.category.replace('_', ' ')}
-                        </Badge>
-                        <Badge variant="outline" className="text-xs">
-                          {currentQuestion.learningDomain.replace('_', ' ')}
-                        </Badge>
-                      </div>
+            <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 relative">
+              {/* Chat header meta */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-purple-100 rounded-lg">
+                    <Calendar className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500">Question {currentQuestionIndex + 1} of 10</div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge variant="outline" className="text-xs">
+                        {currentQuestion.category.replace('_', ' ')}
+                      </Badge>
+                      <Badge variant="outline" className="text-xs">
+                        {currentQuestion.learningDomain.replace('_', ' ')}
+                      </Badge>
                     </div>
                   </div>
                 </div>
-              </CardHeader>
-              
-              <CardContent className="space-y-6">
-                {/* Question */}
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">
+              </div>
+
+              {/* Chat body */}
+              <div className="space-y-4">
+                {/* Question bubble (left) */}
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-purple-200 flex items-center justify-center text-purple-700 font-semibold">Q</div>
+                  <div className="max-w-[80%] rounded-2xl rounded-tl-sm bg-gray-100 px-4 py-3 text-gray-900 whitespace-pre-wrap break-words leading-relaxed">
                     {currentQuestion.text}
-                  </h3>
-                  
-                  {/* Answer Input */}
-                  {currentQuestion.type === 'text' && (
-                    <Textarea
-                      placeholder="Type your answer here..."
-                      value={currentAnswer}
-                      onChange={(e) => setCurrentAnswer(e.target.value)}
-                      className="min-h-[120px] resize-none"
-                      disabled={submitting}
-                    />
-                  )}
-                  
-                  {currentQuestion.type === 'multiple_choice' && currentQuestion.options && (
-                    <RadioGroup
-                      value={selectedOption}
-                      onValueChange={setSelectedOption}
-                      disabled={submitting}
-                    >
-                      {currentQuestion.options.map((option) => (
-                        <div key={option.id} className="flex items-center space-x-2">
-                          <RadioGroupItem value={option.id} id={option.id} />
-                          <Label htmlFor={option.id} className="text-base cursor-pointer">
-                            {option.text}
-                          </Label>
-                        </div>
-                      ))}
-                    </RadioGroup>
-                  )}
-                  
-                  {currentQuestion.type === 'rating' && currentQuestion.options && (
-                    <RadioGroup
-                      value={selectedOption}
-                      onValueChange={setSelectedOption}
-                      disabled={submitting}
-                    >
-                      {currentQuestion.options.map((option) => (
-                        <div key={option.id} className="flex items-center space-x-2">
-                          <RadioGroupItem value={option.id} id={option.id} />
-                          <Label htmlFor={option.id} className="text-base cursor-pointer">
-                            {option.text}
-                          </Label>
-                        </div>
-                      ))}
-                    </RadioGroup>
-                  )}
+                  </div>
                 </div>
 
-                {/* Navigation Buttons */}
-                <div className="flex items-center justify-between pt-4 border-t">
+                {/* (typing indicator moved to bottom of chat body) */}
+
+                {/* Options bubble (right) */}
+                <div className="flex justify-end">
+                  <div className="max-w-[85%]">
+                    {currentQuestion.type === 'multiple_choice' && currentQuestion.options && (
+                      <div className="rounded-2xl rounded-tr-sm bg-purple-50 p-3 sm:p-4">
+                        <div className="flex flex-col gap-2">
+                          {currentQuestion.options.map((option) => (
+                            <Button
+                              key={option.id}
+                              variant={selectedOption === option.id ? 'default' : 'outline'}
+                              className={`justify-start text-left w-full whitespace-pre-wrap break-words leading-normal ${selectedOption === option.id ? 'bg-purple-600 hover:bg-purple-700 text-white' : ''}`}
+                              disabled={submitting}
+                              onClick={async () => {
+                                setSelectedOption(option.id);
+                                await handleAnswerSubmit(option.id);
+                              }}
+                            >
+                              {option.text}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {currentQuestion.type === 'rating' && currentQuestion.options && (
+                      <div className="rounded-2xl rounded-tr-sm bg-purple-50 p-4">
+                        <RadioGroup
+                          value={selectedOption}
+                          onValueChange={(v) => setSelectedOption(v)}
+                          disabled={submitting}
+                        >
+                          <div className="flex flex-col gap-2">
+                            {currentQuestion.options.map((option) => (
+                              <Button
+                                key={option.id}
+                                variant={selectedOption === option.id ? 'default' : 'outline'}
+                                className={`w-full justify-start text-left whitespace-pre-wrap break-words leading-normal ${selectedOption === option.id ? 'bg-purple-600 hover:bg-purple-700 text-white' : ''}`}
+                                onClick={async () => {
+                                  setSelectedOption(option.id);
+                                  await handleAnswerSubmit(option.id);
+                                }}
+                              >
+                                {option.text}
+                              </Button>
+                            ))}
+                          </div>
+                        </RadioGroup>
+                      </div>
+                    )}
+
+                    {currentQuestion.type === 'text' && (
+                      <div className="rounded-2xl rounded-tr-sm bg-purple-50 p-3 sm:p-4">
+                        <div className="flex items-end gap-2">
+                          <Textarea
+                            placeholder="Type your answer..."
+                            value={currentAnswer}
+                            onChange={(e) => setCurrentAnswer(e.target.value)}
+                            className="min-h-[80px] resize-none"
+                            disabled={submitting}
+                          />
+                          <Button
+                            className="bg-purple-600 hover:bg-purple-700"
+                            disabled={submitting || (currentQuestion.required && !currentAnswer)}
+                            onClick={handleAnswerSubmit}
+                          >
+                            Send
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* (typing indicator now rendered above under the question) */}
+                  </div>
+                </div>
+
+                {/* Typing indicator at the bottom, left-aligned */}
+                {showTyping && (
+                  <div className="flex items-center gap-2 mt-3">
+                    <div className="w-8 h-8 rounded-full bg-purple-200 flex items-center justify-center text-purple-700 font-semibold">Q</div>
+                    <div className="rounded-full bg-purple-600/90 text-white px-3 py-2">
+                      <span className="inline-flex items-center gap-1">
+                        <span className="w-2 h-2 bg-white/90 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></span>
+                        <span className="w-2 h-2 bg-white/90 rounded-full animate-bounce" style={{animationDelay: '120ms'}}></span>
+                        <span className="w-2 h-2 bg-white/90 rounded-full animate-bounce" style={{animationDelay: '240ms'}}></span>
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Back/Skip minimal controls */}
+                <div className="flex items-center justify-between pt-2">
                   <div className="flex gap-2">
                     {!isFirstQuestion && (
-                      <Button
-                        variant="outline"
-                        onClick={handlePreviousQuestion}
-                        disabled={submitting}
-                      >
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        Previous
+                      <Button variant="ghost" size="sm" onClick={handlePreviousQuestion} disabled={submitting}>
+                        <ArrowLeft className="w-4 h-4 mr-1" /> Back
                       </Button>
                     )}
-                    
                     {!currentQuestion.required && !isLastQuestion && (
-                      <Button
-                        variant="ghost"
-                        onClick={handleSkipQuestion}
-                        disabled={submitting}
-                      >
+                      <Button variant="ghost" size="sm" onClick={handleSkipQuestion} disabled={submitting}>
                         Skip
                       </Button>
                     )}
                   </div>
-                  
-                  <Button
-                    onClick={handleAnswerSubmit}
-                    disabled={
-                      submitting || 
-                      (currentQuestion.required && !currentAnswer && !selectedOption)
-                    }
-                    className="bg-purple-600 hover:bg-purple-700"
-                  >
-                    {submitting ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Submitting...
-                      </>
-                    ) : isTrulyLastQuestion ? (
-                      <>
-                        <CheckCircle className="w-4 h-4 mr-2" />
-                        Complete Onboarding
-                      </>
-                    ) : (
-                      <>
-                        Next
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </>
-                    )}
-                  </Button>
+                  {isTrulyLastQuestion && (
+                    <Badge variant="default">Last question</Badge>
+                  )}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+
+              {/* Semi-transparent scrolling fact bar while thinking */}
+              {showTyping && (
+                <div className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 px-4 sm:px-6">
+                  <div className="relative w-full overflow-hidden">
+                    {/* Moving band (background travels with text) */}
+                    <div
+                      className="inline-flex items-center bg-white/65 backdrop-blur-[2px] rounded-full shadow px-4 sm:px-6 py-2 whitespace-nowrap text-purple-900 text-sm sm:text-base font-medium"
+                      style={{animation: 'marquee 8s linear infinite'}}
+                    >
+                      {facts[factIndex]}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>
     </div>
   );
 };
+
+// Local keyframes for marquee animation
+const styleEl = document.createElement('style');
+styleEl.innerHTML = `@keyframes marquee { from { transform: translateX(100%); } to { transform: translateX(-100%); } }`;
+if (typeof document !== 'undefined' && !document.getElementById('onboarding-marquee-kf')) {
+  styleEl.id = 'onboarding-marquee-kf';
+  document.head.appendChild(styleEl);
+}
 
 export default OnboardingPage;
