@@ -231,6 +231,24 @@ const OnboardingPage: React.FC = () => {
           return;
         }
 
+        // Check if there's an unanswered question that we should move to
+        const nextUnansweredIndex = findFirstUnansweredQuestion(freshQuestionnaire);
+        if (nextUnansweredIndex !== -1 && nextUnansweredIndex !== currentQuestionIndex) {
+          console.log(`📝 Found unanswered question at index ${nextUnansweredIndex}, moving from ${currentQuestionIndex}`);
+          
+          // Move to the next unanswered question
+          setCurrentQuestionIndex(prevIndex => {
+            console.log(`🔄 State update: ${prevIndex} → ${nextUnansweredIndex}`);
+            return nextUnansweredIndex;
+          });
+          
+          // Force a re-render to ensure UI updates
+          setForceUpdate(prev => prev + 1);
+          
+          setShowTyping(false); // Stop typing dots
+          return;
+        }
+
 
         // Check if new response was added (response count increased)
         if (freshQuestionnaire.responses.length > lastResponseCount) {
