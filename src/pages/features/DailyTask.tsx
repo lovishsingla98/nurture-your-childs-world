@@ -316,28 +316,51 @@ const DailyTask: React.FC = () => {
 
             {/* Completed Status */}
             {taskData.status === 'completed' && (
-              <Card className="border-0 shadow-xl bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
-                <CardContent className="pt-6">
-                  <div className="text-center">
-                    <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-green-900 mb-2">Task Completed! 🎉</h3>
-                    <p className="text-green-700 mb-4">
-                      Great job on completing today's task! 
-                      {taskData.completedAt && (
-                        <span className="block text-sm mt-2">
-                          Completed at {new Date(taskData.completedAt).toLocaleTimeString()}
-                        </span>
+              <div className="space-y-6">
+                {/* Completion Card */}
+                <Card className="border-0 shadow-xl bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+                  <CardContent className="pt-6">
+                    <div className="text-center">
+                      <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
+                      <h3 className="text-xl font-semibold text-green-900 mb-2">Task Completed! 🎉</h3>
+                      <p className="text-green-700 mb-4">
+                        Great job on completing today's task! 
+                        {taskData.completedAt && (
+                          <span className="block text-sm mt-2">
+                            Completed at {new Date(taskData.completedAt).toLocaleTimeString()}
+                          </span>
+                        )}
+                      </p>
+                      {taskData.response && (
+                        <div className="bg-white/70 p-4 rounded-lg text-left max-w-2xl mx-auto">
+                          <h4 className="font-medium text-slate-900 mb-2">Your Response:</h4>
+                          <p className="text-slate-700">{taskData.response}</p>
+                        </div>
                       )}
-                    </p>
-                    {taskData.response && (
-                      <div className="bg-white/70 p-4 rounded-lg text-left max-w-2xl mx-auto">
-                        <h4 className="font-medium text-slate-900 mb-2">Your Response:</h4>
-                        <p className="text-slate-700">{taskData.response}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Theory Section */}
+                {taskData.data.theory && (
+                  <Card className="border-0 shadow-xl bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+                    <CardHeader>
+                      <div className="flex items-center gap-2">
+                        <Lightbulb className="w-5 h-5 text-blue-600" />
+                        <CardTitle className="text-lg text-blue-900">What You Learned</CardTitle>
                       </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+                      <CardDescription className="text-blue-700">
+                        Here's the theory behind today's activity to deepen your understanding!
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="bg-white/70 p-4 rounded-lg border border-blue-100">
+                        <p className="text-slate-700 leading-relaxed">{taskData.data.theory}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
             )}
           </>
         )}

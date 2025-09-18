@@ -200,6 +200,7 @@ export interface DailyTaskData {
   materials: string[];
   title: string;
   longTermPathway: string;
+  theory?: string;
 }
 
 export interface DailyTask {
