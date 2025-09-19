@@ -19,6 +19,7 @@ import {
   NextQuestionResponse 
 } from '@/lib/types';
 import OnboardingLoadingScreen from '@/components/forms/OnboardingLoadingScreen';
+import OnboardingTransition from '@/components/OnboardingTransition';
 
 const OnboardingPage: React.FC = () => {
   const { childId } = useParams<{ childId: string }>();
@@ -34,6 +35,7 @@ const OnboardingPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showTyping, setShowTyping] = useState(false);
   const [forceUpdate, setForceUpdate] = useState(0);
+  const [showTransition, setShowTransition] = useState(false);
   const facts = [
     '🧠 Did you know? Children ask an average of 73 questions per day!',
     '✨ Short, consistent routines build stronger long‑term habits.',
@@ -95,8 +97,8 @@ const OnboardingPage: React.FC = () => {
         
         // Check if questionnaire is completed (10 questions answered)
         if (response.data.status === 'completed' || response.data.responses.length >= 10) {
-          // Questionnaire is completed, show completion screen
-          setCurrentQuestionIndex(-1); // Special index for completion screen
+          // Questionnaire is completed, show transition screen
+          setShowTransition(true);
         } else {
           // Find the first unanswered question using our helper function
           const firstUnansweredIndex = findFirstUnansweredQuestion(response.data);
@@ -137,7 +139,7 @@ const OnboardingPage: React.FC = () => {
         // Don't change currentQuestionIndex during polling - let the polling logic handle it
         // Only update if questionnaire is completed
         if (response.data.status === 'completed' || response.data.responses.length >= 10) {
-          setCurrentQuestionIndex(-1); // Special index for completion screen
+          setShowTransition(true);
         }
         
         // Return the fresh data for immediate use in polling
@@ -322,8 +324,8 @@ const OnboardingPage: React.FC = () => {
       setSelectedOption('');
 
       // Wait 5 seconds for answer to be saved and next question to be generated
-      console.log('⏳ Waiting 5 seconds for answer to be saved and next question to be generated...');
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      console.log('⏳ Waiting 1.5 seconds for answer to be saved and next question to be generated...');
+      // await new Promise(resolve => setTimeout(resolve, 1500));
 
       // Start polling for next question
       console.log('🔄 Starting polling for next question');
@@ -428,6 +430,24 @@ const OnboardingPage: React.FC = () => {
   
   // Check if we're waiting for a new question to be generated
   const isWaitingForNextQuestion = currentQuestionIndex === questionnaire.questions.length && !isCompleted;
+
+  // Show transition screen when onboarding is completed
+  if (showTransition && questionnaire) {
+    return (
+      <OnboardingTransition
+        childId={childId!}
+        childName={questionnaire.child?.displayName || 'your child'}
+        onComplete={() => {
+          // Navigate to dashboard after transition is complete
+          navigate('/dashboard');
+        }}
+        onError={(error) => {
+          setError(error);
+          setShowTransition(false);
+        }}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
