@@ -301,10 +301,10 @@ const OnboardingPage: React.FC = () => {
       
       const answerData = {
         questionId: currentQuestion.questionId,
-        answer: currentQuestion.type === 'multiple_choice' || currentQuestion.type === 'rating'
+        answer: currentQuestion.type === 'multiple_choice' || currentQuestion.type === 'rating' 
           ? (effectiveOptionId || '')
           : effectiveText,
-        optionId: currentQuestion.type === 'multiple_choice' || currentQuestion.type === 'rating'
+        optionId: currentQuestion.type === 'multiple_choice' || currentQuestion.type === 'rating' 
           ? (effectiveOptionId || '')
           : undefined
       };
@@ -320,8 +320,8 @@ const OnboardingPage: React.FC = () => {
       toast.success('Answer submitted successfully!');
 
       // Clear current answer immediately
-      setCurrentAnswer('');
-      setSelectedOption('');
+        setCurrentAnswer('');
+        setSelectedOption('');
 
       // Wait 5 seconds for answer to be saved and next question to be generated
       console.log('⏳ Waiting 1.5 seconds for answer to be saved and next question to be generated...');
@@ -542,23 +542,23 @@ const OnboardingPage: React.FC = () => {
             <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 relative">
               {/* Chat header meta */}
               <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-purple-100 rounded-lg">
-                    <Calendar className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <div>
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-purple-100 rounded-lg">
+                      <Calendar className="w-5 h-5 text-purple-600" />
+                    </div>
+                    <div>
                     <div className="text-sm text-gray-500">Question {currentQuestionIndex + 1} of 10</div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Badge variant="outline" className="text-xs">
-                        {currentQuestion.category.replace('_', ' ')}
-                      </Badge>
-                      <Badge variant="outline" className="text-xs">
-                        {currentQuestion.learningDomain.replace('_', ' ')}
-                      </Badge>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge variant="outline" className="text-xs">
+                          {currentQuestion.category.replace('_', ' ')}
+                        </Badge>
+                        <Badge variant="outline" className="text-xs">
+                          {currentQuestion.learningDomain.replace('_', ' ')}
+                        </Badge>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
               {/* Chat body */}
               <div className="space-y-4">
@@ -567,7 +567,7 @@ const OnboardingPage: React.FC = () => {
                   <div className="flex items-start gap-3">
                     <div className="w-8 h-8 rounded-full bg-purple-200 flex items-center justify-center text-purple-700 font-semibold">Q</div>
                     <div className="max-w-[80%] rounded-2xl rounded-tl-sm bg-gray-100 px-4 py-3 text-gray-900 whitespace-pre-wrap break-words leading-relaxed">
-                      {currentQuestion.text}
+                    {currentQuestion.text}
                     </div>
                   </div>
                 )}
@@ -593,7 +593,7 @@ const OnboardingPage: React.FC = () => {
                 {currentQuestion && (
                   <div className="flex justify-end">
                     <div className="max-w-[85%]">
-                      {currentQuestion.type === 'multiple_choice' && currentQuestion.options && (
+                  {currentQuestion.type === 'multiple_choice' && currentQuestion.options && (
                       <div className="rounded-2xl rounded-tr-sm bg-purple-50 p-3 sm:p-4">
                         <div className="flex flex-col gap-2">
                           {currentQuestion.options.map((option) => (
@@ -601,28 +601,28 @@ const OnboardingPage: React.FC = () => {
                               key={option.id}
                               variant={selectedOption === option.id ? 'default' : 'outline'}
                               className={`justify-start text-left w-full whitespace-pre-wrap break-words leading-normal ${selectedOption === option.id ? 'bg-purple-600 hover:bg-purple-700 text-white' : ''}`}
-                              disabled={submitting}
+                      disabled={submitting}
                               onClick={async () => {
                                 setSelectedOption(option.id);
                                 await handleAnswerSubmit(option.id);
                               }}
-                            >
-                              {option.text}
+                    >
+                            {option.text}
                             </Button>
                           ))}
                         </div>
                       </div>
-                    )}
-
-                    {currentQuestion.type === 'rating' && currentQuestion.options && (
+                  )}
+                  
+                  {currentQuestion.type === 'rating' && currentQuestion.options && (
                       <div className="rounded-2xl rounded-tr-sm bg-purple-50 p-4">
-                        <RadioGroup
-                          value={selectedOption}
+                    <RadioGroup
+                      value={selectedOption}
                           onValueChange={(v) => setSelectedOption(v)}
-                          disabled={submitting}
-                        >
+                      disabled={submitting}
+                    >
                           <div className="flex flex-col gap-2">
-                            {currentQuestion.options.map((option) => (
+                      {currentQuestion.options.map((option) => (
                               <Button
                                 key={option.id}
                                 variant={selectedOption === option.id ? 'default' : 'outline'}
@@ -632,7 +632,7 @@ const OnboardingPage: React.FC = () => {
                                   await handleAnswerSubmit(option.id);
                                 }}
                               >
-                                {option.text}
+                            {option.text}
                               </Button>
                             ))}
                           </div>
@@ -659,8 +659,8 @@ const OnboardingPage: React.FC = () => {
                             </Button>
                           </div>
                         </div>
-                      )}
-                    </div>
+                  )}
+                </div>
                   </div>
                 )}
 
@@ -696,8 +696,8 @@ const OnboardingPage: React.FC = () => {
                     <Badge variant="default">Last question</Badge>
                   )}
                 </div>
-              </div>
-
+                  </div>
+                  
               {/* Semi-transparent scrolling fact bar while thinking */}
               {(showTyping || isWaitingForNextQuestion) && (
                 <div className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 px-4 sm:px-6">
