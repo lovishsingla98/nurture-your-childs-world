@@ -22,6 +22,7 @@ import ParentsChatbot from "./pages/features/ParentsChatbot";
 import InitialInterestPage from "./pages/InitialInterestPage";
 import PreOnboardingPage from "./pages/PreOnboardingPage";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import DeleteAccount from "./pages/DeleteAccount";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +53,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<PublicRoute><Index /></PublicRoute>} />
             <Route path="/privacy" element={<PublicRoute><PrivacyPolicy /></PublicRoute>} />
+            <Route path="/delete-account" element={<PublicRoute><DeleteAccount /></PublicRoute>} />
             <Route 
               path="/dashboard" 
               element={
