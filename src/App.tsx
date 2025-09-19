@@ -21,6 +21,7 @@ import MoralStory from "./pages/features/MoralStory";
 import ParentsChatbot from "./pages/features/ParentsChatbot";
 import InitialInterestPage from "./pages/InitialInterestPage";
 import PreOnboardingPage from "./pages/PreOnboardingPage";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<PublicRoute><Index /></PublicRoute>} />
+            <Route path="/privacy" element={<PublicRoute><PrivacyPolicy /></PublicRoute>} />
             <Route 
               path="/dashboard" 
               element={
