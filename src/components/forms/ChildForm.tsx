@@ -78,8 +78,8 @@ const ChildForm: React.FC<ChildFormProps> = ({ onChildAdded, trigger, isModal = 
         setOpen(false);
         onChildAdded(); // Trigger parent component to refresh
         
-        // Navigate to onboarding page for the new child
-        window.location.href = `/onboarding/${response.data.child.id}`;
+        // Navigate to initial interest page for the new child
+        window.location.href = `/initial-interest/${response.data.child.id}`;
       } else {
         throw new Error(response.message || 'Failed to add child');
       }

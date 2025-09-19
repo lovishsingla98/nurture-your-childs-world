@@ -19,6 +19,8 @@ import SparkInterest from "./pages/features/SparkInterest";
 import WeeklyQuiz from "./pages/features/WeeklyQuiz";
 import MoralStory from "./pages/features/MoralStory";
 import ParentsChatbot from "./pages/features/ParentsChatbot";
+import InitialInterestPage from "./pages/InitialInterestPage";
+import PreOnboardingPage from "./pages/PreOnboardingPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -61,6 +63,22 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <ChildDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/initial-interest/:childId" 
+              element={
+                <ProtectedRoute>
+                  <InitialInterestPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/pre-onboarding/:childId" 
+              element={
+                <ProtectedRoute>
+                  <PreOnboardingPage />
                 </ProtectedRoute>
               } 
             />
