@@ -51,7 +51,7 @@ const InitialInterestPage: React.FC = () => {
       }
 
       console.log('Saving initial interest:', requestData);
-      const response = await apiClient.submitSparkInterest(childId!, requestData);
+      const response = await apiClient.createSparkInterest(childId!, requestData);
 
       if (response.success && response.data) {
         toast.success('Interest saved successfully!');
