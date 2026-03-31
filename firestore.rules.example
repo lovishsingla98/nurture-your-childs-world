@@ -1,0 +1,39 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow public write access to waitlist collection
+    // Users can only create documents, not read, update, or delete
+    match /waitlist/{document} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
+    
+    // Allow public write access to feedback collection
+    // Users can only create documents, not read, update, or delete
+    match /feedback/{document} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
+    
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+// How to apply these rules:
+// 1. Go to Firebase Console > Firestore Database
+// 2. Click on "Rules" tab
+// 3. Replace the default rules with the above rules
+// 4. Click "Publish"
+//
+// These rules allow:
+// - Anyone to submit waitlist entries (create only)
+// - Anyone to submit feedback (create only)
+// - No public read access (keeps data private)
+// - No update/delete access (prevents tampering)
+//
+// For admin access, you'll need to set up Firebase Admin SDK
+// or create specific admin rules with authentication. 
