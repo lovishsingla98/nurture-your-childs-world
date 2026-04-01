@@ -20,6 +20,7 @@ const Header = () => {
         <nav className="hidden lg:flex items-center gap-4 xl:gap-6 text-sm">
           <a href="#features" className="hover:text-primary transition-colors">Features</a>
           <a href="#testimonials" className="hover:text-primary transition-colors">Testimonials</a>
+          <a href="/blog" className="hover:text-primary transition-colors">Blog</a>
         </nav>
         <div className="flex items-center gap-1 sm:gap-2">
           <Button asChild variant="soft" size="sm" className="text-xs sm:text-sm">

@@ -1,1 +1,26 @@
+# Dependencies
 node_modules
+
+# Build output
+dist
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Editor
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Firebase service account keys
+service-account.json
+*.service-account.json
+
+# Blog pipeline drafts (generated content)
+scripts/blog/drafts/
+!scripts/blog/drafts/.gitkeep

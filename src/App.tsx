@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -25,6 +26,14 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import DeleteAccount from "./pages/DeleteAccount";
 import NotFound from "./pages/NotFound";
 
+// Blog system (lazy-loaded)
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
+const AdminBlog = lazy(() => import("./pages/admin/AdminBlog"));
+const AdminBlogNew = lazy(() => import("./pages/admin/AdminBlogNew"));
+const AdminBlogEdit = lazy(() => import("./pages/admin/AdminBlogEdit"));
+const AdminComments = lazy(() => import("./pages/admin/AdminComments"));
+
 const queryClient = new QueryClient();
 
 // Route wrapper that allows both authenticated and unauthenticated users to access public content
@@ -50,6 +59,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading…</div>}>
           <Routes>
             <Route path="/" element={<PublicRoute><Index /></PublicRoute>} />
             <Route path="/privacy" element={<PublicRoute><PrivacyPolicy /></PublicRoute>} />
@@ -166,9 +176,19 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            {/* Blog routes (public) */}
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
+
+            {/* Blog admin routes */}
+            <Route path="/admin/blog" element={<ProtectedRoute><AdminBlog /></ProtectedRoute>} />
+            <Route path="/admin/blog/new" element={<ProtectedRoute><AdminBlogNew /></ProtectedRoute>} />
+            <Route path="/admin/blog/:id/edit" element={<ProtectedRoute><AdminBlogEdit /></ProtectedRoute>} />
+            <Route path="/admin/comments" element={<ProtectedRoute><AdminComments /></ProtectedRoute>} />
+
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </Suspense>
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
