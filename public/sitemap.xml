@@ -1,9 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://nurture.org.in/</loc>
+    <loc>https://enrichbeauty.com/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <lastmod>2026-04-01</lastmod>
   </url>
-  <!-- Add more URLs when available -->
+  <url>
+    <loc>https://enrichbeauty.com/blog</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-04-01</lastmod>
+  </url>
+  <url>
+    <loc>https://enrichbeauty.com/blog/understanding-screen-time-balanced-approach</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <lastmod>2026-03-31</lastmod>
+  </url>
+  <url>
+    <loc>https://enrichbeauty.com/blog/child-screen-time</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <lastmod>2026-03-31</lastmod>
+  </url>
+  <url>
+    <loc>https://enrichbeauty.com/blog/parents-guide-nurturing-child-development</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <lastmod>2026-03-31</lastmod>
+  </url>
+  <url>
+    <loc>https://enrichbeauty.com/blog/after-school-meltdowns-5-6-7-year-olds</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <lastmod>2026-03-31</lastmod>
+  </url>
+  <url>
+    <loc>https://enrichbeauty.com/blog/five-fun-activities-spark-curiosity</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <lastmod>2026-03-31</lastmod>
+  </url>
 </urlset>
