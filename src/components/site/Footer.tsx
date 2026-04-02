@@ -18,6 +18,7 @@ const Footer = () => {
             <li><a href="#waitlist" className="hover:text-foreground">Waitlist</a></li>
             <li><a href="#feedback" className="hover:text-foreground">Feedback</a></li>
             <li><a href="/blog" className="hover:text-foreground">Blog</a></li>
+            <li><a href="/privacy" className="hover:text-foreground">Privacy Policy</a></li>
           </ul>
         </div>
         <div>

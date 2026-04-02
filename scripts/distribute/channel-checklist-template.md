@@ -16,16 +16,17 @@
 - [ ] **Perplexity Publisher Portal** — Submit new content
   URL: https://perplexity.ai/publisher
 
-- [ ] **Pinterest** — Pin 3 pins to correct boards
-  - Pin 1 (Question): {PIN 1 TITLE}
-    Board: {BOARD NAME}
-    Description: {PIN 1 DESCRIPTION}
-  - Pin 2 (How-to): {PIN 2 TITLE}
-    Board: {BOARD NAME}
-    Description: {PIN 2 DESCRIPTION}
-  - Pin 3 (Number): {PIN 3 TITLE}
-    Board: {BOARD NAME}
-    Description: {PIN 3 DESCRIPTION}
+- [ ] **Pinterest** — Run automation:
+  ```
+  npx tsx scripts/distribute/pinterest/create-pins.ts \
+    scripts/blog/drafts/{slug}.json \
+    scripts/blog/drafts/{slug}-distribution.md
+  ```
+  - Pin 1 goes live immediately
+  - Pin 2 auto-scheduled for tomorrow
+  - Pin 3 auto-scheduled for day after tomorrow
+  - All 3 pin images auto-generated from cover image
+  - All 3 pins logged to pinterest/pin-log.json
 
 - [ ] **WhatsApp Broadcast** — Send message
   ```
