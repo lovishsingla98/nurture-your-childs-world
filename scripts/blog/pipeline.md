@@ -9,7 +9,7 @@
 
 **Product:** Nurture — an AI parenting co-pilot for children ages 3–12
 **Company:** Cortiq Labs
-**Website:** nurture.cortiq.labs (new domain, low DA — SEO strategy must account for this)
+**Website:** https://nurture.org.in (new domain, low DA — SEO strategy must account for this)
 **Blog purpose:** Drive organic traffic, build topical authority in parenting/child development, and funnel readers toward the Nurture product waitlist.
 
 ---

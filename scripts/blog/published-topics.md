@@ -15,6 +15,7 @@ Its purpose is to prevent duplicate topics and help plan content clusters.
 | 5 Fun Activities to Spark Your Child's Curiosity | activities to spark curiosity in kids | Activities | 2026-03-31 | five-fun-activities-spark-curiosity |
 | Understanding Screen Time: A Balanced Approach for Families | screen time for kids balanced approach | Parenting | 2026-03-31 | understanding-screen-time-balanced-approach |
 | Why Does Your Child Fall Apart After School? Understanding After-School Meltdowns | after school meltdowns 5 6 7 year olds | Child Development | 2026-04-01 | after-school-meltdowns-5-6-7-year-olds |
+| Why Your 4-6 Year Old Lies (It's Not What You Think) | child lying ages 4 5 6 | Child Development | 2026-04-02 | why-your-child-lies-ages-4-5-6 |
 
 ---
 

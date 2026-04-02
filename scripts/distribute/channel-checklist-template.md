@@ -1,6 +1,6 @@
 # Distribution Checklist — {POST TITLE}
 
-**Post URL:** https://enrichbeauty.com/blog/{slug}
+**Post URL:** https://nurture.org.in/blog/{slug}
 **Published:** {date}
 
 ---
@@ -8,10 +8,10 @@
 ## IMMEDIATE (within 1 hour of publishing)
 
 - [ ] **Google Search Console** — Submit URL for indexing
-  URL: https://search.google.com/search-console/inspect?resource_id=https://enrichbeauty.com&id=https://enrichbeauty.com/blog/{slug}
+  URL: https://search.google.com/search-console/inspect?resource_id=https://nurture.org.in&id=https://nurture.org.in/blog/{slug}
 
 - [ ] **Bing Webmaster Tools** — Submit URL
-  URL: https://www.bing.com/webmasters/submiturl?siteUrl=https://enrichbeauty.com&url=https://enrichbeauty.com/blog/{slug}
+  URL: https://www.bing.com/webmasters/submiturl?siteUrl=https://nurture.org.in&url=https://nurture.org.in/blog/{slug}
 
 - [ ] **Perplexity Publisher Portal** — Submit new content
   URL: https://perplexity.ai/publisher
@@ -32,7 +32,7 @@
   {WHATSAPP MESSAGE LINE 1}
   {WHATSAPP MESSAGE LINE 2}
 
-  Read: https://enrichbeauty.com/blog/{slug}
+  Read: https://nurture.org.in/blog/{slug}
   ```
 
 - [ ] **Instagram Carousel** — Post using generated copy + Canva template
@@ -58,7 +58,7 @@
   #Parenting #ChildDevelopment #Nurture
   ```
   **First comment (post immediately after):**
-  Full guide: https://enrichbeauty.com/blog/{slug}
+  Full guide: https://nurture.org.in/blog/{slug}
 
 - [ ] **X Thread** — Post 6-tweet thread
   ```

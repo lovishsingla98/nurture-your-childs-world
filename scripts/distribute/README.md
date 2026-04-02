@@ -72,19 +72,19 @@ Reads all published posts from Firestore, generates `public/sitemap.xml` and upd
 
 ### 1. Pinterest Rich Pins (high priority)
 1. Go to https://developers.pinterest.com/tools/url-debugger/
-2. Enter your blog URL: `https://enrichbeauty.com/blog`
+2. Enter your blog URL: `https://nurture.org.in/blog`
 3. Pinterest will detect the OG tags from your posts
 4. Apply for Rich Pins — approval is usually automatic
 
 ### 2. Google Search Console (high priority)
 1. Go to https://search.google.com/search-console
-2. Add property: `https://enrichbeauty.com`
+2. Add property: `https://nurture.org.in`
 3. Verify via DNS TXT record or HTML file upload
-4. Submit sitemap: `https://enrichbeauty.com/sitemap.xml`
+4. Submit sitemap: `https://nurture.org.in/sitemap.xml`
 
 ### 3. Bing Webmaster Tools
 1. Go to https://www.bing.com/webmasters
-2. Add site: `https://enrichbeauty.com`
+2. Add site: `https://nurture.org.in`
 3. Import from Google Search Console (easiest)
 4. Submit sitemap
 

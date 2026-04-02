@@ -17,7 +17,7 @@ import { getFirestore, collection, getDocs, query, where } from "firebase/firest
 import * as fs from "fs";
 import * as path from "path";
 
-const SITE_URL = "https://enrichbeauty.com";
+const SITE_URL = "https://nurture.org.in";
 
 const app = initializeApp({
   apiKey: "AIzaSyBNnvfHAfYMXOEktg9B5DjjDB0LcL5MPrk",

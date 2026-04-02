@@ -10,17 +10,12 @@
 import * as fs from "fs";
 import * as path from "path";
 
-const SITE_URL = "https://enrichbeauty.com";
+const SITE_URL = "https://nurture.org.in";
 const ORG_NAME = "Cortiq Labs";
 const PRODUCT_NAME = "Nurture";
 
 function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, " ").replace(/<!--.*?-->/g, " ").replace(/\s+/g, " ").trim();
-}
-
-function extractFirstParagraph(html: string): string {
-  const match = html.match(/<p[^>]*>(.*?)<\/p>/is);
-  return match ? stripHtml(match[1]) : "";
 }
 
 function extractFaqPairs(html: string): { question: string; answer: string }[] {
@@ -32,8 +27,9 @@ function extractFaqPairs(html: string): { question: string; answer: string }[] {
   const pairs: { question: string; answer: string }[] = [];
 
   // Extract h3 (question) + p (answer) pairs
-  const h3Matches = faqHtml.matchAll(/<h3[^>]*>(.*?)<\/h3>\s*<p[^>]*>(.*?)<\/p>/gis);
-  for (const match of h3Matches) {
+  const pattern = /<h3[^>]*>([\s\S]*?)<\/h3>\s*<p[^>]*>([\s\S]*?)<\/p>/gi;
+  let match: RegExpExecArray | null;
+  while ((match = pattern.exec(faqHtml)) !== null) {
     pairs.push({
       question: stripHtml(match[1]),
       answer: stripHtml(match[2]),
@@ -95,7 +91,7 @@ function generateFaqSchema(faqPairs: { question: string; answer: string }[]): ob
   };
 }
 
-function generateSpeakableSchema(data: Record<string, unknown>, introText: string): object {
+function generateSpeakableSchema(data: Record<string, unknown>): object {
   const slug = data.slug as string;
 
   return {
@@ -136,13 +132,12 @@ function main() {
 
   const content = (data.content as string) || "";
   const slug = (data.slug as string) || "unknown";
-  const introText = extractFirstParagraph(content);
   const faqPairs = extractFaqPairs(content);
 
   // Generate schemas
   const articleSchema = generateArticleSchema(data);
   const faqSchema = generateFaqSchema(faqPairs);
-  const speakableSchema = generateSpeakableSchema(data, introText);
+  const speakableSchema = generateSpeakableSchema(data);
 
   // Build HTML output
   let html = `<!-- Structured Data for: ${data.title} -->\n`;

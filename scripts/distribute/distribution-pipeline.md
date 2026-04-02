@@ -7,7 +7,7 @@
 ## Brand Context
 
 **Product:** Nurture — AI parenting co-pilot for ages 3–12 by Cortiq Labs
-**Website:** enrichbeauty.com
+**Website:** nurture.org.in
 **Audience:** Parents of children aged 3–12, primarily mothers 28–40, India-first but global
 **Brand voice:** Warm, evidence-based, practical, non-judgmental — friend-who-did-the-research tone
 **Visual identity:** Lavender primary, mint green accent, clean and airy, no harsh or clinical language
@@ -17,7 +17,7 @@
 - Instagram: [ADD YOUR HANDLE HERE]
 - LinkedIn: [ADD YOUR URL HERE]
 - Pinterest: [ADD YOUR URL HERE]
-- Blog base URL: https://enrichbeauty.com/blog
+- Blog base URL: https://nurture.org.in/blog
 
 ---
 

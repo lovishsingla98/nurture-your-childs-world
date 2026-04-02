@@ -1,4 +1,4 @@
 User-agent: *
 Disallow: /admin
 
-Sitemap: https://enrichbeauty.com/sitemap.xml
+Sitemap: https://nurture.org.in/sitemap.xml
