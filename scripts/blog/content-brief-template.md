@@ -26,6 +26,18 @@ Do NOT include `<h1>` — the post title is rendered separately by the blog temp
 
 ---
 
+## AEO (Answer Engine Optimisation) Requirements
+
+Every post must be LLM-ready from the start:
+
+- **Direct answer paragraph:** The first paragraph must contain a 1–2 sentence direct answer to the post's core question. LLMs extract this for citations.
+- **FAQ section:** Every post ends with an `<h2>Frequently Asked Questions</h2>` section containing exactly 4 Q&A pairs. Use `<h3>` for questions and `<p>` for answers. Questions must match how parents would actually phrase them.
+- **Research citation:** At least one `<blockquote>` citing a specific external source (AAP guidelines, WHO, a named study, or a credentialed expert). Format: "According to [source], [finding]."
+- **Speakable intro:** The intro paragraph should be written as a complete, standalone answer that makes sense read aloud — it will be marked with Speakable schema for voice assistants.
+- **Define key terms inline:** For any clinical or technical term used, include a brief plain-language definition in parentheses on first use. LLMs extract these definitions.
+
+---
+
 ## Section Structure
 
 Follow this structure for every post:
@@ -58,7 +70,14 @@ One `<blockquote>` containing a research reference or expert insight. Format:
 ### 5. Practical Takeaway Section (always second-to-last)
 A clear, scannable section (often a numbered list) summarising what the reader can do starting today. Title it something like "What You Can Try This Week" or "Quick Wins to Start Today".
 
-### 6. Closing Paragraph (final)
+### 6. Frequently Asked Questions (always before closing)
+An `<h2>Frequently Asked Questions</h2>` section with exactly 4 Q&A pairs:
+- Use `<h3>` for each question, `<p>` for the answer
+- Phrase questions as parents would actually search them
+- Keep answers to 2–3 sentences each
+- This section powers the FAQ schema for search engines and AI answers
+
+### 7. Closing Paragraph (final)
 Forward-looking and encouraging. No generic summary of what was covered. Instead:
 - Acknowledge the reader's effort
 - Point toward progress, not perfection
@@ -131,4 +150,8 @@ Before saving the final JSON, verify:
 - [ ] metaTitle is under 60 characters
 - [ ] metaDescription is under 160 characters
 - [ ] Slug matches title, is URL-safe
+- [ ] FAQ section present with exactly 4 Q&A pairs (h3 + p)
+- [ ] First paragraph contains a direct, standalone answer
+- [ ] At least one research citation with named source
+- [ ] Technical terms defined inline on first use
 - [ ] JSON saved to `scripts/blog/drafts/{slug}.json`
