@@ -33,12 +33,29 @@
 - **Caption:** 3-line hook + 5 relevant hashtags + "link in bio"
 - **Hashtag pool:** #parentingtips #childdevelopment #momlife #parentingadvice #raisingkids #gentleparenting #parenthood #kidsandparenting #childbehavior #parentinglife #IndianParenting #momsofindia #parentingindia
 
-### Pinterest (3 pins per post)
+### Pinterest (3 pins per post — AUTOMATED)
+
+**Fully automated** via `scripts/distribute/pinterest/create-pins.ts`. Run:
+```
+npx tsx scripts/distribute/pinterest/create-pins.ts \
+  scripts/blog/drafts/{slug}.json \
+  scripts/blog/drafts/{slug}-distribution.md
+```
+
+What the automation does:
+- Generates 3 pin images (1000x1500px) from the blog cover image using Sharp
+- Pin 1 published immediately, Pin 2 scheduled +1 day, Pin 3 scheduled +2 days
+- Pinterest rewards consistent daily activity — the 3-day spread is intentional strategy
+- Board auto-assigned based on post category via `boards.json`
+- All pins logged to `pinterest/pin-log.json`
+
+**Pin formats (generated during content session):**
 - **Pin 1:** Question format — "Why does my 5-year-old...?"
 - **Pin 2:** How-to format — "How to handle..."
 - **Pin 3:** Number format — "5 things every parent should know about..."
-- **Description:** 80–100 words, keyword in first sentence, naturally written, ends with "Read the full guide →"
-- **Board mapping:**
+- **Description:** 80–100 words, keyword in first sentence, ends with "Read the full guide →"
+
+**Board mapping** (configured in `setup-boards.ts`):
   | Category | Board |
   |----------|-------|
   | Child Development | Child Development Ages 3–12 |
@@ -49,6 +66,8 @@
   | Emotional Regulation | Raising Emotionally Healthy Kids |
   | Screen Time | Screen Time & Kids |
   | Parent Wellbeing | Parenting Self-Care |
+
+To add new boards: edit `BOARDS_TO_CREATE` and `CATEGORY_BOARD_MAP` in `setup-boards.ts`, then re-run it.
 
 ### WhatsApp Broadcast
 - **Max 4 lines**

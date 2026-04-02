@@ -21,6 +21,11 @@ Thumbs.db
 service-account.json
 *.service-account.json
 
+# Pinterest automation
+.pinterest-token.json
+scripts/distribute/pinterest/images/
+!scripts/distribute/pinterest/images/.gitkeep
+
 # Blog pipeline drafts (generated content)
 scripts/blog/drafts/
 !scripts/blog/drafts/.gitkeep
