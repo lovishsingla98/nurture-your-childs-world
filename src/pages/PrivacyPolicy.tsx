@@ -191,7 +191,7 @@ const PrivacyPolicy = () => {
                 <ul className="list-disc pl-6 space-y-2">
                   <li><strong>Email:</strong> cortiqlabs@gmail.com</li>
                   <li><strong>Website:</strong> https://nurture.org.in</li>
-                  <li><strong>Address:</strong> RH805, Purva Riviera, Bengaluru - 560037</li>
+                  <li><strong>Address:</strong> Purva Riviera, Bengaluru - 560037</li>
                 </ul>
                 <p className="text-green-800 mt-4">
                   We will respond to all privacy inquiries within 30 days.
