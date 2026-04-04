@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
+import { analytics } from "@/lib/analytics";
 import { BlogLayout } from "@/components/layout/BlogLayout";
 import { PostContent } from "@/components/blog/PostContent";
 import { PostSEO } from "@/components/blog/PostSEO";
@@ -57,6 +59,10 @@ function PostNotFound() {
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
   const { data: post, isLoading, error } = usePost(slug ?? "");
+
+  useEffect(() => {
+    if (slug) analytics.trackEvent("blog_opened", { slug });
+  }, [slug]);
 
   if (isLoading) return <PostDetailSkeleton />;
   if (!post || error) return <PostNotFound />;

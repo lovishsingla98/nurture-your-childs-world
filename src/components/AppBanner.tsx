@@ -1,3 +1,5 @@
+import { analytics } from "@/lib/analytics";
+
 const PLAY_STORE_URL =
   "https://play.google.com/store/apps/details?id=com.cortiqlabs.nurture";
 const BADGE_SRC =
@@ -23,6 +25,7 @@ const AppBanner = () => {
           href={PLAY_STORE_URL}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => analytics.trackEvent("playstore_banner_clicked")}
           className="shrink-0"
         >
           <img
