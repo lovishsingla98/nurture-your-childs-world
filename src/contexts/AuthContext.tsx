@@ -8,6 +8,7 @@ import {
   getIdToken
 } from 'firebase/auth';
 import { auth, googleProvider } from '../lib/firebase';
+import { analytics } from '../lib/analytics';
 
 interface AuthContextType {
   user: User | null;
@@ -114,6 +115,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Store the token in localStorage for API calls
       localStorage.setItem('authToken', idToken);
       
+      analytics.identifyUser(result.user.uid, result.user.email ?? undefined);
+
       console.log('Successfully signed in with Google:', result.user.email);
     } catch (error) {
       console.error('Error signing in with Google:', error);

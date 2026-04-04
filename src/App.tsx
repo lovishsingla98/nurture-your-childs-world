@@ -1,9 +1,10 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { initAnalytics, analytics } from "@/lib/analytics";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
@@ -36,6 +37,16 @@ const AdminComments = lazy(() => import("./pages/admin/AdminComments"));
 
 const queryClient = new QueryClient();
 
+initAnalytics();
+
+const PageTracker = () => {
+  const location = useLocation();
+  useEffect(() => {
+    analytics.trackPage(location.pathname);
+  }, [location.pathname]);
+  return null;
+};
+
 // Route wrapper that allows both authenticated and unauthenticated users to access public content
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
@@ -59,6 +70,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <PageTracker />
           <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading…</div>}>
           <Routes>
             <Route path="/" element={<PublicRoute><Index /></PublicRoute>} />

@@ -12,6 +12,7 @@ import childParentRobotHero from "@/assets/features/child-parent-robot-hero.png"
 import ParallaxEffect from "@/components/3d/ParallaxEffect";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { analytics } from "@/lib/analytics";
 
 const Index = () => {
   const canonical = typeof window !== 'undefined' ? window.location.href : 'https://nurture.cortiq.labs';
@@ -19,6 +20,7 @@ const Index = () => {
 
   const handleJoinNow = async () => {
     // Track CTA click
+    analytics.trackEvent("waitlist_clicked");
     if (typeof window !== "undefined" && window.gtag) {
       window.gtag("event", "cta_click", { event_category: "engagement", event_label: "join_now_hero" });
     }    try {
@@ -83,7 +85,7 @@ const Index = () => {
                         size="lg" 
                         className="bg-gradient-to-r from-purple-600 to-green-500 hover:from-purple-700 hover:to-green-600 text-white font-semibold px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 w-full sm:w-auto"
                       >
-                        <a href="/dashboard">Go to Dashboard</a>
+                        <a href="/dashboard" onClick={() => analytics.trackEvent("dashboard_cta_clicked")}>Go to Dashboard</a>
                       </Button>
                       <Button asChild size="lg" variant="soft" className="w-full sm:w-auto">
                         <a href="#features">Explore Features</a>
@@ -207,7 +209,7 @@ const Index = () => {
             {user ? "Continue your journey with personalized learning for your children." : "Join thousands of parents discovering joyful, personalized learning."}
           </p>
           <Button asChild size="lg" variant="hero" className="w-full sm:w-auto">
-            <a href={user ? "/dashboard" : "#waitlist"}>
+            <a href={user ? "/dashboard" : "#waitlist"} onClick={() => user ? analytics.trackEvent("dashboard_cta_clicked") : analytics.trackEvent("waitlist_clicked")}>
               {user ? "Go to Dashboard" : "Get Early Access"}
             </a>
           </Button>
