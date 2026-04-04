@@ -22,7 +22,7 @@ const Header = () => {
           <a href="#testimonials" className="hover:text-primary transition-colors">Testimonials</a>
           <a href="/blog" className="hover:text-primary transition-colors">Blog</a>
         </nav>
-        <div className="flex items-center gap-1 sm:gap-2">
+        <div className="hidden md:flex items-center gap-1 sm:gap-2">
           <Button asChild variant="soft" size="sm" className="text-xs sm:text-sm">
             <a href="#feedback">Feedback</a>
           </Button>
@@ -35,7 +35,9 @@ const Header = () => {
             </Button>
           )}
           <AuthButtons />
-          <MobileMenu />
+        </div>
+        <div className="md:hidden">
+          <MobileMenu user={user} />
         </div>
       </div>
     </header>

@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import AppBanner from "@/components/AppBanner";
 import Header from "@/components/site/Header";
 import Footer from "@/components/site/Footer";
 import WaitlistForm from "@/components/forms/WaitlistForm";
@@ -63,6 +64,7 @@ const Index = () => {
       <main>
         {/* Hero */}
         <section className="hero-veil pt-0">
+          <AppBanner />
           <Header />
           <div className="container px-4 sm:px-6 lg:px-8">
             <div className="grid gap-8 lg:grid-cols-2 items-center py-8 sm:py-12 md:py-16 lg:py-20">
