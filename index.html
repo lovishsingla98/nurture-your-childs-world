@@ -35,6 +35,11 @@
     <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     <link rel="dns-prefetch" href="https://app.posthog.com">
 
+    <!-- Preload LCP hero image -->
+    <link rel="preload" as="image" href="/images/child-parent-robot-hero-desktop.webp" type="image/webp" fetchpriority="high">
+    <!-- Preload FCP logo -->
+    <link rel="preload" as="image" href="/images/nurture-logo.webp">
+
     <!-- JSON-LD: Organization -->
     <script type="application/ld+json">
     {
@@ -88,7 +93,7 @@
     </script>
 
     <!-- GA4 (placeholder - replace with actual measurement ID) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"></script>
+    <script defer src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"></script>
     <script defer>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}

@@ -39,7 +39,8 @@ export default defineConfig(({ mode }) => ({
         },
       },
     },
-    // Enable source maps for production debugging
+    assetsInlineLimit: 4096,
+    cssCodeSplit: true,
     sourcemap: mode === 'development',
   },
   // Security headers for development
