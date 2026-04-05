@@ -4,10 +4,17 @@ const POSTHOG_KEY = import.meta.env.VITE_POSTHOG_KEY as string | undefined;
 
 export function initAnalytics() {
   if (!POSTHOG_KEY) return;
-  posthog.init(POSTHOG_KEY, {
-    api_host: "https://app.posthog.com",
-    autocapture: true,
-  });
+  const init = () => {
+    posthog.init(POSTHOG_KEY, {
+      api_host: "https://app.posthog.com",
+      autocapture: true,
+    });
+  };
+  if ("requestIdleCallback" in window) {
+    requestIdleCallback(init);
+  } else {
+    setTimeout(init, 1);
+  }
 }
 
 export const analytics = {

@@ -32,6 +32,8 @@ const AppBanner = () => {
             src={BADGE_SRC}
             alt="Get it on Google Play"
             className="h-auto w-[120px] sm:w-[160px]"
+            width="160"
+            height="48"
           />
         </a>
       </div>

@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import FeatureSlides from "@/components/sections/FeatureSlides";
 import { Sparkles, Brain, Baby, ChartNoAxesGantt, Stars, ShieldCheck } from "lucide-react";
-import childParentRobotHero from "@/assets/features/child-parent-robot-hero.png";
+import childParentRobotHeroMobile from "@/assets/features/child-parent-robot-hero-mobile.webp";
+import childParentRobotHeroDesktop from "@/assets/features/child-parent-robot-hero-desktop.webp";
+import childParentRobotHeroFallback from "@/assets/features/child-parent-robot-hero.png";
 import ParallaxEffect from "@/components/3d/ParallaxEffect";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -112,13 +114,22 @@ const Index = () => {
               <div className="flex justify-center depth-layer-3 order-first lg:order-last">
                 <ParallaxEffect intensity={0.05} className="w-full max-w-md lg:max-w-full">
                   <div className="relative w-full hero-image-3d" style={{ background: 'transparent' }}>
-                    <img 
-                      src={childParentRobotHero}
-                      alt="Child and parent with AI robot co-pilot learning together" 
-                      className="w-full h-auto" 
-                      loading="lazy"
-                      style={{ background: 'transparent' }}
-                    />
+                    <picture>
+                      <source
+                        srcSet={`${childParentRobotHeroMobile} 390w, ${childParentRobotHeroDesktop} 800w`}
+                        sizes="(max-width: 768px) 390px, 800px"
+                        type="image/webp"
+                      />
+                      <img
+                        src={childParentRobotHeroFallback}
+                        alt="Child and parent with AI robot co-pilot learning together"
+                        className="w-full h-auto"
+                        width="800"
+                        height="800"
+                        fetchPriority="high"
+                        style={{ background: 'transparent' }}
+                      />
+                    </picture>
                   </div>
                 </ParallaxEffect>
               </div>

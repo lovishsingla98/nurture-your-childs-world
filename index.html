@@ -30,8 +30,10 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico">
 
     <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+    <link rel="dns-prefetch" href="https://app.posthog.com">
 
     <!-- JSON-LD: Organization -->
     <script type="application/ld+json">
@@ -87,12 +89,12 @@
 
     <!-- GA4 (placeholder - replace with actual measurement ID) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"></script>
-    <script>
+    <script defer>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
       gtag('config', 'G-XXXXXXX');
-      
+
       // CTA tracking function
       function trackCTA(label){
         gtag('event', 'cta_click', { event_category: 'engagement', event_label: label });
