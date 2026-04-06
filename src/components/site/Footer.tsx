@@ -6,7 +6,7 @@ const Footer = () => {
       <div className="container py-10 grid gap-8 md:grid-cols-3">
         <div className="space-y-3">
           <div className="flex items-center gap-3">
-            <img src="/CortiqLabs.png" alt="Cortiq Labs logo" className="h-8 w-8" loading="lazy" />
+            <img src="/CortiqLabs.webp" alt="Cortiq Labs logo" className="h-8 w-8" width="32" height="32" loading="lazy" />
             <div className="font-semibold">Cortiq Labs</div>
           </div>
           <p className="text-sm text-muted-foreground">Building human-centered AI for families.</p>

@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import { getCanonicalUrl } from "@/lib/seo";
 import AppBanner from "@/components/AppBanner";
 import Header from "@/components/site/Header";
 import Footer from "@/components/site/Footer";
@@ -8,14 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import FeatureSlides from "@/components/sections/FeatureSlides";
 import { Sparkles, Brain, Baby, ChartNoAxesGantt, Stars, ShieldCheck } from "lucide-react";
-import childParentRobotHero from "@/assets/features/child-parent-robot-hero.png";
 import ParallaxEffect from "@/components/3d/ParallaxEffect";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { analytics } from "@/lib/analytics";
 
 const Index = () => {
-  const canonical = typeof window !== 'undefined' ? window.location.href : 'https://nurture.cortiq.labs';
+  const canonical = getCanonicalUrl("/");
   const { signInWithGoogle, loading, user } = useAuth();
 
   const handleJoinNow = async () => {
@@ -112,13 +112,22 @@ const Index = () => {
               <div className="flex justify-center depth-layer-3 order-first lg:order-last">
                 <ParallaxEffect intensity={0.05} className="w-full max-w-md lg:max-w-full">
                   <div className="relative w-full hero-image-3d" style={{ background: 'transparent' }}>
-                    <img 
-                      src={childParentRobotHero}
-                      alt="Child and parent with AI robot co-pilot learning together" 
-                      className="w-full h-auto" 
-                      loading="lazy"
-                      style={{ background: 'transparent' }}
-                    />
+                    <picture>
+                      <source
+                        srcSet="/images/child-parent-robot-hero-mobile.webp 390w, /images/child-parent-robot-hero-desktop.webp 800w"
+                        sizes="(max-width: 768px) 390px, 800px"
+                        type="image/webp"
+                      />
+                      <img
+                        src="/images/child-parent-robot-hero.png"
+                        alt="Child and parent with AI robot co-pilot learning together"
+                        className="w-full h-auto"
+                        width={800}
+                        height={800}
+                        fetchPriority="high"
+                        style={{ background: 'transparent' }}
+                      />
+                    </picture>
                   </div>
                 </ParallaxEffect>
               </div>

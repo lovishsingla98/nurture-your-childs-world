@@ -3,14 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Brain, CalendarCheck2, MessageSquare, Rocket, Sparkles, Waypoints, Workflow } from "lucide-react";
-import dailyTaskImg from "@/assets/features/daily-task.jpg";
-import weeklyInterestImg from "@/assets/features/weekly-interest.jpg";
-import weeklyPotentialImg from "@/assets/features/weekly-potential.jpg";
-import careerInsightsImg from "@/assets/features/career-insights.jpg";
-import sparkInterestImg from "@/assets/features/spark-interest.jpg";
-import weeklyQuizImg from "@/assets/features/weekly-quiz.jpg";
-import parentsChatbotImg from "@/assets/features/parents-chatbot.jpg";
-import moralStoryImg from "@/assets/features/moral-story.jpg";
+import dailyTaskImg from "@/assets/features/daily-task.webp";
+import weeklyInterestImg from "@/assets/features/weekly-interest.webp";
+import weeklyPotentialImg from "@/assets/features/weekly-potential.webp";
+import careerInsightsImg from "@/assets/features/career-insights.webp";
+import sparkInterestImg from "@/assets/features/spark-interest.webp";
+import weeklyQuizImg from "@/assets/features/weekly-quiz.webp";
+import parentsChatbotImg from "@/assets/features/parents-chatbot.webp";
+import moralStoryImg from "@/assets/features/moral-story.webp";
 const slides = [
   {
     title: "One Daily Task. Every Domain. Every Skill.",
@@ -115,6 +115,8 @@ const FeatureSlides = () => {
                             src={s.image}
                             alt={s.alt}
                             loading="lazy"
+                            width="640"
+                            height="400"
                             className="h-full w-full rounded-lg object-cover shadow"
                           />
                         </AspectRatio>
