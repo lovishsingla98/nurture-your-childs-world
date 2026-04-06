@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import { getCanonicalUrl } from "@/lib/seo";
 import AppBanner from "@/components/AppBanner";
 import Header from "@/components/site/Header";
 import Footer from "@/components/site/Footer";
@@ -14,7 +15,7 @@ import { toast } from "sonner";
 import { analytics } from "@/lib/analytics";
 
 const Index = () => {
-  const canonical = typeof window !== 'undefined' ? window.location.href : 'https://nurture.cortiq.labs';
+  const canonical = getCanonicalUrl("/");
   const { signInWithGoogle, loading, user } = useAuth();
 
   const handleJoinNow = async () => {

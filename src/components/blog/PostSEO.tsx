@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import { getCanonicalUrl } from "@/lib/seo";
 import type { Post } from "@/types/blog";
 
 interface PostSEOProps {
@@ -8,8 +9,7 @@ interface PostSEOProps {
 export function PostSEO({ post }: PostSEOProps) {
   const title = post.metaTitle || post.title;
   const description = post.metaDescription || post.excerpt;
-  const canonicalUrl = `/blog/${post.slug}`;
-  const fullUrl = `${window.location.origin}${canonicalUrl}`;
+  const fullUrl = getCanonicalUrl(`/blog/${post.slug}`);
   const publishedDate = post.publishedAt?.toDate().toISOString() ?? "";
   const modifiedDate = post.updatedAt?.toDate().toISOString() ?? "";
 
@@ -39,7 +39,7 @@ export function PostSEO({ post }: PostSEOProps) {
     <Helmet>
       <title>{`${title} — Nurture`}</title>
       <meta name="description" content={description} />
-      <link rel="canonical" href={canonicalUrl} />
+      <link rel="canonical" href={fullUrl} />
 
       {/* Open Graph */}
       <meta property="og:type" content="article" />
@@ -86,7 +86,7 @@ export function BlogListSEO({ category }: BlogListSEOProps) {
     <Helmet>
       <title>{title}</title>
       <meta name="description" content={description} />
-      <link rel="canonical" href="/blog" />
+      <link rel="canonical" href={getCanonicalUrl("/blog")} />
     </Helmet>
   );
 }

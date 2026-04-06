@@ -1,9 +1,15 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
+import { getCanonicalUrl } from '@/lib/seo';
 import { Card, CardContent } from '@/components/ui/card';
 
 const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
+      <Helmet>
+        <title>Privacy Policy — Nurture</title>
+        <link rel="canonical" href={getCanonicalUrl("/privacy")} />
+      </Helmet>
       <div className="max-w-4xl mx-auto px-4">
         <Card className="shadow-lg">
           <CardContent className="p-8">

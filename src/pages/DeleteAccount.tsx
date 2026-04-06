@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { getCanonicalUrl } from '@/lib/seo';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -73,6 +75,10 @@ Please process this account deletion request within 30 days.
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
+      <Helmet>
+        <title>Delete Account — Nurture</title>
+        <link rel="canonical" href={getCanonicalUrl("/delete-account")} />
+      </Helmet>
       <div className="max-w-4xl mx-auto px-4">
         <Card className="shadow-lg">
           <CardHeader className="text-center">
