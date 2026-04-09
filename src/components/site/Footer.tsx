@@ -12,7 +12,7 @@ const Footer = () => {
           <p className="text-sm text-muted-foreground">Building human-centered AI for families.</p>
         </div>
         <div>
-          <h4 className="font-medium mb-3">Company</h4>
+          <h3 className="font-medium mb-3">Company</h3>
           <ul className="text-sm space-y-2 text-muted-foreground">
             <li><a href="#features" className="hover:text-foreground">Features</a></li>
             <li><a href="#waitlist" className="hover:text-foreground">Waitlist</a></li>
@@ -22,10 +22,10 @@ const Footer = () => {
           </ul>
         </div>
         <div>
-          <h4 className="font-medium mb-3">Connect</h4>
+          <h3 className="font-medium mb-3">Connect</h3>
           <div className="flex items-center gap-4 text-muted-foreground">
-            <a href="mailto:cortiqlabs@gmail.com" aria-label="Email" className="hover:text-foreground"><Mail size={18} /></a>
-            <a href="https://wa.me/919148361554" aria-label="WhatsApp" className="hover:text-foreground"><MessageCircle size={18} /></a>
+            <a href="mailto:cortiqlabs@gmail.com" aria-label="Email" className="hover:text-foreground"><Mail aria-hidden="true" size={18} /></a>
+            <a href="https://wa.me/919148361554" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="hover:text-foreground"><MessageCircle aria-hidden="true" size={18} /></a>
           </div>
         </div>
       </div>

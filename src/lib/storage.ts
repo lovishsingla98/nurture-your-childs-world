@@ -4,7 +4,7 @@ import {
   getDownloadURL,
   type UploadTask,
 } from "firebase/storage";
-import { storage } from "./firebase";
+import { getFirebaseStorage } from "./firebase";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
@@ -17,10 +17,6 @@ export interface UploadProgress {
 
 /**
  * Upload an image to Firebase Storage.
- * @param file - The file to upload
- * @param path - Storage path (e.g. "blog-covers/{postId}/{filename}")
- * @param onProgress - Callback for upload progress
- * @returns Download URL
  */
 export function uploadImage(
   file: File,
@@ -45,29 +41,39 @@ export function uploadImage(
     };
   }
 
-  const storageRef = ref(storage, path);
-  const task = uploadBytesResumable(storageRef, file);
+  // Lazy wrapper: we need to start the upload after getting storage
+  let resolveTask: (task: UploadTask) => void;
+  const taskPromise = new Promise<UploadTask>((r) => { resolveTask = r; });
 
-  const promise = new Promise<string>((resolve, reject) => {
-    task.on(
-      "state_changed",
-      (snapshot) => {
-        const progress = Math.round(
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-        );
-        onProgress?.({ progress });
-      },
-      (error) => {
-        onProgress?.({ progress: 0, error: error.message });
-        reject(error);
-      },
-      async () => {
-        const url = await getDownloadURL(task.snapshot.ref);
-        onProgress?.({ progress: 100, url });
-        resolve(url);
-      }
-    );
+  const promise = getFirebaseStorage().then((storage) => {
+    const storageRef = ref(storage, path);
+    const task = uploadBytesResumable(storageRef, file);
+    resolveTask(task);
+
+    return new Promise<string>((resolve, reject) => {
+      task.on(
+        "state_changed",
+        (snapshot) => {
+          const progress = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
+          onProgress?.({ progress });
+        },
+        (error) => {
+          onProgress?.({ progress: 0, error: error.message });
+          reject(error);
+        },
+        async () => {
+          const url = await getDownloadURL(task.snapshot.ref);
+          onProgress?.({ progress: 100, url });
+          resolve(url);
+        }
+      );
+    });
   });
 
-  return { promise, task };
+  return {
+    promise,
+    task: null as unknown as UploadTask, // Task is resolved async
+  };
 }

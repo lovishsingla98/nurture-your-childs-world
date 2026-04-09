@@ -1,7 +1,7 @@
-import { initializeApp } from 'firebase/app';
-import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
-import { getAuth, connectAuthEmulator, GoogleAuthProvider } from 'firebase/auth';
-import { getStorage } from 'firebase/storage';
+import type { FirebaseApp } from 'firebase/app';
+import type { Firestore } from 'firebase/firestore';
+import type { Auth, GoogleAuthProvider } from 'firebase/auth';
+import type { FirebaseStorage } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'demo-key',
@@ -12,52 +12,45 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:123456789012:web:demo'
 };
 
-// Initialize Firebase
-let app;
-try {
-  app = initializeApp(firebaseConfig);
-  console.log('Firebase initialized successfully');
-} catch (error) {
-  console.error('Error initializing Firebase:', error);
-  // Create a fallback config for development
-  const fallbackConfig = {
-    apiKey: 'demo-key',
-    authDomain: 'demo.firebaseapp.com',
-    projectId: 'demo',
-    storageBucket: 'demo.appspot.com',
-    messagingSenderId: '123456789012',
-    appId: '1:123456789012:web:demo'
-  };
-  app = initializeApp(fallbackConfig);
+// Lazy singletons — Firebase modules load on first use, not at page load
+let _app: FirebaseApp | null = null;
+let _db: Firestore | null = null;
+let _auth: Auth | null = null;
+let _googleProvider: GoogleAuthProvider | null = null;
+let _storage: FirebaseStorage | null = null;
+
+export async function getFirebaseApp(): Promise<FirebaseApp> {
+  if (!_app) {
+    const { initializeApp } = await import('firebase/app');
+    _app = initializeApp(firebaseConfig);
+  }
+  return _app;
 }
 
-// Initialize Firestore
-export const db = getFirestore(app);
-
-// Initialize Auth
-export const auth = getAuth(app);
-
-// Initialize Google Auth Provider
-export const googleProvider = new GoogleAuthProvider();
-
-// Initialize Storage
-export const storage = getStorage(app);
-
-// Connect to emulators in development (only if explicitly enabled)
-if (import.meta.env.DEV && import.meta.env.VITE_USE_EMULATORS === 'true') {
-  try {
-    connectFirestoreEmulator(db, 'localhost', 8080);
-  } catch (error) {
-    // Emulator already connected or other connection error
-    console.log('Firestore emulator connection skipped:', error);
+export async function getFirebaseDb(): Promise<Firestore> {
+  if (!_db) {
+    const app = await getFirebaseApp();
+    const { getFirestore } = await import('firebase/firestore');
+    _db = getFirestore(app);
   }
-  
-  try {
-    connectAuthEmulator(auth, 'http://localhost:9099');
-  } catch (error) {
-    // Emulator already connected or other connection error
-    console.log('Auth emulator connection skipped:', error);
-  }
+  return _db;
 }
 
-export default app; 
+export async function getFirebaseAuth(): Promise<{ auth: Auth; googleProvider: GoogleAuthProvider }> {
+  if (!_auth) {
+    const app = await getFirebaseApp();
+    const { getAuth, GoogleAuthProvider } = await import('firebase/auth');
+    _auth = getAuth(app);
+    _googleProvider = new GoogleAuthProvider();
+  }
+  return { auth: _auth, googleProvider: _googleProvider! };
+}
+
+export async function getFirebaseStorage(): Promise<FirebaseStorage> {
+  if (!_storage) {
+    const app = await getFirebaseApp();
+    const { getStorage } = await import('firebase/storage');
+    _storage = getStorage(app);
+  }
+  return _storage;
+}

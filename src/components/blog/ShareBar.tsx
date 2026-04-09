@@ -20,7 +20,8 @@ export function ShareBar({ url, title }: ShareBarProps) {
   function shareWhatsApp() {
     window.open(
       `https://wa.me/?text=${encodeURIComponent(`${title} — ${canonicalUrl}`)}`,
-      "_blank"
+      "_blank",
+      "noopener,noreferrer"
     );
   }
 
@@ -41,11 +42,11 @@ export function ShareBar({ url, title }: ShareBarProps) {
       <Button variant="outline" size="sm" onClick={copyLink}>
         {copied ? (
           <>
-            <Check className="mr-1 h-4 w-4" /> Copied!
+            <Check aria-hidden="true" className="mr-1 h-4 w-4" /> Copied!
           </>
         ) : (
           <>
-            <Link2 className="mr-1 h-4 w-4" /> Copy link
+            <Link2 aria-hidden="true" className="mr-1 h-4 w-4" /> Copy link
           </>
         )}
       </Button>
@@ -53,7 +54,7 @@ export function ShareBar({ url, title }: ShareBarProps) {
         WhatsApp
       </Button>
       <Button variant="outline" size="sm" onClick={shareNative}>
-        <Share2 className="mr-1 h-4 w-4" /> Share
+        <Share2 aria-hidden="true" className="mr-1 h-4 w-4" /> Share
       </Button>
     </div>
   );

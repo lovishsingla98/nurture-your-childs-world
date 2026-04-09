@@ -1,13 +1,5 @@
-import {
-  GoogleAuthProvider,
-  signInWithPopup,
-  signOut as firebaseSignOut,
-} from "firebase/auth";
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
-import { auth, db } from "./firebase";
+import { getFirebaseAuth, getFirebaseDb } from "./firebase";
 import type { UserProfile } from "@/types/blog";
-
-const googleProvider = new GoogleAuthProvider();
 
 /**
  * Sign in with Google popup.
@@ -15,6 +7,11 @@ const googleProvider = new GoogleAuthProvider();
  * If not, create a new profile matching the existing parents schema.
  */
 export async function signInWithGoogle() {
+  const { auth, googleProvider } = await getFirebaseAuth();
+  const { signInWithPopup } = await import("firebase/auth");
+  const { doc, getDoc, setDoc, updateDoc, serverTimestamp } = await import("firebase/firestore");
+  const db = await getFirebaseDb();
+
   const result = await signInWithPopup(auth, googleProvider);
   const user = result.user;
 
@@ -22,7 +19,6 @@ export async function signInWithGoogle() {
   const parentSnap = await getDoc(parentRef);
 
   if (!parentSnap.exists()) {
-    // New user — create profile matching existing parents schema
     const now = serverTimestamp();
     await setDoc(parentRef, {
       uid: user.uid,
@@ -57,8 +53,8 @@ export async function signInWithGoogle() {
       updatedAt: now,
     });
   } else {
-    // Existing user — update last sign-in
-    await updateDoc(parentRef, {
+    const { serverTimestamp, updateDoc: update } = await import("firebase/firestore");
+    await update(parentRef, {
       "auth.lastSignIn": serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
@@ -71,14 +67,18 @@ export async function signInWithGoogle() {
  * Sign out the current user.
  */
 export async function signOut() {
+  const { auth } = await getFirebaseAuth();
+  const { signOut: firebaseSignOut } = await import("firebase/auth");
   await firebaseSignOut(auth);
 }
 
 /**
  * Fetch the user profile from the `parents` collection.
- * Maps the parents schema to the UserProfile interface.
  */
 export async function getUserProfile(uid: string): Promise<UserProfile | null> {
+  const { doc, getDoc } = await import("firebase/firestore");
+  const db = await getFirebaseDb();
+
   const parentRef = doc(db, "parents", uid);
   const parentSnap = await getDoc(parentRef);
   if (!parentSnap.exists()) return null;

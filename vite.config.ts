@@ -1,5 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
+import { visualizer } from "rollup-plugin-visualizer";
+import compression from "vite-plugin-compression";
 import path from "path";
 
 // https://vitejs.dev/config/
@@ -10,6 +12,9 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
+    compression({ algorithm: 'gzip', ext: '.gz' }),
+    compression({ algorithm: 'brotliCompress', ext: '.br' }),
+    mode === 'analyze' && visualizer({ open: true, gzipSize: true, brotliSize: true }),
   ],
   resolve: {
     alias: {
@@ -17,6 +22,8 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
+    // Target modern browsers to eliminate legacy polyfills (~28KB savings)
+    target: 'es2020',
     // Performance optimizations
     minify: 'terser',
     terserOptions: {
@@ -27,15 +34,14 @@ export default defineConfig(({ mode }) => ({
     },
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom'],
-          'vendor-router': ['react-router-dom'],
-          'vendor-query': ['@tanstack/react-query'],
-          'vendor-firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore'],
-          'posthog': ['posthog-js'],
-          'vendor-tiptap': ['@tiptap/react', '@tiptap/starter-kit'],
-          'vendor-recharts': ['recharts'],
-          'ui': ['@radix-ui/react-accordion', '@radix-ui/react-alert-dialog', '@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-tooltip'],
+        manualChunks(id) {
+          // Only force-chunk libraries that are needed on EVERY page load.
+          // Everything else (Firebase, Tiptap, PostHog, Recharts, Radix)
+          // is left to Vite's natural code-splitting via lazy routes.
+          if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/')) {
+            return 'vendor-react';
+          }
+          if (id.includes('node_modules/react-router')) return 'vendor-router';
         },
       },
     },

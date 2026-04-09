@@ -35,7 +35,7 @@ export default function Blog() {
 
   return (
     <BlogLayout>
-      <BlogListSEO category={category} />
+      <BlogListSEO category={category} page={page} />
       <section className="container py-10 md:py-16">
         <div className="mb-8">
           <h1 className="text-3xl font-bold md:text-4xl">Blog</h1>

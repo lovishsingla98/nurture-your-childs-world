@@ -32,9 +32,18 @@ const FeedbackForm = () => {
 
   return (
     <form onSubmit={onSubmit} className="grid gap-3 ">
-      <Input placeholder="Your name" value={name} onChange={e => setName(e.target.value)} />
-      <Input type="email" placeholder="Email address" value={email} onChange={e => setEmail(e.target.value)} />
-      <Textarea placeholder="Share your thoughts..." value={message} onChange={e => setMessage(e.target.value)} required />
+      <div>
+        <label htmlFor="feedback-name" className="sr-only">Your name</label>
+        <Input id="feedback-name" placeholder="Your name" value={name} onChange={e => setName(e.target.value)} />
+      </div>
+      <div>
+        <label htmlFor="feedback-email" className="sr-only">Email address</label>
+        <Input id="feedback-email" type="email" placeholder="Email address" value={email} onChange={e => setEmail(e.target.value)} />
+      </div>
+      <div>
+        <label htmlFor="feedback-message" className="sr-only">Your feedback</label>
+        <Textarea id="feedback-message" placeholder="Share your thoughts..." value={message} onChange={e => setMessage(e.target.value)} required />
+      </div>
       <Button type="submit" variant="soft" disabled={loading} className="">{loading ? "Sending..." : "Send Feedback"}</Button>
     </form>
   );

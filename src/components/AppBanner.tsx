@@ -2,8 +2,7 @@ import { analytics } from "@/lib/analytics";
 
 const PLAY_STORE_URL =
   "https://play.google.com/store/apps/details?id=com.cortiqlabs.nurture";
-const BADGE_SRC =
-  "https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg";
+const BADGE_SRC = "/images/google-play-badge.svg";
 
 const AppBanner = () => {
   return (

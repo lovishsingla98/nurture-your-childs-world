@@ -27,12 +27,41 @@ export function PostSEO({ post }: PostSEOProps) {
     publisher: {
       "@type": "Organization",
       name: "Nurture",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://nurture.org.in/images/nurture-logo.webp",
+      },
     },
     description,
     mainEntityOfPage: {
       "@type": "WebPage",
       "@id": fullUrl,
     },
+  };
+
+  const breadcrumbData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://nurture.org.in/",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Blog",
+        item: "https://nurture.org.in/blog",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: post.title,
+        item: fullUrl,
+      },
+    ],
   };
 
   return (
@@ -47,6 +76,13 @@ export function PostSEO({ post }: PostSEOProps) {
       <meta property="og:description" content={description} />
       <meta property="og:url" content={fullUrl} />
       {post.coverImage && <meta property="og:image" content={post.coverImage} />}
+
+      {/* Twitter Card */}
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content={title} />
+      <meta name="twitter:description" content={description} />
+      {post.coverImage && <meta name="twitter:image" content={post.coverImage} />}
+      <meta name="twitter:site" content="@cortiqlabs" />
 
       {/* Article meta */}
       {publishedDate && (
@@ -66,15 +102,19 @@ export function PostSEO({ post }: PostSEOProps) {
       <script type="application/ld+json">
         {JSON.stringify(structuredData)}
       </script>
+      <script type="application/ld+json">
+        {JSON.stringify(breadcrumbData)}
+      </script>
     </Helmet>
   );
 }
 
 interface BlogListSEOProps {
   category?: string;
+  page?: number;
 }
 
-export function BlogListSEO({ category }: BlogListSEOProps) {
+export function BlogListSEO({ category, page }: BlogListSEOProps) {
   const title = category
     ? `${category} Blog Posts — Nurture`
     : "Blog — Nurture";
@@ -82,11 +122,35 @@ export function BlogListSEO({ category }: BlogListSEOProps) {
     ? `Read our latest ${category.toLowerCase()} articles and insights.`
     : "Explore parenting tips, child development insights, and more from Nurture.";
 
+  const canonicalPath = page && page > 1 ? `/blog?page=${page}` : "/blog";
+
+  const breadcrumbData = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://nurture.org.in/",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Blog",
+        item: "https://nurture.org.in/blog",
+      },
+    ],
+  };
+
   return (
     <Helmet>
       <title>{title}</title>
       <meta name="description" content={description} />
-      <link rel="canonical" href={getCanonicalUrl("/blog")} />
+      <link rel="canonical" href={getCanonicalUrl(canonicalPath)} />
+      <script type="application/ld+json">
+        {JSON.stringify(breadcrumbData)}
+      </script>
     </Helmet>
   );
 }

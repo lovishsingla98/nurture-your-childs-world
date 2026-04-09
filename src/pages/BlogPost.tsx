@@ -48,7 +48,7 @@ function PostNotFound() {
           to="/blog"
           className="inline-flex items-center gap-2 text-primary hover:underline"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft aria-hidden="true" className="h-4 w-4" />
           Back to Blog
         </Link>
       </div>
@@ -78,7 +78,7 @@ export default function BlogPost() {
           to="/blog"
           className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft aria-hidden="true" className="h-4 w-4" />
           Back to Blog
         </Link>
 
@@ -105,11 +105,11 @@ export default function BlogPost() {
           </h1>
           <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" />
+              <Calendar aria-hidden="true" className="h-4 w-4" />
               {formatDate(post.publishedAt)}
             </span>
             <span className="flex items-center gap-1">
-              <Clock className="h-4 w-4" />
+              <Clock aria-hidden="true" className="h-4 w-4" />
               {readTime} min read
             </span>
           </div>
