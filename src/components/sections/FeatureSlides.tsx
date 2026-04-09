@@ -99,7 +99,7 @@ const FeatureSlides = () => {
                   <Card className="glass-card h-full">
                     <CardHeader>
                       <CardTitle className="flex items-start gap-3">
-                        <Icon className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                        <Icon aria-hidden="true" className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                         <span>{s.title}</span>
                       </CardTitle>
                       {s.subtitle ? (
@@ -115,6 +115,7 @@ const FeatureSlides = () => {
                             src={s.image}
                             alt={s.alt}
                             loading="lazy"
+                            decoding="async"
                             width="640"
                             height="400"
                             className="h-full w-full rounded-lg object-cover shadow"
@@ -141,7 +142,7 @@ const FeatureSlides = () => {
             <Card key={i} className="glass-card h-full">
               <CardHeader>
                 <CardTitle className="flex items-start gap-3">
-                  <Icon className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                  <Icon aria-hidden="true" className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                   <span>{s.title}</span>
                 </CardTitle>
                 {s.subtitle ? (
@@ -157,6 +158,9 @@ const FeatureSlides = () => {
                       src={s.image}
                       alt={s.alt}
                       loading="lazy"
+                      decoding="async"
+                      width="640"
+                      height="400"
                       className="h-full w-full rounded-lg object-cover shadow"
                     />
                   </AspectRatio>

@@ -29,14 +29,13 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico">
 
-    <!-- Preconnect for performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
-    <link rel="dns-prefetch" href="https://app.posthog.com">
+    <!-- DNS prefetch for deferred third-party scripts -->
+    <link rel="dns-prefetch" href="https://us.i.posthog.com">
+    <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin>
 
     <!-- Preload LCP hero image -->
-    <link rel="preload" as="image" href="/images/child-parent-robot-hero-desktop.webp" type="image/webp" fetchpriority="high">
+    <link rel="preload" as="image" href="/images/child-parent-robot-hero-desktop.webp" type="image/webp" fetchpriority="high" imagesizes="(max-width: 768px) 390px, 700px" imagesrcset="/images/child-parent-robot-hero-mobile.webp 390w, /images/child-parent-robot-hero-desktop.webp 700w">
     <!-- Preload FCP logo -->
     <link rel="preload" as="image" href="/images/nurture-logo.webp">
 
@@ -47,7 +46,7 @@
       "@type": "Organization",
       "name": "Nurture",
       "url": "https://nurture.org.in",
-      "logo": "https://nurture.org.in/logo.png",
+      "logo": "https://nurture.org.in/images/nurture-logo.webp",
       "description": "AI Co-pilot for Modern Parenting - Personalized daily activities and moral stories for ages 3–12",
       "foundingDate": "2024",
       "sameAs": ["https://www.instagram.com/nurtureapphq/"]
@@ -92,19 +91,6 @@
     }
     </script>
 
-    <!-- GA4 (placeholder - replace with actual measurement ID) -->
-    <script defer src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"></script>
-    <script defer>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-XXXXXXX');
-
-      // CTA tracking function
-      function trackCTA(label){
-        gtag('event', 'cta_click', { event_category: 'engagement', event_label: label });
-      }
-    </script>
   </head>
 
   <body>

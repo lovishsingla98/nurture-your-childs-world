@@ -10,10 +10,8 @@ import {
   serverTimestamp,
   writeBatch,
 } from "firebase/firestore";
-import { db } from "./firebase";
+import { getFirebaseDb } from "./firebase";
 import type { Post } from "@/types/blog";
-
-const postsRef = collection(db, "posts");
 
 // --- Slug helpers ---
 
@@ -27,7 +25,8 @@ export function generateSlug(title: string): string {
 }
 
 export async function isSlugUnique(slug: string, excludeId?: string): Promise<boolean> {
-  const q = query(postsRef, where("slug", "==", slug));
+  const db = await getFirebaseDb();
+  const q = query(collection(db, "posts"), where("slug", "==", slug));
   const snap = await getDocs(q);
   if (snap.empty) return true;
   if (excludeId && snap.docs.length === 1 && snap.docs[0].id === excludeId) return true;
@@ -53,8 +52,9 @@ export interface PostInput {
 }
 
 export async function createPost(data: PostInput): Promise<string> {
+  const db = await getFirebaseDb();
   const now = serverTimestamp();
-  const docRef = await addDoc(postsRef, {
+  const docRef = await addDoc(collection(db, "posts"), {
     ...data,
     publishedAt: data.status === "published" ? now : null,
     viewCount: 0,
@@ -66,6 +66,7 @@ export async function createPost(data: PostInput): Promise<string> {
 }
 
 export async function updatePost(id: string, data: Partial<PostInput>): Promise<void> {
+  const db = await getFirebaseDb();
   const postRef = doc(db, "posts", id);
   await updateDoc(postRef, {
     ...data,
@@ -74,6 +75,7 @@ export async function updatePost(id: string, data: Partial<PostInput>): Promise<
 }
 
 export async function publishPost(id: string, data: Partial<PostInput>): Promise<void> {
+  const db = await getFirebaseDb();
   const postRef = doc(db, "posts", id);
   await updateDoc(postRef, {
     ...data,
@@ -84,6 +86,7 @@ export async function publishPost(id: string, data: Partial<PostInput>): Promise
 }
 
 export async function unpublishPost(id: string): Promise<void> {
+  const db = await getFirebaseDb();
   const postRef = doc(db, "posts", id);
   await updateDoc(postRef, {
     status: "draft",
@@ -93,7 +96,7 @@ export async function unpublishPost(id: string): Promise<void> {
 }
 
 export async function deletePost(id: string): Promise<void> {
-  // Delete all comments in the subcollection posts/{id}/comments
+  const db = await getFirebaseDb();
   const commentsRef = collection(db, "posts", id, "comments");
   const commentsSnap = await getDocs(commentsRef);
 
@@ -129,7 +132,8 @@ export async function duplicatePost(post: Post, authorId: string): Promise<strin
 // --- Fetch all posts (admin) ---
 
 export async function getAllPosts(): Promise<Post[]> {
-  const snap = await getDocs(postsRef);
+  const db = await getFirebaseDb();
+  const snap = await getDocs(collection(db, "posts"));
   return snap.docs
     .map((d) => ({ id: d.id, ...d.data() } as Post))
     .sort((a, b) => {
@@ -141,6 +145,7 @@ export async function getAllPosts(): Promise<Post[]> {
 
 export async function getPostById(id: string): Promise<Post | null> {
   const { getDoc } = await import("firebase/firestore");
+  const db = await getFirebaseDb();
   const postRef = doc(db, "posts", id);
   const snap = await getDoc(postRef);
   if (!snap.exists()) return null;

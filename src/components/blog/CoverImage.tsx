@@ -38,6 +38,9 @@ export function CoverImage({
         src={src}
         alt={alt}
         loading="lazy"
+        decoding="async"
+        width={960}
+        height={540}
         onLoad={() => setLoaded(true)}
         onError={() => setError(true)}
         className={cn(

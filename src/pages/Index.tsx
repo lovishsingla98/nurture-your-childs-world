@@ -1,18 +1,21 @@
+import { lazy, Suspense } from "react";
 import { Helmet } from "react-helmet-async";
 import { getCanonicalUrl } from "@/lib/seo";
 import AppBanner from "@/components/AppBanner";
 import Header from "@/components/site/Header";
 import Footer from "@/components/site/Footer";
-import WaitlistForm from "@/components/forms/WaitlistForm";
-import FeedbackForm from "@/components/forms/FeedbackForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import FeatureSlides from "@/components/sections/FeatureSlides";
 import { Sparkles, Brain, Baby, ChartNoAxesGantt, Stars, ShieldCheck } from "lucide-react";
 import ParallaxEffect from "@/components/3d/ParallaxEffect";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { analytics } from "@/lib/analytics";
+
+// Lazy-load below-fold components to unblock LCP hero paint
+const FeatureSlides = lazy(() => import("@/components/sections/FeatureSlides"));
+const WaitlistForm = lazy(() => import("@/components/forms/WaitlistForm"));
+const FeedbackForm = lazy(() => import("@/components/forms/FeedbackForm"));
 
 const Index = () => {
   const canonical = getCanonicalUrl("/");
@@ -21,9 +24,7 @@ const Index = () => {
   const handleJoinNow = async () => {
     // Track CTA click
     analytics.trackEvent("waitlist_clicked");
-    if (typeof window !== "undefined" && window.gtag) {
-      window.gtag("event", "cta_click", { event_category: "engagement", event_label: "join_now_hero" });
-    }    try {
+    try {
       await signInWithGoogle();
       toast.success("Successfully signed in with Google!");
     } catch (error: any) {
@@ -63,7 +64,7 @@ const Index = () => {
         <script type="application/ld+json">{JSON.stringify(orgLd)}</script>
       </Helmet>
 
-      <main>
+      <main id="main-content">
         {/* Hero */}
         <section className="hero-veil pt-0">
           <AppBanner />
@@ -119,12 +120,14 @@ const Index = () => {
                         type="image/webp"
                       />
                       <img
-                        src="/images/child-parent-robot-hero.png"
+                        src="/images/child-parent-robot-hero-desktop.webp"
                         alt="Child and parent with AI robot co-pilot learning together"
                         className="w-full h-auto"
-                        width={800}
-                        height={800}
+                        width={700}
+                        height={467}
                         fetchPriority="high"
+                        decoding="sync"
+                        loading="eager"
                         style={{ background: 'transparent' }}
                       />
                     </picture>
@@ -143,11 +146,11 @@ const Index = () => {
           </div>
           <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
             {[{
-              icon: <Sparkles className="text-primary icon-3d" />, title: "Daily Dynamic Plans", desc: "Fresh, tailored activities every day — no scripts, only personalization."
+              icon: <Sparkles aria-hidden="true" className="text-primary icon-3d" />, title: "Daily Dynamic Plans", desc: "Fresh, tailored activities every day — no scripts, only personalization."
             },{
-              icon: <Brain className="text-primary icon-3d" />, title: "Parent Insights", desc: "Clarity without overwhelm: strengths map, curiosity tracker, gentle tips."
+              icon: <Brain aria-hidden="true" className="text-primary icon-3d" />, title: "Parent Insights", desc: "Clarity without overwhelm: strengths map, curiosity tracker, gentle tips."
             },{
-              icon: <Baby className="text-primary icon-3d" />, title: "Kid‑Friendly Fun", desc: "Whimsical UI, story‑led prompts, soft encouragement — never judgment."
+              icon: <Baby aria-hidden="true" className="text-primary icon-3d" />, title: "Kid‑Friendly Fun", desc: "Whimsical UI, story‑led prompts, soft encouragement — never judgment."
             }].map((f, i) => (
               <Card key={i} className="glass-card depth-layer-2">
                 <CardHeader className="pb-3">
@@ -159,7 +162,9 @@ const Index = () => {
           </div>
         </section>
 
-        <FeatureSlides />
+        <Suspense fallback={null}>
+          <FeatureSlides />
+        </Suspense>
 
         {/* Testimonials */}
         <section id="testimonials" className="container px-4 sm:px-6 lg:px-8 mt-12 sm:mt-16 md:mt-20">
@@ -182,7 +187,7 @@ const Index = () => {
           <Card className="glass-card depth-layer-2">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-                <ShieldCheck className="text-primary icon-3d" /> Privacy first
+                <ShieldCheck aria-hidden="true" className="text-primary icon-3d" /> Privacy first
               </CardTitle>
             </CardHeader>
             <CardContent className="text-sm sm:text-base text-muted-foreground">
@@ -197,23 +202,23 @@ const Index = () => {
             {/* Waitlist - Only show for unauthenticated users */}
             {!user && (
               <div>
-                <h3 className="text-xl sm:text-2xl font-bold mb-2">Join the beta waitlist</h3>
+                <h2 className="text-xl sm:text-2xl font-bold mb-2">Join the beta waitlist</h2>
                 <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">Be first to try Nurture and help shape the future of AI‑supported parenting.</p>
-                <WaitlistForm />
+                <Suspense fallback={null}><WaitlistForm /></Suspense>
               </div>
             )}
             {/* Feedback - Always show */}
             <div id="feedback">
-              <h3 className="text-xl sm:text-2xl font-bold mb-2">Have feedback or ideas?</h3>
+              <h2 className="text-xl sm:text-2xl font-bold mb-2">Have feedback or ideas?</h2>
               <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">Tell us what would make Nurture truly valuable for your family.</p>
-              <FeedbackForm />
+              <Suspense fallback={null}><FeedbackForm /></Suspense>
             </div>
           </div>
         </section>
 
         {/* CTA */}
         <section className="container px-4 sm:px-6 lg:px-8 mt-12 sm:mt-16 md:mt-20 text-center">
-          <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4">Parenting, supported — not replaced.</h3>
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4">Parenting, supported — not replaced.</h2>
           <p className="text-sm sm:text-base text-muted-foreground mb-6">
             {user ? "Continue your journey with personalized learning for your children." : "Join thousands of parents discovering joyful, personalized learning."}
           </p>

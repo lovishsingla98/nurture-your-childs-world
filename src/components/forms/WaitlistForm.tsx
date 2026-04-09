@@ -33,10 +33,22 @@ const WaitlistForm = () => {
 
   return (
     <form onSubmit={onSubmit} className="grid gap-3 ">
-      <Input placeholder="Your name" value={name} onChange={e => setName(e.target.value)} required />
-      <Input type="email" placeholder="Email address" value={email} onChange={e => setEmail(e.target.value)} required />
-      <Input placeholder="Child age (e.g., 6)" value={age} onChange={e => setAge(e.target.value)} />
-      <Textarea placeholder="Interests (space, music, puzzles...)" value={interests} onChange={e => setInterests(e.target.value)} />
+      <div>
+        <label htmlFor="waitlist-name" className="sr-only">Your name</label>
+        <Input id="waitlist-name" placeholder="Your name" value={name} onChange={e => setName(e.target.value)} required />
+      </div>
+      <div>
+        <label htmlFor="waitlist-email" className="sr-only">Email address</label>
+        <Input id="waitlist-email" type="email" placeholder="Email address" value={email} onChange={e => setEmail(e.target.value)} required />
+      </div>
+      <div>
+        <label htmlFor="waitlist-age" className="sr-only">Child age</label>
+        <Input id="waitlist-age" placeholder="Child age (e.g., 6)" value={age} onChange={e => setAge(e.target.value)} />
+      </div>
+      <div>
+        <label htmlFor="waitlist-interests" className="sr-only">Interests</label>
+        <Textarea id="waitlist-interests" placeholder="Interests (space, music, puzzles...)" value={interests} onChange={e => setInterests(e.target.value)} />
+      </div>
       <Button type="submit" variant="hero" disabled={loading} className="">{loading ? "Joining..." : "Join Waitlist"}</Button>
       <p className="text-xs text-muted-foreground">We’ll only email important updates. No spam.</p>
     </form>

@@ -9,15 +9,21 @@ const Header = () => {
 
   return (
     <header className="w-full py-3 sm:py-4 md:py-6 bg-transparent">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-4 focus:left-4 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:outline-none"
+      >
+        Skip to content
+      </a>
       <div className="container px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4">
-        <Link to="#" className="flex items-center gap-2 sm:gap-3" aria-label="Nurture home">
+        <Link to="/" className="flex items-center gap-2 sm:gap-3">
           <img src="/images/nurture-logo.webp" alt="Nurture logo" className="h-8 w-8 sm:h-9 sm:w-9" width={36} height={36} />
           <div className="flex flex-col leading-tight">
             <span className="text-base sm:text-lg font-semibold">Nurture</span>
             <span className="text-xs text-muted-foreground">by Cortiq Labs</span>
           </div>
         </Link>
-        <nav className="hidden lg:flex items-center gap-4 xl:gap-6 text-sm">
+        <nav aria-label="Main navigation" className="hidden lg:flex items-center gap-4 xl:gap-6 text-sm">
           <a href="#features" className="hover:text-primary transition-colors">Features</a>
           <a href="#testimonials" className="hover:text-primary transition-colors">Testimonials</a>
           <a href="/blog" className="hover:text-primary transition-colors">Blog</a>

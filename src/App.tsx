@@ -37,10 +37,11 @@ const AdminComments = lazy(() => import("./pages/admin/AdminComments"));
 
 const queryClient = new QueryClient();
 
-initAnalytics();
-
 const PageTracker = () => {
   const location = useLocation();
+  useEffect(() => {
+    initAnalytics();
+  }, []);
   useEffect(() => {
     analytics.trackPage(location.pathname);
   }, [location.pathname]);

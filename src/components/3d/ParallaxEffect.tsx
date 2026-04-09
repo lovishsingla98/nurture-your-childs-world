@@ -17,6 +17,9 @@ const ParallaxEffect: React.FC<ParallaxEffectProps> = ({
     const element = ref.current;
     if (!element) return;
 
+    // Respect reduced motion preference
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
     const handleMouseMove = (e: MouseEvent) => {
       const rect = element.getBoundingClientRect();
       const x = e.clientX - rect.left;

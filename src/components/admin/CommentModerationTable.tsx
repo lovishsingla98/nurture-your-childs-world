@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { getFirebaseDb } from "@/lib/firebase";
 import {
   Table,
   TableBody,
@@ -34,7 +34,7 @@ const tabs: { value: FilterTab; label: string }[] = [
 ];
 
 async function fetchAllComments(): Promise<Comment[]> {
-  // Fetch all posts, then fetch comments subcollection for each
+  const db = await getFirebaseDb();
   const postsSnap = await getDocs(collection(db, "posts"));
   const allComments: Comment[] = [];
 

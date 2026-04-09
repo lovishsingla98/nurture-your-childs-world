@@ -10,17 +10,7 @@ import {
   serverTimestamp,
   Timestamp,
 } from "firebase/firestore";
-import { db } from "./firebase";
-
-/** Get a comment doc ref inside the post subcollection */
-function commentRef(postId: string, commentId: string) {
-  return doc(db, "posts", postId, "comments", commentId);
-}
-
-/** Get the comments subcollection for a post */
-function commentsCol(postId: string) {
-  return collection(db, "posts", postId, "comments");
-}
+import { getFirebaseDb } from "./firebase";
 
 // --- Add comment ---
 
@@ -34,7 +24,8 @@ interface AddCommentInput {
 }
 
 export async function addComment(input: AddCommentInput): Promise<string> {
-  const docRef = await addDoc(commentsCol(input.postId), {
+  const db = await getFirebaseDb();
+  const docRef = await addDoc(collection(db, "posts", input.postId, "comments"), {
     ...input,
     status: "active",
     upvotes: 0,
@@ -43,14 +34,10 @@ export async function addComment(input: AddCommentInput): Promise<string> {
     createdAt: serverTimestamp(),
   });
 
-  // Update post comment count
-  const postRef = doc(db, "posts", input.postId);
-  await updateDoc(postRef, { commentCount: increment(1) });
+  await updateDoc(doc(db, "posts", input.postId), { commentCount: increment(1) });
 
-  // Update parent reply count if this is a reply
   if (input.parentId) {
-    const parentRef = commentRef(input.postId, input.parentId);
-    await updateDoc(parentRef, { replyCount: increment(1) });
+    await updateDoc(doc(db, "posts", input.postId, "comments", input.parentId), { replyCount: increment(1) });
   }
 
   return docRef.id;
@@ -59,7 +46,8 @@ export async function addComment(input: AddCommentInput): Promise<string> {
 // --- Edit comment (within 15 min) ---
 
 export async function editComment(postId: string, commentId: string, body: string): Promise<void> {
-  const ref = commentRef(postId, commentId);
+  const db = await getFirebaseDb();
+  const ref = doc(db, "posts", postId, "comments", commentId);
   const snap = await getDoc(ref);
   if (!snap.exists()) throw new Error("Comment not found");
 
@@ -67,35 +55,30 @@ export async function editComment(postId: string, commentId: string, body: strin
   const createdAt = data.createdAt as Timestamp;
   const now = Timestamp.now();
   const diffMs = now.toMillis() - createdAt.toMillis();
-  const fifteenMinMs = 15 * 60 * 1000;
 
-  if (diffMs > fifteenMinMs) {
+  if (diffMs > 15 * 60 * 1000) {
     throw new Error("Edit window has expired (15 minutes)");
   }
 
-  await updateDoc(ref, {
-    body,
-    editedAt: serverTimestamp(),
-  });
+  await updateDoc(ref, { body, editedAt: serverTimestamp() });
 }
 
 // --- Delete comment (soft delete by user) ---
 
 export async function deleteComment(postId: string, commentId: string): Promise<void> {
-  const ref = commentRef(postId, commentId);
+  const db = await getFirebaseDb();
+  const ref = doc(db, "posts", postId, "comments", commentId);
   const snap = await getDoc(ref);
   if (!snap.exists()) throw new Error("Comment not found");
 
   const data = snap.data();
-
   if (data.replyCount > 0) {
     await updateDoc(ref, { status: "deleted", body: null });
   } else {
     await deleteDoc(ref);
   }
 
-  const postRef = doc(db, "posts", postId);
-  await updateDoc(postRef, { commentCount: increment(-1) });
+  await updateDoc(doc(db, "posts", postId), { commentCount: increment(-1) });
 }
 
 // --- Upvote toggle ---
@@ -105,10 +88,11 @@ export async function toggleUpvote(
   commentId: string,
   userId: string
 ): Promise<boolean> {
+  const db = await getFirebaseDb();
   const voteId = `${userId}_${commentId}`;
   const voteRef = doc(db, "comment_votes", voteId);
   const voteSnap = await getDoc(voteRef);
-  const ref = commentRef(postId, commentId);
+  const ref = doc(db, "posts", postId, "comments", commentId);
 
   if (voteSnap.exists()) {
     await deleteDoc(voteRef);
@@ -123,10 +107,8 @@ export async function toggleUpvote(
 
 // --- Check if user has upvoted ---
 
-export async function hasUpvoted(
-  commentId: string,
-  userId: string
-): Promise<boolean> {
+export async function hasUpvoted(commentId: string, userId: string): Promise<boolean> {
+  const db = await getFirebaseDb();
   const voteRef = doc(db, "comment_votes", `${userId}_${commentId}`);
   const snap = await getDoc(voteRef);
   return snap.exists();
@@ -135,23 +117,27 @@ export async function hasUpvoted(
 // --- Flag comment ---
 
 export async function flagComment(postId: string, commentId: string): Promise<void> {
-  await updateDoc(commentRef(postId, commentId), { status: "flagged" });
+  const db = await getFirebaseDb();
+  await updateDoc(doc(db, "posts", postId, "comments", commentId), { status: "flagged" });
 }
 
 // --- Admin: hide/unhide ---
 
 export async function hideComment(postId: string, commentId: string): Promise<void> {
-  await updateDoc(commentRef(postId, commentId), { status: "hidden" });
+  const db = await getFirebaseDb();
+  await updateDoc(doc(db, "posts", postId, "comments", commentId), { status: "hidden" });
 }
 
 export async function unhideComment(postId: string, commentId: string): Promise<void> {
-  await updateDoc(commentRef(postId, commentId), { status: "active" });
+  const db = await getFirebaseDb();
+  await updateDoc(doc(db, "posts", postId, "comments", commentId), { status: "active" });
 }
 
 // --- Admin: hard delete ---
 
 export async function adminDeleteComment(postId: string, commentId: string): Promise<void> {
-  const ref = commentRef(postId, commentId);
+  const db = await getFirebaseDb();
+  const ref = doc(db, "posts", postId, "comments", commentId);
   const snap = await getDoc(ref);
   if (!snap.exists()) return;
 
@@ -168,9 +154,11 @@ export async function adminDeleteComment(postId: string, commentId: string): Pro
 // --- Admin: ban user ---
 
 export async function banUser(uid: string): Promise<void> {
+  const db = await getFirebaseDb();
   await updateDoc(doc(db, "parents", uid), { isBanned: true });
 }
 
 export async function unbanUser(uid: string): Promise<void> {
+  const db = await getFirebaseDb();
   await updateDoc(doc(db, "parents", uid), { isBanned: false });
 }

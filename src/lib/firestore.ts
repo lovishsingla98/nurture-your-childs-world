@@ -1,5 +1,4 @@
-import { collection, addDoc, serverTimestamp, DocumentReference } from 'firebase/firestore';
-import { db } from './firebase';
+import type { DocumentReference } from 'firebase/firestore';
 
 export interface WaitlistEntry {
   name: string;

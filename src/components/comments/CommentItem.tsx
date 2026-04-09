@@ -11,7 +11,7 @@ import { useReplies } from "@/hooks/use-comments";
 import { deleteComment, flagComment, hideComment, unhideComment, adminDeleteComment, banUser } from "@/lib/comment-mutations";
 import { toast } from "sonner";
 import { MessageSquare, Pencil, Trash2, Flag, EyeOff, Eye, Ban } from "lucide-react";
-import { Timestamp } from "firebase/firestore";
+import type { Timestamp } from "firebase/firestore";
 import type { Comment } from "@/types/blog";
 
 interface CommentItemProps {
