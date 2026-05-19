@@ -1,28 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import DashboardHeader from '@/components/site/DashboardHeader';
+import MobileSimulatorLayout from '@/components/MobileSimulatorLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiClient } from '@/lib/api';
 import { toast } from 'sonner';
-import { 
-  ArrowLeft, 
-  TrendingUp, 
-  CheckCircle, 
+import { WeeklyPotentialQuestion, WeeklyPotentialData } from '@/lib/types';
+import {
+  TrendingUp,
+  CheckCircle,
   Send,
   Target,
   ArrowRight,
-  Star
+  ArrowLeft,
+  Star,
+  Loader2
 } from 'lucide-react';
-import { WeeklyPotentialQuestion, WeeklyPotentialData } from '@/lib/types';
 
 const WeeklyPotential: React.FC = () => {
   const { childId } = useParams<{ childId: string }>();
-  const navigate = useNavigate();
   const { getValidToken } = useAuth();
   const [potentialData, setPotentialData] = useState<WeeklyPotentialData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -33,35 +32,25 @@ const WeeklyPotential: React.FC = () => {
     try {
       setLoading(true);
       await getValidToken();
-      
       const response = await apiClient.getWeeklyPotential(childId!);
-      
       if (response.success) {
         setPotentialData(response.data);
       } else {
         toast.error(response.error || 'Failed to load weekly potential assessment');
       }
     } catch (error: any) {
-      console.error('Failed to fetch weekly potential:', error);
-      toast.error('Failed to load this week\'s assessment');
+      toast.error("Failed to load this week's assessment");
     } finally {
       setLoading(false);
     }
   };
+
   const handleAnswerSelect = async (questionId: string, answer: string, selectedIndex: number) => {
     if (!potentialData) return;
-    
-    const updatedQuestions = potentialData.questions.map(q => 
+    const updatedQuestions = potentialData.questions.map(q =>
       q.id === questionId ? { ...q, selectedAnswer: answer, selectedIndex } : q
     );
-    
-    setPotentialData({
-      ...potentialData,
-      questions: updatedQuestions,
-      status: 'in_progress'
-    });
-
-    // Start the assessment if this is the first answer
+    setPotentialData({ ...potentialData, questions: updatedQuestions, status: 'in_progress' });
     if (potentialData.status === 'pending') {
       try {
         await apiClient.startWeeklyPotential(childId!, potentialData.potentialId);
@@ -72,272 +61,158 @@ const WeeklyPotential: React.FC = () => {
   };
 
   const handleNextQuestion = () => {
-    if (currentQuestionIndex < potentialData!.questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    }
+    if (currentQuestionIndex < potentialData!.questions.length - 1) setCurrentQuestionIndex(i => i + 1);
   };
-
   const handlePreviousQuestion = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
-    }
+    if (currentQuestionIndex > 0) setCurrentQuestionIndex(i => i - 1);
   };
 
   const handleSubmitAnswers = async () => {
     if (!potentialData) return;
-    
-    const unansweredQuestions = potentialData.questions.filter(q => !q.selectedAnswer);
-    if (unansweredQuestions.length > 0) {
+    if (potentialData.questions.some(q => !q.selectedAnswer)) {
       toast.error('Please answer all questions before submitting!');
       return;
     }
-
     try {
       setSubmitting(true);
       await getValidToken();
-      
-      // Prepare responses array for API
       const responses = potentialData.questions.map(q => ({
-        questionId: q.id,
-        selectedAnswer: q.selectedAnswer!,
-        selectedIndex: q.selectedIndex!
+        questionId: q.id, selectedAnswer: q.selectedAnswer!, selectedIndex: q.selectedIndex!
       }));
-      
       const result = await apiClient.completeWeeklyPotential(childId!, potentialData.potentialId, responses);
-      
       if (result.success) {
-        setPotentialData(prev => prev ? {
-          ...prev,
-          status: 'completed',
-          completedAt: new Date().toISOString()
-        } : null);
-        toast.success('Assessment completed! We\'re analyzing the strengths.');
+        setPotentialData(prev => prev ? { ...prev, status: 'completed', completedAt: new Date().toISOString() } : null);
+        toast.success("Assessment completed! We're analyzing the strengths.");
       } else {
         toast.error(result.error || 'Failed to submit assessment');
       }
     } catch (error: any) {
-      console.error('Failed to submit answers:', error);
       toast.error('Failed to submit assessment');
     } finally {
       setSubmitting(false);
     }
   };
 
-  useEffect(() => {
-    if (childId) {
-      fetchWeeklyPotential();
-    }
-  }, [childId]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50 to-teal-100">
-        <DashboardHeader />
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center">
-            <div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-slate-600 font-medium">Loading potential assessment...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => { if (childId) fetchWeeklyPotential(); }, [childId]);
 
   const currentQuestion = potentialData?.questions[currentQuestionIndex];
-  const isLastQuestion = currentQuestionIndex === potentialData!.questions.length - 1;
+  const isLastQuestion = potentialData ? currentQuestionIndex === potentialData.questions.length - 1 : false;
   const allQuestionsAnswered = potentialData?.questions.every(q => q.selectedAnswer);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50 to-teal-100">
-      <DashboardHeader />
-      
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        {/* Back Navigation */}
-        <div className="mb-6">
-          <Button variant="ghost" onClick={() => navigate(`/child/${childId}`)} className="text-slate-600 hover:text-slate-900">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Child Dashboard
-          </Button>
+    <MobileSimulatorLayout title="Weekly Potential" subtitle="Assess strengths & momentum" backUrl={`/child/${childId}`} onRefresh={fetchWeeklyPotential}>
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20">
+          <Loader2 className="w-6 h-6 text-[#2D6A4F] animate-spin mb-2" />
+          <p className="text-[#607060] text-[10px] font-semibold">Loading potential assessment...</p>
         </div>
-
-        {potentialData && (
-          <>
-            {/* Header */}
-            <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-md mb-6">
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <TrendingUp className="w-5 h-5 text-emerald-600" />
-                      <span className="text-sm font-medium text-slate-600">{potentialData.week}</span>
-                    </div>
-                    <CardTitle className="text-2xl text-slate-900 mb-2">{potentialData.title}</CardTitle>
-                    <CardDescription className="text-base text-slate-600">
-                      {potentialData.description}
-                    </CardDescription>
-                  </div>
-                  <Badge 
-                    variant={
-                      potentialData.status === 'completed' ? 'default' :
-                      potentialData.status === 'in_progress' ? 'secondary' : 'outline'
-                    }
-                    className={
-                      potentialData.status === 'completed' ? 'bg-green-100 text-green-700 border-green-200' :
-                      potentialData.status === 'in_progress' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
-                      'bg-gray-100 text-gray-700 border-gray-200'
-                    }
-                  >
-                    {potentialData.status === 'completed' ? 'Completed' :
-                     potentialData.status === 'in_progress' ? 'In Progress' : 'Not Started'}
-                  </Badge>
+      ) : !potentialData ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <TrendingUp className="w-10 h-10 text-slate-300 mb-3" />
+          <h3 className="text-xs font-bold text-slate-700 mb-1">No Assessment Available</h3>
+          <p className="text-[9px] text-[#607060] max-w-[200px]">Check back later for new potential assessments!</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {/* Header */}
+          <div className="bg-white border border-[#D5DFD0] rounded-2xl p-3.5 shadow-sm">
+            <div className="flex items-start justify-between gap-2 mb-2">
+              <div className="flex items-center gap-1.5">
+                <div className="p-1.5 bg-emerald-50 rounded-lg flex-none">
+                  <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-600">
-                    Question {currentQuestionIndex + 1} of {potentialData.questions.length}
-                  </span>
-                  <div className="w-32 bg-slate-200 rounded-full h-2">
-                    <div 
-                      className="bg-emerald-600 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${((currentQuestionIndex + 1) / potentialData.questions.length) * 100}%` }}
-                    />
-                  </div>
+                <span className="text-[9px] font-semibold text-[#607060]">{potentialData.week}</span>
+              </div>
+              <Badge className={`border-transparent text-[7px] font-extrabold px-1.5 py-0 rounded-full ${
+                potentialData.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
+                potentialData.status === 'in_progress' ? 'bg-teal-100 text-teal-700' : 'bg-slate-100 text-slate-600'
+              }`}>
+                {potentialData.status === 'completed' ? 'Completed' : potentialData.status === 'in_progress' ? 'In Progress' : 'Not Started'}
+              </Badge>
+            </div>
+            <h2 className="text-sm font-extrabold text-[#18211A] mb-1 leading-tight">{potentialData.title}</h2>
+            <p className="text-[9px] text-[#607060] leading-relaxed font-semibold mb-2">{potentialData.description}</p>
+            <div className="flex items-center justify-between">
+              <span className="text-[8px] text-[#607060] font-semibold">Q{currentQuestionIndex + 1} of {potentialData.questions.length}</span>
+              <div className="w-24 bg-slate-200 rounded-full h-1.5">
+                <div className="bg-emerald-500 h-1.5 rounded-full transition-all duration-300" style={{ width: `${((currentQuestionIndex + 1) / potentialData.questions.length) * 100}%` }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Question Card */}
+          {potentialData.status !== 'completed' && currentQuestion && (
+            <div className="bg-white border border-[#D5DFD0] rounded-2xl p-3.5 shadow-sm">
+              <div className="flex items-start gap-2 mb-2">
+                <Target className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-none" />
+                <div>
+                  <h3 className="text-[11px] font-bold text-[#18211A] mb-0.5">{currentQuestion.question}</h3>
+                  {currentQuestion.context && (
+                    <p className="text-[8px] text-emerald-700 font-semibold">💡 {currentQuestion.context}</p>
+                  )}
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Question Card */}
-            {potentialData.status !== 'completed' && currentQuestion && (
-              <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-md mb-6">
-                <CardHeader>
-                  <div className="flex items-start gap-3">
-                    <Target className="w-5 h-5 text-emerald-600 mt-1 flex-shrink-0" />
-                    <div>
-                      <CardTitle className="text-lg text-slate-900 mb-2">{currentQuestion.question}</CardTitle>
-                      <CardDescription className="text-emerald-700 font-medium">
-                        💡 {currentQuestion.context}
-                      </CardDescription>
-                    </div>
+              </div>
+              <RadioGroup
+                value={currentQuestion.selectedAnswer || ''}
+                onValueChange={(value) => {
+                  const selectedIndex = currentQuestion.options.findIndex(o => o === value);
+                  handleAnswerSelect(currentQuestion.id, value, selectedIndex);
+                }}
+              >
+                {currentQuestion.options.map((option, index) => (
+                  <div key={index} className="flex items-center space-x-2 p-2 rounded-xl hover:bg-[#EAF0E6] transition-colors border border-transparent hover:border-[#D5DFD0]">
+                    <RadioGroupItem value={option} id={`pot-${index}`} className="border-[#2D6A4F] text-[#2D6A4F]" />
+                    <Label htmlFor={`pot-${index}`} className="flex-1 cursor-pointer text-[9px] text-[#18211A] font-semibold leading-relaxed">{option}</Label>
                   </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <RadioGroup 
-                    value={currentQuestion.selectedAnswer || ''} 
-                    onValueChange={(value) => {
-                      const selectedIndex = currentQuestion.options.findIndex(option => option === value);
-                      handleAnswerSelect(currentQuestion.id, value, selectedIndex);
-                    }}
-                  >
-                    {currentQuestion.options.map((option, index) => (
-                      <div key={index} className="flex items-center space-x-3 p-4 rounded-lg hover:bg-emerald-50 transition-colors border border-slate-200">
-                        <RadioGroupItem value={option} id={`option-${index}`} />
-                        <Label 
-                          htmlFor={`option-${index}`} 
-                          className="flex-1 cursor-pointer text-slate-700 leading-relaxed"
-                        >
-                          {option}
-                        </Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
-                </CardContent>
-              </Card>
-            )}
+                ))}
+              </RadioGroup>
+            </div>
+          )}
 
-            {/* Navigation Buttons */}
-            {potentialData.status !== 'completed' && (
-              <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-md">
-                <CardContent className="pt-6">
-                  <div className="flex justify-between items-center">
-                    <Button 
-                      variant="outline" 
-                      onClick={handlePreviousQuestion}
-                      disabled={currentQuestionIndex === 0}
-                    >
-                      <ArrowLeft className="w-4 h-4 mr-2" />
-                      Previous
-                    </Button>
-                    
-                    <div className="flex items-center gap-2">
-                      {potentialData.questions.map((_, index) => (
-                        <div
-                          key={index}
-                          className={`w-3 h-3 rounded-full transition-colors ${
-                            index === currentQuestionIndex ? 'bg-emerald-600' :
-                            potentialData.questions[index].selectedAnswer ? 'bg-green-500' :
-                            'bg-slate-300'
-                          }`}
-                        />
-                      ))}
-                    </div>
+          {/* Navigation */}
+          {potentialData.status !== 'completed' && (
+            <div className="bg-white border border-[#D5DFD0] rounded-2xl p-3 shadow-sm">
+              <div className="flex justify-between items-center">
+                <Button variant="outline" onClick={handlePreviousQuestion} disabled={currentQuestionIndex === 0} className="text-[9px] px-3 py-1.5 rounded-full border-[#D5DFD0] h-auto">
+                  <ArrowLeft className="w-3 h-3 mr-1" /> Prev
+                </Button>
+                <div className="flex items-center gap-1">
+                  {potentialData.questions.map((_, i) => (
+                    <div key={i} className={`w-2 h-2 rounded-full transition-colors ${i === currentQuestionIndex ? 'bg-emerald-600' : potentialData.questions[i].selectedAnswer ? 'bg-emerald-400' : 'bg-slate-300'}`} />
+                  ))}
+                </div>
+                {isLastQuestion ? (
+                  <Button onClick={handleSubmitAnswers} disabled={submitting || !allQuestionsAnswered} className="bg-[#2D6A4F] hover:bg-[#1F513C] text-white text-[9px] px-3 py-1.5 rounded-full h-auto font-bold">
+                    {submitting ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Send className="w-3 h-3 mr-1" />}
+                    {submitting ? 'Submitting...' : 'Submit'}
+                  </Button>
+                ) : (
+                  <Button onClick={handleNextQuestion} disabled={!currentQuestion?.selectedAnswer} className="bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] px-3 py-1.5 rounded-full h-auto font-bold">
+                    Next <ArrowRight className="w-3 h-3 ml-1" />
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
 
-                    {isLastQuestion ? (
-                      <Button 
-                        onClick={handleSubmitAnswers}
-                        disabled={submitting || !allQuestionsAnswered}
-                        className="bg-green-600 hover:bg-green-700"
-                      >
-                        {submitting ? (
-                          <>
-                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                            Submitting...
-                          </>
-                        ) : (
-                          <>
-                            <Send className="w-4 h-4 mr-2" />
-                            Submit Assessment
-                          </>
-                        )}
-                      </Button>
-                    ) : (
-                      <Button 
-                        onClick={handleNextQuestion}
-                        disabled={!currentQuestion?.selectedAnswer}
-                        className="bg-emerald-600 hover:bg-emerald-700"
-                      >
-                        Next
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Completed Status */}
-            {potentialData.status === 'completed' && (
-              <Card className="border-0 shadow-xl bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
-                <CardContent className="pt-6">
-                  <div className="text-center">
-                    <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-green-900 mb-2">Assessment Complete! 🌟</h3>
-                    <p className="text-green-700 mb-4">
-                      Thank you for completing the potential assessment! 
-                      {potentialData.completedAt && (
-                        <span className="block text-sm mt-2">
-                          Completed at {new Date(potentialData.completedAt).toLocaleTimeString()}
-                        </span>
-                      )}
-                    </p>
-                    <div className="bg-white/70 p-4 rounded-lg max-w-2xl mx-auto">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Star className="w-5 h-5 text-emerald-600" />
-                        <h4 className="font-medium text-slate-900">Analyzing Strengths & Potential</h4>
-                      </div>
-                      <p className="text-slate-700 text-sm">
-                        We're now analyzing these responses to better understand your child's natural strengths and learning style.
-                        This will help us create more targeted activities and recommendations.
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </>
-        )}
-      </div>
-    </div>
+          {/* Completed */}
+          {potentialData.status === 'completed' && (
+            <div className="bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200 rounded-2xl p-4 text-center">
+              <CheckCircle className="w-10 h-10 text-emerald-600 mx-auto mb-2" />
+              <h3 className="text-xs font-extrabold text-emerald-900 mb-1">Assessment Complete! 🌟</h3>
+              <p className="text-[9px] text-emerald-700 font-semibold mb-3">Thank you for completing the potential assessment!</p>
+              <div className="bg-white/70 p-2.5 rounded-xl border border-emerald-100">
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <Star className="w-3.5 h-3.5 text-emerald-600" />
+                  <h4 className="text-[9px] font-bold text-slate-800">Analyzing Strengths & Potential</h4>
+                </div>
+                <p className="text-[8px] text-slate-600 leading-relaxed">We're analyzing these responses to better understand your child's natural strengths.</p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </MobileSimulatorLayout>
   );
 };
 

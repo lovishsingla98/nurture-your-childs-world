@@ -1,29 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
-import DashboardHeader from '@/components/site/DashboardHeader';
+import MobileSimulatorLayout from '@/components/MobileSimulatorLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiClient } from '@/lib/api';
 import { DailyTaskResponse } from '@/lib/types';
 import { toast } from 'sonner';
 import { 
-  ArrowLeft, 
   Calendar, 
   Clock, 
   Target, 
   CheckCircle, 
   Play, 
   Send,
-  Lightbulb
+  Lightbulb,
+  Loader2,
+  TrendingUp,
+  AlertCircle
 } from 'lucide-react';
 
 const DailyTask: React.FC = () => {
   const { childId } = useParams<{ childId: string }>();
-  const navigate = useNavigate();
   const { getValidToken } = useAuth();
   const [taskData, setTaskData] = useState<DailyTaskResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -34,18 +33,15 @@ const DailyTask: React.FC = () => {
     try {
       setLoading(true);
       await getValidToken();
-      
-      const response = await apiClient.getDailyTask(childId!);
-      
-      if (response.success && response.data) {
-        setTaskData(response.data);
-        console.log('Daily task loaded successfully:', response.data);
+      const res = await apiClient.getDailyTask(childId!);
+      if (res.success && res.data) {
+        setTaskData(res.data);
       } else {
-        toast.error(response.message || 'Failed to load today\'s task');
+        toast.error(res.message || "Failed to load today's task");
       }
     } catch (error: any) {
       console.error('Failed to fetch daily task:', error);
-      toast.error('Failed to load today\'s task');
+      toast.error("Failed to load today's task");
     } finally {
       setLoading(false);
     }
@@ -53,15 +49,13 @@ const DailyTask: React.FC = () => {
 
   const handleStartTask = async () => {
     if (!taskData || !childId) return;
-    
     try {
-      const response = await apiClient.startDailyTask(childId, taskData.taskId);
-      
-      if (response.success && response.data) {
-        setTaskData(response.data);
+      const res = await apiClient.startDailyTask(childId, taskData.taskId);
+      if (res.success && res.data) {
+        setTaskData(res.data);
         toast.success('Task started! Have fun learning!');
       } else {
-        toast.error(response.message || 'Failed to start task');
+        toast.error(res.message || 'Failed to start task');
       }
     } catch (error: any) {
       console.error('Failed to start task:', error);
@@ -74,20 +68,15 @@ const DailyTask: React.FC = () => {
       toast.error('Please share how the task went!');
       return;
     }
-
     if (response.trim().length < 50) {
       toast.error('Please provide a more detailed response (at least 50 characters)');
       return;
     }
-
     if (!taskData || !childId) return;
-
     try {
       setSubmitting(true);
       await getValidToken();
-      
       const result = await apiClient.completeDailyTask(childId, taskData.taskId, response.trim());
-      
       if (result.success && result.data) {
         setTaskData(result.data);
         toast.success('Great job! Task completed successfully!');
@@ -104,268 +93,206 @@ const DailyTask: React.FC = () => {
   };
 
   useEffect(() => {
-    if (childId) {
-      fetchDailyTask();
-    }
+    if (childId) fetchDailyTask();
   }, [childId]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-        <DashboardHeader />
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center">
-            <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-slate-600 font-medium">Loading today's task...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const statusColor = taskData?.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
+                       taskData?.status === 'in_progress' ? 'bg-blue-100 text-blue-700' :
+                       'bg-slate-100 text-slate-600';
+  const statusLabel = taskData?.status === 'completed' ? 'Completed' :
+                      taskData?.status === 'in_progress' ? 'In Progress' : 'Not Started';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      <DashboardHeader />
-      
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        {/* Back Navigation */}
-        <div className="mb-6">
-          <Button variant="ghost" onClick={() => navigate(`/child/${childId}`)} className="text-slate-600 hover:text-slate-900">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Child Dashboard
-          </Button>
+    <MobileSimulatorLayout
+      title="Daily Task"
+      subtitle="Today's learning activity"
+      backUrl={`/child/${childId}`}
+      onRefresh={fetchDailyTask}
+    >
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20">
+          <Loader2 className="w-6 h-6 text-[#2D6A4F] animate-spin mb-2" />
+          <p className="text-[#607060] text-[10px] font-semibold">Loading today's task...</p>
         </div>
+      ) : !taskData ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <Calendar className="w-10 h-10 text-slate-300 mb-3" />
+          <h3 className="text-xs font-bold text-slate-700 mb-1">No Task Available</h3>
+          <p className="text-[9px] text-[#607060] max-w-[200px]">There's no daily task available for today. Check back tomorrow!</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
 
-        {taskData && (
-          <>
-            {/* Task Header */}
-            <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-md mb-6">
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between">
+          {/* Task Header Card */}
+          <div className="bg-white border border-[#D5DFD0] rounded-2xl p-3.5 shadow-sm">
+            <div className="flex items-start justify-between gap-2 mb-2">
+              <div className="flex items-center gap-1.5">
+                <div className="p-1.5 bg-indigo-50 rounded-lg flex-none">
+                  <Calendar className="w-3.5 h-3.5 text-indigo-600" />
+                </div>
+                <span className="text-[9px] font-semibold text-[#607060]">Today's Daily Task</span>
+              </div>
+              <Badge className={`${statusColor} border-transparent text-[7px] font-extrabold px-1.5 py-0 rounded-full`}>
+                {statusLabel}
+              </Badge>
+            </div>
+            <h2 className="text-sm font-extrabold text-[#18211A] mb-1 leading-tight">{taskData.data.title}</h2>
+            <p className="text-[9px] text-[#607060] leading-relaxed font-semibold mb-3">{taskData.data.description}</p>
+
+            {/* Details Grid */}
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              <div className="flex items-center gap-1 bg-[#F5F7F2] border border-[#D5DFD0]/50 rounded-lg px-2 py-1">
+                <Target className="w-3 h-3 text-[#607060]" />
+                <span className="text-[8px] font-semibold text-[#607060]">{taskData.data.domain}</span>
+              </div>
+              <div className="flex items-center gap-1 bg-[#F5F7F2] border border-[#D5DFD0]/50 rounded-lg px-2 py-1">
+                <Clock className="w-3 h-3 text-[#607060]" />
+                <span className="text-[8px] font-semibold text-[#607060]">{taskData.data.duration} min</span>
+              </div>
+              <div className="flex items-center gap-1 bg-[#F5F7F2] border border-[#D5DFD0]/50 rounded-lg px-2 py-1">
+                <Lightbulb className="w-3 h-3 text-[#607060]" />
+                <span className="text-[8px] font-semibold text-[#607060] capitalize">{taskData.data.activityType}</span>
+              </div>
+            </div>
+
+            {/* Learning Objective */}
+            {taskData.data.learningObjective && (
+              <div className="bg-blue-50 border border-blue-100 rounded-lg p-2.5 mt-2">
+                <div className="flex items-start gap-1.5">
+                  <Target className="w-3 h-3 text-blue-600 mt-0.5 flex-none" />
                   <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <Calendar className="w-5 h-5 text-indigo-600" />
-                      <span className="text-sm font-medium text-slate-600">Today's Daily Task</span>
-                    </div>
-                    <CardTitle className="text-2xl text-slate-900 mb-2">{taskData.data.title}</CardTitle>
-                    <CardDescription className="text-base text-slate-600">
-                      {taskData.data.description}
-                    </CardDescription>
-                  </div>
-                  <Badge 
-                    variant={
-                      taskData.status === 'completed' ? 'default' :
-                      taskData.status === 'in_progress' ? 'secondary' : 'outline'
-                    }
-                    className={
-                      taskData.status === 'completed' ? 'bg-green-100 text-green-700 border-green-200' :
-                      taskData.status === 'in_progress' ? 'bg-blue-100 text-blue-700 border-blue-200' :
-                      'bg-gray-100 text-gray-700 border-gray-200'
-                    }
-                  >
-                    {taskData.status === 'completed' ? 'Completed' :
-                     taskData.status === 'in_progress' ? 'In Progress' : 'Not Started'}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                  <div className="flex items-center gap-2 text-slate-600">
-                    <Target className="w-4 h-4" />
-                    <span className="text-sm">{taskData.data.domain}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-600">
-                    <Clock className="w-4 h-4" />
-                    <span className="text-sm">{taskData.data.duration} minutes</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-600">
-                    <Lightbulb className="w-4 h-4" />
-                    <span className="text-sm capitalize">{taskData.data.activityType}</span>
+                    <span className="text-[8px] font-bold text-blue-800 block">Learning Objective</span>
+                    <p className="text-[8px] text-blue-700 leading-relaxed mt-0.5">{taskData.data.learningObjective}</p>
                   </div>
                 </div>
-                
-                {/* Additional Task Details */}
-                <div className="space-y-3">
-                  {taskData.data.difficulty && (
-                    <div className="flex items-center gap-2 text-slate-600">
-                      <div className="w-4 h-4 rounded-full bg-yellow-100 flex items-center justify-center">
-                        <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
-                      </div>
-                      <span className="text-sm">Difficulty: <span className="font-medium capitalize">{taskData.data.difficulty}</span></span>
-                    </div>
-                  )}
-                  
-                  {taskData.data.learningObjective && (
-                    <div className="flex items-start gap-2 text-slate-600">
-                      <Target className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <span className="text-sm font-medium">Learning Objective:</span>
-                        <p className="text-sm text-slate-700 mt-1">{taskData.data.learningObjective}</p>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {taskData.data.longTermPathway && (
-                    <div className="flex items-start gap-2 text-slate-600">
-                      <div className="w-4 h-4 mt-0.5 flex-shrink-0">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M9 18l6-6-6-6"/>
-                        </svg>
-                      </div>
-                      <div>
-                        <span className="text-sm font-medium">Long-term Pathway:</span>
-                        <p className="text-sm text-slate-700 mt-1">{taskData.data.longTermPathway}</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Task Instructions */}
-            <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-md mb-6">
-              <CardHeader>
-                <CardTitle className="text-lg">Instructions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <ol className="space-y-3">
-                  {taskData.data.instructions && taskData.data.instructions.map((instruction, index) => (
-                    <li key={index} className="flex gap-3">
-                      <span className="flex-shrink-0 w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-sm font-medium">
-                        {index + 1}
-                      </span>
-                      <span className="text-slate-700">{instruction}</span>
-                    </li>
-                  ))}
-                </ol>
-
-                {taskData.data.materials && taskData.data.materials.length > 0 && (
-                  <>
-                    <Separator className="my-4" />
-                    <div>
-                      <h4 className="font-medium text-slate-900 mb-2">Materials needed:</h4>
-                      <ul className="space-y-1">
-                        {taskData.data.materials.map((material, index) => (
-                          <li key={index} className="flex items-center gap-2 text-slate-600">
-                            <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full" />
-                            {material}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Action Buttons */}
-            {taskData.status === 'pending' && (
-              <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-md mb-6">
-                <CardContent className="pt-6">
-                  <div className="text-center">
-                    <h3 className="text-lg font-semibold text-slate-900 mb-2">Ready to start?</h3>
-                    <p className="text-slate-600 mb-4">Click below when you're ready to begin this fun activity!</p>
-                    <Button onClick={handleStartTask} size="lg" className="bg-indigo-600 hover:bg-indigo-700">
-                      <Play className="w-4 h-4 mr-2" />
-                      Start Task
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Response Section */}
-            {taskData.status === 'in_progress' && (
-              <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-md">
-                <CardHeader>
-                  <CardTitle className="text-lg">How did it go?</CardTitle>
-                  <CardDescription>
-                    Tell us about your experience! What did you learn? What was fun or challenging?
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <Textarea
-                    placeholder="I built my rainbow tower using... The most challenging part was... I learned that..."
-                    value={response}
-                    onChange={(e) => setResponse(e.target.value)}
-                    rows={4}
-                    className="resize-none"
-                  />
-                  <div className="flex justify-end">
-                    <Button 
-                      onClick={handleSubmitResponse}
-                      disabled={submitting || !response.trim()}
-                      className="bg-green-600 hover:bg-green-700"
-                    >
-                      {submitting ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                          Submitting...
-                        </>
-                      ) : (
-                        <>
-                          <Send className="w-4 h-4 mr-2" />
-                          Complete Task
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Completed Status */}
-            {taskData.status === 'completed' && (
-              <div className="space-y-6">
-                {/* Completion Card */}
-                <Card className="border-0 shadow-xl bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
-                  <CardContent className="pt-6">
-                    <div className="text-center">
-                      <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold text-green-900 mb-2">Task Completed! 🎉</h3>
-                      <p className="text-green-700 mb-4">
-                        Great job on completing today's task! 
-                        {taskData.completedAt && (
-                          <span className="block text-sm mt-2">
-                            Completed at {new Date(taskData.completedAt).toLocaleTimeString()}
-                          </span>
-                        )}
-                      </p>
-                      {taskData.response && (
-                        <div className="bg-white/70 p-4 rounded-lg text-left max-w-2xl mx-auto">
-                          <h4 className="font-medium text-slate-900 mb-2">Your Response:</h4>
-                          <p className="text-slate-700">{taskData.response}</p>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Theory Section */}
-                {taskData.data.theory && (
-                  <Card className="border-0 shadow-xl bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
-                    <CardHeader>
-                      <div className="flex items-center gap-2">
-                        <Lightbulb className="w-5 h-5 text-blue-600" />
-                        <CardTitle className="text-lg text-blue-900">What You Learned</CardTitle>
-                      </div>
-                      <CardDescription className="text-blue-700">
-                        Here's the theory behind today's activity to deepen your understanding!
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="bg-white/70 p-4 rounded-lg border border-blue-100">
-                        <p className="text-slate-700 leading-relaxed">{taskData.data.theory}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
               </div>
             )}
-          </>
-        )}
-      </div>
-    </div>
+
+            {/* Long Term Pathway */}
+            {taskData.data.longTermPathway && (
+              <div className="bg-purple-50 border border-purple-100 rounded-lg p-2.5 mt-2">
+                <div className="flex items-start gap-1.5">
+                  <TrendingUp className="w-3 h-3 text-purple-600 mt-0.5 flex-none" />
+                  <div>
+                    <span className="text-[8px] font-bold text-purple-800 block">Long-term Pathway</span>
+                    <p className="text-[8px] text-purple-700 leading-relaxed mt-0.5">{taskData.data.longTermPathway}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Instructions Card */}
+          <div className="bg-white border border-[#D5DFD0] rounded-2xl p-3.5 shadow-sm">
+            <h3 className="text-[10px] font-bold text-[#18211A] mb-2.5">Instructions</h3>
+            <ol className="space-y-2">
+              {taskData.data.instructions?.map((instruction, index) => (
+                <li key={index} className="flex gap-2">
+                  <span className="flex-none w-5 h-5 bg-[#D8EADB] text-[#2D6A4F] rounded-full flex items-center justify-center text-[8px] font-extrabold">
+                    {index + 1}
+                  </span>
+                  <span className="text-[9px] text-[#607060] leading-relaxed font-semibold flex-1">{instruction}</span>
+                </li>
+              ))}
+            </ol>
+            {taskData.data.materials && taskData.data.materials.length > 0 && (
+              <>
+                <div className="h-px bg-[#D5DFD0] my-3" />
+                <h4 className="text-[9px] font-bold text-[#18211A] mb-1.5">Materials needed</h4>
+                <ul className="space-y-1">
+                  {taskData.data.materials.map((material, index) => (
+                    <li key={index} className="flex items-center gap-1.5 text-[8px] text-[#607060] font-semibold">
+                      <div className="w-1 h-1 bg-[#2D6A4F] rounded-full flex-none" />
+                      {material}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </div>
+
+          {/* Action: Pending */}
+          {taskData.status === 'pending' && (
+            <div className="bg-[#EAF0E6] border border-[#D5DFD0] rounded-2xl p-4 text-center">
+              <h3 className="text-xs font-bold text-[#18211A] mb-1">Ready to start?</h3>
+              <p className="text-[9px] text-[#607060] mb-3 font-semibold">Click below when you're ready to begin this fun activity!</p>
+              <Button onClick={handleStartTask} className="bg-[#2D6A4F] hover:bg-[#1F513C] text-white font-bold px-5 py-2 rounded-full text-[10px]">
+                <Play className="w-3 h-3 mr-1.5" />
+                Start Task
+              </Button>
+            </div>
+          )}
+
+          {/* Action: In Progress */}
+          {taskData.status === 'in_progress' && (
+            <div className="bg-white border border-[#D5DFD0] rounded-2xl p-3.5 shadow-sm">
+              <h3 className="text-[10px] font-bold text-[#18211A] mb-1">How did it go?</h3>
+              <p className="text-[8px] text-[#607060] mb-2 font-semibold">Tell us about your experience! What did you learn?</p>
+              <Textarea
+                placeholder="I built my rainbow tower using... The most challenging part was..."
+                value={response}
+                onChange={(e) => setResponse(e.target.value)}
+                rows={3}
+                className="resize-none text-[10px] border-[#D5DFD0] bg-[#F5F7F2] rounded-xl mb-2 focus:border-[#2D6A4F]"
+              />
+              <div className="flex justify-end">
+                <Button
+                  onClick={handleSubmitResponse}
+                  disabled={submitting || !response.trim()}
+                  className="bg-[#2D6A4F] hover:bg-[#1F513C] text-white font-bold px-4 py-1.5 rounded-full text-[10px]"
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-3 h-3 mr-1.5" />
+                      Complete Task
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Completed */}
+          {taskData.status === 'completed' && (
+            <div className="space-y-3">
+              <div className="bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200 rounded-2xl p-4 text-center">
+                <CheckCircle className="w-10 h-10 text-emerald-600 mx-auto mb-2" />
+                <h3 className="text-xs font-extrabold text-emerald-900 mb-1">Task Completed! 🎉</h3>
+                <p className="text-[9px] text-emerald-700 font-semibold">
+                  Great job on completing today's task!
+                  {taskData.completedAt && (
+                    <span className="block text-[8px] mt-1">
+                      Completed at {new Date(taskData.completedAt).toLocaleTimeString()}
+                    </span>
+                  )}
+                </p>
+                {taskData.response && (
+                  <div className="bg-white/70 p-2.5 rounded-xl text-left mt-3 border border-emerald-100">
+                    <h4 className="text-[8px] font-bold text-slate-800 mb-1">Your Response:</h4>
+                    <p className="text-[8px] text-slate-600 leading-relaxed">{taskData.response}</p>
+                  </div>
+                )}
+              </div>
+
+              {taskData.data.theory && (
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-3.5">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    <Lightbulb className="w-3.5 h-3.5 text-blue-600" />
+                    <h3 className="text-[10px] font-bold text-blue-900">What You Learned</h3>
+                  </div>
+                  <p className="text-[8px] text-blue-700 leading-relaxed">{taskData.data.theory}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </MobileSimulatorLayout>
   );
 };
 

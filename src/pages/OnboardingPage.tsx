@@ -2,30 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiClient } from '@/lib/api';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Loader2, ArrowRight, CheckCircle, ArrowLeft, User, Calendar, Heart } from 'lucide-react';
+import MobileSimulatorLayout from '@/components/MobileSimulatorLayout';
+import { Loader2, ArrowRight, CheckCircle, ArrowLeft, Calendar, Heart } from 'lucide-react';
 import { toast } from 'sonner';
-import { 
-  OnboardingQuestionnaire, 
-  OnboardingQuestion, 
-  OnboardingResponse,
-  OnboardingAnswerData,
-  NextQuestionResponse 
-} from '@/lib/types';
-import OnboardingLoadingScreen from '@/components/forms/OnboardingLoadingScreen';
+import { OnboardingQuestionnaire, OnboardingQuestion } from '@/lib/types';
 import OnboardingTransition from '@/components/OnboardingTransition';
 
 const OnboardingPage: React.FC = () => {
   const { childId } = useParams<{ childId: string }>();
   const navigate = useNavigate();
   const { user, getValidToken } = useAuth();
-  
+
   const [questionnaire, setQuestionnaire] = useState<OnboardingQuestionnaire | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentAnswer, setCurrentAnswer] = useState('');
@@ -37,691 +30,189 @@ const OnboardingPage: React.FC = () => {
   const [forceUpdate, setForceUpdate] = useState(0);
   const [showTransition, setShowTransition] = useState(false);
   const facts = [
-    '🧠 Did you know? Children ask an average of 73 questions per day!',
-    '✨ Short, consistent routines build stronger long‑term habits.',
-    '💡 Open‑ended questions spark curiosity better than yes/no questions.',
-    '🎯 Tiny progress daily > giant leaps rarely. Keep it playful!',
-    '🌟 Short breaks can improve focus and memory in kids.',
-    '🎨 Creative play helps develop problem-solving skills naturally.',
-    '📚 Reading together for just 15 minutes daily boosts vocabulary.',
-    '🏃‍♀️ Physical activity improves both mood and cognitive function.',
-    '🎵 Music and rhythm help with memory and language development.',
-    '🤝 Social interactions teach empathy and communication skills.',
-    '🌱 Every child learns at their own unique pace and style.',
-    '💪 Encouragement works better than criticism for motivation.',
+    '🧠 Children ask ~73 questions per day!',
+    '✨ Short, consistent routines build habits.',
+    '💡 Open-ended questions spark curiosity.',
+    '🎯 Tiny daily progress > big leaps rarely.',
+    '🌟 Breaks improve focus and memory.',
+    '📚 15 min reading daily boosts vocabulary.',
   ];
   const [factIndex, setFactIndex] = useState(0);
 
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
-    
-    // Start the fact rotation after a small delay to sync with animation
-    const timeoutId = setTimeout(() => {
-      intervalId = setInterval(() => {
-        setFactIndex((i) => (i + 1) % facts.length);
-      }, 8000); // Match the marquee animation duration
-    }, 1000); // Small delay to sync with animation start
-    
-    return () => {
-      clearTimeout(timeoutId);
-      if (intervalId) clearInterval(intervalId);
-    };
+    const timeoutId = setTimeout(() => { intervalId = setInterval(() => { setFactIndex(i => (i + 1) % facts.length); }, 8000); }, 1000);
+    return () => { clearTimeout(timeoutId); if (intervalId) clearInterval(intervalId); };
   }, []);
 
-  useEffect(() => {
-    if (childId && user) {
-      fetchQuestionnaire();
-    }
-  }, [childId, user]);
-
-  // Debug: Log when currentQuestionIndex changes
-  useEffect(() => {
-    console.log(`🔄 currentQuestionIndex changed to: ${currentQuestionIndex}`);
-    if (questionnaire) {
-      console.log(`📊 Current question:`, questionnaire.questions[currentQuestionIndex]);
-    }
-  }, [currentQuestionIndex, questionnaire]);
+  useEffect(() => { if (childId && user) fetchQuestionnaire(); }, [childId, user]);
 
   const fetchQuestionnaire = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      await getValidToken();
-      const response = await apiClient.getOnboardingQuestionnaire(childId!);
-      
-      if (response.success && response.data) {
-        console.log('📊 Received questionnaire data:', response.data);
-        console.log('📊 Child object:', response.data.child);
-        setQuestionnaire(response.data);
-        
-        // Check if questionnaire is completed (10 questions answered)
-        if (response.data.status === 'completed' || response.data.responses.length >= 10) {
-          // Questionnaire is completed, show transition screen
-          setShowTransition(true);
-        } else {
-          // Find the first unanswered question using our helper function
-          const firstUnansweredIndex = findFirstUnansweredQuestion(response.data);
-          
-          if (firstUnansweredIndex !== -1) {
-            setCurrentQuestionIndex(firstUnansweredIndex);
-          } else {
-            // All current questions answered, but not completed - wait for next question
-            setCurrentQuestionIndex(response.data.questions.length);
-          }
-        }
-      } else {
-        setError('Failed to load questionnaire');
-        toast.error('Failed to load questionnaire');
-      }
-    } catch (error: any) {
-      console.error('Error fetching questionnaire:', error);
-      setError(error.message || 'Failed to load questionnaire');
-      toast.error('Failed to load questionnaire');
-    } finally {
-      setLoading(false);
-    }
+    try { setLoading(true); setError(null); await getValidToken();
+      const r = await apiClient.getOnboardingQuestionnaire(childId!);
+      if (r.success && r.data) {
+        setQuestionnaire(r.data);
+        if (r.data.status === 'completed' || r.data.responses.length >= 10) { setShowTransition(true); }
+        else { const idx = findFirstUnanswered(r.data); setCurrentQuestionIndex(idx !== -1 ? idx : r.data.questions.length); }
+      } else { setError('Failed to load questionnaire'); }
+    } catch (e: any) { setError(e.message || 'Failed to load'); } finally { setLoading(false); }
   };
 
-  // Silent version that doesn't show loading screen (for polling)
-  const fetchQuestionnaireSilently = async () => {
-    try {
-      await getValidToken();
-      const response = await apiClient.getOnboardingQuestionnaire(childId!);
-      
-      if (response.success && response.data) {
-        console.log('📊 Received questionnaire data (silent):', response.data);
-        console.log('📊 Questions count:', response.data.questions.length);
-        console.log('📊 Responses count:', response.data.responses.length);
-        
-        setQuestionnaire(response.data);
-        
-        // Don't change currentQuestionIndex during polling - let the polling logic handle it
-        // Only update if questionnaire is completed
-        if (response.data.status === 'completed' || response.data.responses.length >= 10) {
-          setShowTransition(true);
-        }
-        
-        // Return the fresh data for immediate use in polling
-        return response.data;
-      } else {
-        throw new Error('Failed to load questionnaire');
-      }
-    } catch (error: any) {
-      console.error('Error fetching questionnaire (silent):', error);
-      throw error;
-    }
+  const fetchSilently = async () => {
+    try { await getValidToken(); const r = await apiClient.getOnboardingQuestionnaire(childId!);
+      if (r.success && r.data) { setQuestionnaire(r.data); if (r.data.status === 'completed' || r.data.responses.length >= 10) setShowTransition(true); return r.data; }
+      throw new Error('Failed');
+    } catch (e: any) { throw e; }
   };
 
-  const getCurrentQuestion = (): OnboardingQuestion | null => {
-    if (!questionnaire || !questionnaire.questions[currentQuestionIndex]) {
-      return null;
-    }
-    return questionnaire.questions[currentQuestionIndex];
+  const getCurrentQuestion = (): OnboardingQuestion | null => questionnaire?.questions[currentQuestionIndex] || null;
+  const getProgress = (): number => questionnaire ? Math.round((questionnaire.responses.length / 10) * 100) : 0;
+  const findFirstUnanswered = (q: any): number => {
+    const answered = new Set(q.responses.map((r: any) => r.questionId));
+    for (let i = 0; i < q.questions.length; i++) { if (!answered.has(q.questions[i].questionId)) return i; }
+    return -1;
   };
 
-  const getProgressPercentage = (): number => {
-    if (!questionnaire) return 0;
-    const totalQuestions = 10; // Hardcoded total questions
-    return Math.round((questionnaire.responses.length / totalQuestions) * 100);
-  };
-
-  // Find the first unanswered question
-  const findFirstUnansweredQuestion = (questionnaire: any): number => {
-    if (!questionnaire || !questionnaire.questions) return -1;
-    
-    const answeredQuestionIds = new Set(questionnaire.responses.map((r: any) => r.questionId));
-    
-    for (let i = 0; i < questionnaire.questions.length; i++) {
-      if (!answeredQuestionIds.has(questionnaire.questions[i].questionId)) {
-        return i;
-      }
-    }
-    
-    return -1; // All questions answered
-  };
-
-  // Poll for next question with exponential backoff
-  const pollForNextQuestion = async (): Promise<void> => {
-    const maxRetries = 12; // Max 12 retries (about 60 seconds total)
-    const baseDelay = 2000; // Start with 2 seconds
-    
-    // Initialize counts with current state
-    let lastQuestionCount = questionnaire?.questions.length || 0;
-    let lastResponseCount = questionnaire?.responses.length || 0;
-    
-    console.log(`🚀 Starting polling with initial counts: questions=${lastQuestionCount}, responses=${lastResponseCount}`);
-    
-    for (let attempt = 0; attempt < maxRetries; attempt++) {
+  const pollForNext = async (): Promise<void> => {
+    let lastQCount = questionnaire?.questions.length || 0;
+    let lastRCount = questionnaire?.responses.length || 0;
+    for (let attempt = 0; attempt < 12; attempt++) {
       try {
-        // Fetch latest questionnaire (without showing loading screen) and get fresh data
-        const freshQuestionnaire = await fetchQuestionnaireSilently();
-        
-        if (!freshQuestionnaire) {
-          throw new Error('Questionnaire not found');
-        }
-
-        console.log(`🔍 Polling attempt ${attempt + 1}: questions=${freshQuestionnaire.questions.length}, responses=${freshQuestionnaire.responses.length}, currentIndex=${currentQuestionIndex}`);
-        console.log(`🔍 Last counts: questions=${lastQuestionCount}, responses=${lastResponseCount}`);
-
-        // Check if we have 10 answered questions (completion)
-        if (freshQuestionnaire.responses.length >= 10) {
-          console.log('🎉 10 questions answered - onboarding completed!');
-          setShowTyping(false); // Stop typing dots
-          toast.success('Onboarding completed successfully! Your child is now ready to explore.');
-          return;
-        }
-
-        // Check if new question was added (question count increased)
-        if (freshQuestionnaire.questions.length > lastQuestionCount) {
-          console.log(`🆕 New question detected! Questions: ${lastQuestionCount} → ${freshQuestionnaire.questions.length}`);
-          
-          // When a new question is added, move to the last question (which should be the new one)
-          const newQuestionIndex = freshQuestionnaire.questions.length - 1;
-          console.log(`🎯 New question added at index ${newQuestionIndex}, moving from ${currentQuestionIndex}`);
-          
-          // Force a state update by using a callback
-          setCurrentQuestionIndex(prevIndex => {
-            console.log(`🔄 State update: ${prevIndex} → ${newQuestionIndex}`);
-            return newQuestionIndex;
-          });
-          
-          // Force a re-render to ensure UI updates
-          setForceUpdate(prev => prev + 1);
-          
-          setShowTyping(false); // Stop typing dots
-          return;
-        }
-
-        // Check if there's an unanswered question that we should move to
-        const nextUnansweredIndex = findFirstUnansweredQuestion(freshQuestionnaire);
-        if (nextUnansweredIndex !== -1 && nextUnansweredIndex !== currentQuestionIndex) {
-          console.log(`📝 Found unanswered question at index ${nextUnansweredIndex}, moving from ${currentQuestionIndex}`);
-          
-          // Move to the next unanswered question
-          setCurrentQuestionIndex(prevIndex => {
-            console.log(`🔄 State update: ${prevIndex} → ${nextUnansweredIndex}`);
-            return nextUnansweredIndex;
-          });
-          
-          // Force a re-render to ensure UI updates
-          setForceUpdate(prev => prev + 1);
-          
-          setShowTyping(false); // Stop typing dots
-          return;
-        }
-
-
-        // Check if new response was added (response count increased)
-        if (freshQuestionnaire.responses.length > lastResponseCount) {
-          console.log(`📝 New response detected! Responses: ${lastResponseCount} → ${freshQuestionnaire.responses.length}`);
-          lastResponseCount = freshQuestionnaire.responses.length;
-        }
-
-        // No new question found - wait and retry (keep typing dots running)
-        if (attempt < maxRetries - 1) {
-          const delay = Math.min(baseDelay * Math.pow(1.3, attempt), 8000); // Max 8 seconds between retries
-          console.log(`⏳ No new question found, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`);
-          await new Promise(resolve => setTimeout(resolve, delay));
-        } else {
-          console.log('⚠️ Max retries reached, no new question generated');
-          setShowTyping(false); // Stop typing dots
-          toast.error('No new question was generated. Please try again.');
-        }
-
-      } catch (error) {
-        console.error(`Error in polling attempt ${attempt + 1}:`, error);
-        if (attempt === maxRetries - 1) {
-          setShowTyping(false); // Stop typing dots
-          toast.error('Failed to load next question. Please refresh the page.');
-        }
-      }
+        const fresh = await fetchSilently();
+        if (!fresh) throw new Error('Not found');
+        if (fresh.responses.length >= 10) { setShowTyping(false); toast.success('Onboarding completed!'); return; }
+        if (fresh.questions.length > lastQCount) { const ni = fresh.questions.length - 1; setCurrentQuestionIndex(ni); setForceUpdate(p => p + 1); setShowTyping(false); return; }
+        const nui = findFirstUnanswered(fresh);
+        if (nui !== -1 && nui !== currentQuestionIndex) { setCurrentQuestionIndex(nui); setForceUpdate(p => p + 1); setShowTyping(false); return; }
+        if (fresh.responses.length > lastRCount) lastRCount = fresh.responses.length;
+        if (attempt < 11) { await new Promise(r => setTimeout(r, Math.min(2000 * Math.pow(1.3, attempt), 8000))); }
+        else { setShowTyping(false); toast.error('No new question. Please try again.'); }
+      } catch (e) { if (attempt === 11) { setShowTyping(false); toast.error('Failed. Please refresh.'); } }
     }
   };
 
   const handleAnswerSubmit = async (clickedOptionId?: string) => {
-    const currentQuestion = getCurrentQuestion();
-    if (!currentQuestion || !childId) return;
-
-    // Determine effective answer based on click or current state
-    const effectiveOptionId = clickedOptionId || selectedOption;
-    const effectiveText = currentAnswer;
-
-    // Validate answer
-    if (currentQuestion.required && !effectiveText && !effectiveOptionId) {
-      toast.error('Please provide an answer to continue');
-      return;
-    }
-
-    try {
-      setSubmitting(true);
-      setShowTyping(true);
-      
-      await getValidToken();
-      
-      const answerData = {
-        questionId: currentQuestion.questionId,
-        answer: currentQuestion.type === 'multiple_choice' || currentQuestion.type === 'rating' 
-          ? (effectiveOptionId || '')
-          : effectiveText,
-        optionId: currentQuestion.type === 'multiple_choice' || currentQuestion.type === 'rating' 
-          ? (effectiveOptionId || '')
-          : undefined
-      };
-
-      // Submit answer asynchronously (fire-and-forget)
-      apiClient.submitOnboardingAnswer(childId, answerData).catch(error => {
-        console.error('Error submitting answer (async):', error);
-        setShowTyping(false); // Stop typing dots on error
-        toast.error('Failed to submit answer. Please try again.');
-      });
-
-      // Show success message immediately
-      toast.success('Answer submitted successfully!');
-
-      // Clear current answer immediately
-        setCurrentAnswer('');
-        setSelectedOption('');
-
-      // Wait 5 seconds for answer to be saved and next question to be generated
-      console.log('⏳ Waiting 1.5 seconds for answer to be saved and next question to be generated...');
-      // await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Start polling for next question
-      console.log('🔄 Starting polling for next question');
-      await pollForNextQuestion();
-
-    } catch (error: any) {
-      console.error('Error in answer submission flow:', error);
-      setShowTyping(false); // Stop typing dots on error
-      toast.error(error.message || 'Failed to submit answer');
-    } finally {
-      setSubmitting(false);
-      // Don't stop typing dots here - let pollForNextQuestion handle it
-      // The typing dots will continue until we find the next question or complete
-    }
+    const cq = getCurrentQuestion(); if (!cq || !childId) return;
+    const eff = clickedOptionId || selectedOption;
+    if (cq.required && !currentAnswer && !eff) { toast.error('Please provide an answer'); return; }
+    try { setSubmitting(true); setShowTyping(true); await getValidToken();
+      const ad = { questionId: cq.questionId, answer: (cq.type === 'multiple_choice' || cq.type === 'rating') ? (eff || '') : currentAnswer, optionId: (cq.type === 'multiple_choice' || cq.type === 'rating') ? (eff || '') : undefined };
+      apiClient.submitOnboardingAnswer(childId, ad).catch(e => { setShowTyping(false); toast.error('Failed to submit'); });
+      toast.success('Answer submitted!'); setCurrentAnswer(''); setSelectedOption('');
+      await pollForNext();
+    } catch (e: any) { setShowTyping(false); toast.error(e.message || 'Failed'); } finally { setSubmitting(false); }
   };
 
-  const handlePreviousQuestion = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(prev => prev - 1);
-      setCurrentAnswer('');
-      setSelectedOption('');
-    }
-  };
+  const handlePrev = () => { if (currentQuestionIndex > 0) { setCurrentQuestionIndex(p => p - 1); setCurrentAnswer(''); setSelectedOption(''); } };
+  const handleSkip = () => { if (currentQuestionIndex < (questionnaire?.questions.length || 0) - 1) { setCurrentQuestionIndex(p => p + 1); setCurrentAnswer(''); setSelectedOption(''); } };
 
-  const handleSkipQuestion = () => {
-    if (currentQuestionIndex < (questionnaire?.questions.length || 0) - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
-      setCurrentAnswer('');
-      setSelectedOption('');
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-purple-600" />
-          <p className="text-gray-600">Loading onboarding questionnaire...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardContent className="text-center p-6">
-            <div className="text-red-500 mb-4">
-              <Heart className="w-12 h-12 mx-auto" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">Something went wrong</h3>
-            <p className="text-gray-600 mb-4">{error}</p>
-            <Button onClick={() => window.location.reload()}>
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardContent className="text-center p-6">
-            <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-purple-600" />
-            <h3 className="text-lg font-semibold mb-2">Loading Questionnaire...</h3>
-            <p className="text-gray-600 mb-4">Please wait while we load your child's onboarding questions.</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (!questionnaire) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardContent className="text-center p-6">
-            <div className="text-gray-500 mb-4">
-              <User className="w-12 h-12 mx-auto" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">Questionnaire not found</h3>
-            <p className="text-gray-600 mb-4">The onboarding questionnaire could not be loaded.</p>
-            <Button onClick={() => navigate('/dashboard')}>
-              Back to Dashboard
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
+  if (showTransition && questionnaire) {
+    return <OnboardingTransition childId={childId!} childName={questionnaire.child?.displayName || 'your child'} onComplete={() => navigate('/dashboard')} onError={(e) => { setError(e); setShowTransition(false); }} />;
   }
 
   const currentQuestion = getCurrentQuestion();
-  const isFirstQuestion = currentQuestionIndex === 0;
+  const isFirst = currentQuestionIndex === 0;
   const isCompleted = currentQuestionIndex === -1;
-  
-  // Check if this is truly the last question (reached 10 questions or questionnaire completed)
-  const isTrulyLastQuestion = questionnaire.responses.length >= 9 || questionnaire.status === 'completed';
-  
-  // Check if we're waiting for a new question to be generated
-  const isWaitingForNextQuestion = currentQuestionIndex === questionnaire.questions.length && !isCompleted;
-
-  // Show transition screen when onboarding is completed
-  if (showTransition && questionnaire) {
-    return (
-      <OnboardingTransition
-        childId={childId!}
-        childName={questionnaire.child?.displayName || 'your child'}
-        onComplete={() => {
-          // Navigate to dashboard after transition is complete
-          navigate('/dashboard');
-        }}
-        onError={(error) => {
-          setError(error);
-          setShowTransition(false);
-        }}
-      />
-    );
-  }
+  const isTrulyLast = (questionnaire?.responses.length || 0) >= 9 || questionnaire?.status === 'completed';
+  const isWaiting = currentQuestionIndex === (questionnaire?.questions.length || 0) && !isCompleted;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-      {/* Loading Screen - shows when generating next question */}
-      {/* Replace full-screen loader with inline typing indicator UI */}
-      
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate('/dashboard')}
-                className="text-gray-600 hover:text-gray-900"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Dashboard
-              </Button>
-              <div className="h-6 w-px bg-gray-300" />
-              <div>
-                <h1 className="text-lg font-semibold text-gray-900">
-                  Onboarding for {questionnaire.child?.displayName || 'Child'}
-                </h1>
-                <p className="text-sm text-gray-600">
-                  {questionnaire.child?.age || 'Unknown'} years old • {questionnaire.child?.gender || 'Unknown'}
-                </p>
-              </div>
-            </div>
-            <Badge variant={questionnaire.status === 'completed' ? 'default' : 'secondary'}>
-              {questionnaire.status === 'completed' ? 'Completed' : 'In Progress'}
-            </Badge>
+    <MobileSimulatorLayout title={`Onboarding ${questionnaire?.child?.displayName || ''}`} subtitle={questionnaire ? `${questionnaire.child?.age || '?'} yrs • ${questionnaire.child?.gender || ''}` : 'Loading...'} backUrl="/dashboard"
+      headerRight={questionnaire ? <Badge className={`text-[7px] px-1.5 py-0 rounded-full border-transparent ${questionnaire.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-purple-100 text-purple-700'}`}>{questionnaire.status === 'completed' ? 'Done' : 'In Progress'}</Badge> : undefined}
+    >
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-20"><Loader2 className="w-6 h-6 text-[#2D6A4F] animate-spin mb-2" /><p className="text-[#607060] text-[10px] font-semibold">Loading questionnaire...</p></div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center"><Heart className="w-10 h-10 text-red-300 mb-3" /><h3 className="text-xs font-bold text-red-700 mb-1">Something went wrong</h3><p className="text-[9px] text-[#607060] mb-3">{error}</p><Button onClick={() => window.location.reload()} className="bg-[#2D6A4F] hover:bg-[#1F513C] text-white font-bold px-4 py-1.5 rounded-full text-[10px]">Try Again</Button></div>
+      ) : !questionnaire ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center"><p className="text-[9px] text-[#607060] mb-3">Questionnaire not found.</p><Button onClick={() => navigate('/dashboard')} className="bg-[#2D6A4F] hover:bg-[#1F513C] text-white font-bold px-4 py-1.5 rounded-full text-[10px]">Back to Dashboard</Button></div>
+      ) : (
+        <div className="space-y-3">
+          {/* Progress */}
+          <div className="bg-white border border-[#D5DFD0] rounded-2xl p-3 shadow-sm">
+            <div className="flex items-center justify-between mb-1.5"><span className="text-[8px] text-[#607060] font-semibold">Progress: {questionnaire.responses.length} / 10</span><span className="text-[8px] text-[#607060] font-semibold">{getProgress()}%</span></div>
+            <Progress value={getProgress()} className="h-1.5" />
           </div>
-        </div>
-      </div>
 
-      {/* Progress Bar */}
-      <div className="bg-white border-b">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700">
-              Progress: {questionnaire.responses.length} of 10 questions
-            </span>
-            <span className="text-sm text-gray-500">{getProgressPercentage()}%</span>
-          </div>
-          <Progress value={getProgressPercentage()} className="h-2" />
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-3xl mx-auto">
           {isCompleted ? (
-            <Card className="shadow-lg">
-              <CardContent className="text-center p-8">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <CheckCircle className="w-8 h-8 text-green-600" />
-                </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                  Onboarding Completed! 🎉
-                </h2>
-                <p className="text-gray-600 mb-6">
-                  Congratulations! You've successfully completed the onboarding questionnaire for {questionnaire.child?.displayName || 'your child'}. 
-                  We now have a better understanding of your child's interests and learning preferences.
-                </p>
-                <div className="bg-blue-50 rounded-lg p-4 mb-6">
-                  <h3 className="font-semibold text-blue-900 mb-2">What's Next?</h3>
-                  <ul className="text-sm text-blue-800 space-y-1">
-                    <li>• Access personalized learning activities</li>
-                    <li>• Track your child's progress</li>
-                    <li>• Discover new interests and strengths</li>
-                    <li>• Get tailored recommendations</li>
-                  </ul>
-                </div>
-                <Button 
-                  onClick={() => {
-                    // Small delay to ensure any pending state updates are complete
-                    setTimeout(() => {
-                      navigate(`/child/${childId}`);
-                    }, 100);
-                  }}
-                  className="bg-purple-600 hover:bg-purple-700 text-white"
-                  size="lg"
-                >
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Go to Child Dashboard
-                </Button>
-              </CardContent>
-            </Card>
+            <div className="bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200 rounded-2xl p-4 text-center">
+              <CheckCircle className="w-10 h-10 text-emerald-600 mx-auto mb-2" />
+              <h3 className="text-xs font-extrabold text-emerald-900 mb-1">Onboarding Completed! 🎉</h3>
+              <p className="text-[9px] text-emerald-700 font-semibold mb-3">We now understand {questionnaire.child?.displayName}'s interests and learning style.</p>
+              <Button onClick={() => navigate(`/child/${childId}`)} className="bg-[#2D6A4F] hover:bg-[#1F513C] text-white font-bold px-5 py-2 rounded-full text-[10px]"><Calendar className="w-3 h-3 mr-1.5" />Go to Dashboard</Button>
+            </div>
           ) : currentQuestion && (
-            <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 relative">
-              {/* Chat header meta */}
-              <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-purple-100 rounded-lg">
-                      <Calendar className="w-5 h-5 text-purple-600" />
-                    </div>
-                    <div>
-                    <div className="text-sm text-gray-500">Question {currentQuestionIndex + 1} of 10</div>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Badge variant="outline" className="text-xs">
-                          {currentQuestion.category.replace('_', ' ')}
-                        </Badge>
-                        <Badge variant="outline" className="text-xs">
-                          {currentQuestion.learningDomain.replace('_', ' ')}
-                        </Badge>
+            <div className="relative">
+              {/* Chat: Question bubble */}
+              <div className="flex items-start gap-2 mb-2.5">
+                <div className="w-6 h-6 rounded-full bg-[#D8EADB] flex items-center justify-center text-[#2D6A4F] text-[8px] font-extrabold flex-none">Q</div>
+                <div className="max-w-[80%] rounded-2xl rounded-tl-sm bg-white border border-[#D5DFD0] px-3 py-2 text-[9px] text-[#18211A] leading-relaxed font-semibold shadow-sm">{currentQuestion.text}</div>
+              </div>
+
+              {/* Meta badges */}
+              <div className="flex items-center gap-1 mb-2.5 ml-8">
+                <span className="text-[7px] text-[#607060]">Q{currentQuestionIndex + 1}/10</span>
+                <Badge className="bg-[#EAF0E6] text-[#607060] border-transparent text-[6px] px-1 py-0 rounded">{currentQuestion.category.replace('_', ' ')}</Badge>
+                <Badge className="bg-[#EAF0E6] text-[#607060] border-transparent text-[6px] px-1 py-0 rounded">{currentQuestion.learningDomain.replace('_', ' ')}</Badge>
+              </div>
+
+              {/* Options: right-aligned */}
+              <div className="flex justify-end mb-2">
+                <div className="max-w-[85%]">
+                  {(currentQuestion.type === 'multiple_choice' || currentQuestion.type === 'rating') && currentQuestion.options && (
+                    <div className="bg-[#EAF0E6] border border-[#D5DFD0] rounded-2xl rounded-tr-sm p-2.5">
+                      <div className="flex flex-col gap-1.5">
+                        {currentQuestion.options.map(o => (
+                          <Button key={o.id} variant={selectedOption === o.id ? 'default' : 'outline'} className={`justify-start text-left w-full whitespace-pre-wrap break-words text-[9px] font-semibold leading-normal px-3 py-2 h-auto rounded-xl ${selectedOption === o.id ? 'bg-[#2D6A4F] hover:bg-[#1F513C] text-white' : 'bg-white border-[#D5DFD0] text-[#18211A]'}`} disabled={submitting} onClick={async () => { setSelectedOption(o.id); await handleAnswerSubmit(o.id); }}>{o.text}</Button>
+                        ))}
                       </div>
                     </div>
-                  </div>
-                </div>
-
-              {/* Chat body */}
-              <div className="space-y-4">
-                {/* Question bubble (left) */}
-                {currentQuestion && (
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-purple-200 flex items-center justify-center text-purple-700 font-semibold">Q</div>
-                    <div className="max-w-[80%] rounded-2xl rounded-tl-sm bg-gray-100 px-4 py-3 text-gray-900 whitespace-pre-wrap break-words leading-relaxed">
-                    {currentQuestion.text}
-                    </div>
-                  </div>
-                )}
-
-                {/* Waiting for next question */}
-                {isWaitingForNextQuestion && (
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-purple-200 flex items-center justify-center text-purple-700 font-semibold">Q</div>
-                    <div className="max-w-[80%] rounded-2xl rounded-tl-sm bg-gray-100 px-4 py-3 text-gray-600">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
-                        <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '120ms'}}></div>
-                        <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '240ms'}}></div>
-                        <span className="ml-2">Generating your next question...</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* (typing indicator moved to bottom of chat body) */}
-
-                {/* Options bubble (right) */}
-                {currentQuestion && (
-                  <div className="flex justify-end">
-                    <div className="max-w-[85%]">
-                  {currentQuestion.type === 'multiple_choice' && currentQuestion.options && (
-                      <div className="rounded-2xl rounded-tr-sm bg-purple-50 p-3 sm:p-4">
-                        <div className="flex flex-col gap-2">
-                          {currentQuestion.options.map((option) => (
-                            <Button
-                              key={option.id}
-                              variant={selectedOption === option.id ? 'default' : 'outline'}
-                              className={`justify-start text-left w-full whitespace-pre-wrap break-words leading-normal ${selectedOption === option.id ? 'bg-purple-600 hover:bg-purple-700 text-white' : ''}`}
-                      disabled={submitting}
-                              onClick={async () => {
-                                setSelectedOption(option.id);
-                                await handleAnswerSubmit(option.id);
-                              }}
-                    >
-                            {option.text}
-                            </Button>
-                          ))}
-                        </div>
-                      </div>
                   )}
-                  
-                  {currentQuestion.type === 'rating' && currentQuestion.options && (
-                      <div className="rounded-2xl rounded-tr-sm bg-purple-50 p-4">
-                    <RadioGroup
-                      value={selectedOption}
-                          onValueChange={(v) => setSelectedOption(v)}
-                      disabled={submitting}
-                    >
-                          <div className="flex flex-col gap-2">
-                      {currentQuestion.options.map((option) => (
-                              <Button
-                                key={option.id}
-                                variant={selectedOption === option.id ? 'default' : 'outline'}
-                                className={`w-full justify-start text-left whitespace-pre-wrap break-words leading-normal ${selectedOption === option.id ? 'bg-purple-600 hover:bg-purple-700 text-white' : ''}`}
-                                onClick={async () => {
-                                  setSelectedOption(option.id);
-                                  await handleAnswerSubmit(option.id);
-                                }}
-                              >
-                            {option.text}
-                              </Button>
-                            ))}
-                          </div>
-                        </RadioGroup>
+                  {currentQuestion.type === 'text' && (
+                    <div className="bg-[#EAF0E6] border border-[#D5DFD0] rounded-2xl rounded-tr-sm p-2.5">
+                      <div className="flex items-end gap-1.5">
+                        <Textarea placeholder="Type your answer..." value={currentAnswer} onChange={e => setCurrentAnswer(e.target.value)} className="min-h-[50px] resize-none text-[10px] border-[#D5DFD0] bg-white rounded-xl" disabled={submitting} />
+                        <Button className="bg-[#2D6A4F] hover:bg-[#1F513C] rounded-full h-8 w-8 p-0 flex-none" disabled={submitting || (currentQuestion.required && !currentAnswer)} onClick={() => handleAnswerSubmit()}><ArrowRight className="w-3 h-3" /></Button>
                       </div>
-                    )}
-
-                      {currentQuestion.type === 'text' && (
-                        <div className="rounded-2xl rounded-tr-sm bg-purple-50 p-3 sm:p-4">
-                          <div className="flex items-end gap-2">
-                            <Textarea
-                              placeholder="Type your answer..."
-                              value={currentAnswer}
-                              onChange={(e) => setCurrentAnswer(e.target.value)}
-                              className="min-h-[80px] resize-none"
-                              disabled={submitting}
-                            />
-                            <Button
-                              className="bg-purple-600 hover:bg-purple-700"
-                              disabled={submitting || (currentQuestion.required && !currentAnswer)}
-                              onClick={() => handleAnswerSubmit()}
-                            >
-                              Send
-                            </Button>
-                          </div>
-                        </div>
+                    </div>
                   )}
                 </div>
-                  </div>
-                )}
+              </div>
 
-                {/* Typing indicator at the bottom, left-aligned */}
-                {(showTyping || isWaitingForNextQuestion) && (
-                  <div className="flex items-center gap-2 mt-3">
-                    <div className="w-8 h-8 rounded-full bg-purple-200 flex items-center justify-center text-purple-700 font-semibold">Q</div>
-                    <div className="rounded-full bg-purple-600/90 text-white px-3 py-2">
-                      <span className="inline-flex items-center gap-1">
-                        <span className="w-2 h-2 bg-white/90 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></span>
-                        <span className="w-2 h-2 bg-white/90 rounded-full animate-bounce" style={{animationDelay: '120ms'}}></span>
-                        <span className="w-2 h-2 bg-white/90 rounded-full animate-bounce" style={{animationDelay: '240ms'}}></span>
-                      </span>
-                    </div>
+              {/* Typing indicator */}
+              {(showTyping || isWaiting) && (
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-6 h-6 rounded-full bg-[#D8EADB] flex items-center justify-center text-[#2D6A4F] text-[8px] font-extrabold flex-none">Q</div>
+                  <div className="rounded-full bg-[#2D6A4F] text-white px-3 py-1.5">
+                    <span className="inline-flex items-center gap-1"><span className="w-1.5 h-1.5 bg-white/90 rounded-full animate-bounce" style={{animationDelay:'0ms'}}/><span className="w-1.5 h-1.5 bg-white/90 rounded-full animate-bounce" style={{animationDelay:'120ms'}}/><span className="w-1.5 h-1.5 bg-white/90 rounded-full animate-bounce" style={{animationDelay:'240ms'}}/></span>
                   </div>
-                )}
-
-                {/* Back/Skip minimal controls */}
-                <div className="flex items-center justify-between pt-2">
-                  <div className="flex gap-2">
-                    {!isFirstQuestion && (
-                      <Button variant="ghost" size="sm" onClick={handlePreviousQuestion} disabled={submitting}>
-                        <ArrowLeft className="w-4 h-4 mr-1" /> Back
-                      </Button>
-                    )}
-                    {currentQuestion && !currentQuestion.required && !isTrulyLastQuestion && (
-                      <Button variant="ghost" size="sm" onClick={handleSkipQuestion} disabled={submitting}>
-                        Skip
-                      </Button>
-                    )}
-                  </div>
-                  {isTrulyLastQuestion && (
-                    <Badge variant="default">Last question</Badge>
-                  )}
                 </div>
-                  </div>
-                  
-              {/* Semi-transparent scrolling fact bar while thinking */}
-              {(showTyping || isWaitingForNextQuestion) && (
-                <div className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 px-4 sm:px-6">
-                  <div className="relative w-full overflow-hidden">
-                    {/* Moving band (background travels with text) */}
-                    <div
-                      key={factIndex} // Force re-render when fact changes
-                      className="inline-flex items-center bg-white/65 backdrop-blur-[2px] rounded-full shadow px-4 sm:px-6 py-2 whitespace-nowrap text-purple-900 text-sm sm:text-base font-medium"
-                      style={{animation: 'marquee 8s linear infinite'}}
-                    >
-                      {facts[factIndex]}
-                    </div>
-                  </div>
+              )}
+
+              {/* Nav */}
+              <div className="flex items-center justify-between pt-1">
+                <div className="flex gap-1.5">
+                  {!isFirst && <Button variant="ghost" size="sm" onClick={handlePrev} disabled={submitting} className="text-[8px] px-2 py-1 h-auto rounded-full"><ArrowLeft className="w-2.5 h-2.5 mr-0.5" />Back</Button>}
+                  {currentQuestion && !currentQuestion.required && !isTrulyLast && <Button variant="ghost" size="sm" onClick={handleSkip} disabled={submitting} className="text-[8px] px-2 py-1 h-auto rounded-full">Skip</Button>}
+                </div>
+                {isTrulyLast && <Badge className="bg-amber-100 text-amber-700 border-transparent text-[7px] px-1.5 py-0 rounded-full">Last question</Badge>}
+              </div>
+
+              {/* Scrolling fact */}
+              {(showTyping || isWaiting) && (
+                <div className="mt-3 overflow-hidden rounded-xl bg-white/60 border border-[#D5DFD0] px-3 py-1.5">
+                  <p key={factIndex} className="text-[8px] text-[#607060] font-semibold whitespace-nowrap" style={{animation:'marquee 8s linear infinite'}}>{facts[factIndex]}</p>
                 </div>
               )}
             </div>
           )}
         </div>
-      </div>
-    </div>
+      )}
+    </MobileSimulatorLayout>
   );
 };
 
-// Local keyframes for marquee animation
+// Marquee keyframes
 const styleEl = document.createElement('style');
 styleEl.innerHTML = `@keyframes marquee { from { transform: translateX(100%); } to { transform: translateX(-100%); } }`;
 if (typeof document !== 'undefined' && !document.getElementById('onboarding-marquee-kf')) {
