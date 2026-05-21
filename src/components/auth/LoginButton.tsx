@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -17,11 +18,13 @@ export const LoginButton: React.FC<LoginButtonProps> = ({
   children 
 }) => {
   const { signInWithGoogle, loading } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
       await signInWithGoogle();
       toast.success('Successfully signed in with Google!');
+      navigate('/dashboard');
     } catch (error: any) {
       console.error('Login error:', error);
       

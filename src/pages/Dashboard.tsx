@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiClient } from '@/lib/api';
 import { Button } from '@/components/ui/button';
@@ -29,7 +30,8 @@ import {
   BarChart,
   Grid,
   ChevronDown,
-  Home
+  Home,
+  LogOut
 } from 'lucide-react';
 import {
   Radar,
@@ -118,7 +120,8 @@ interface DashboardData {
 }
 
 const Dashboard: React.FC = () => {
-  const { user, getValidToken } = useAuth();
+  const { user, getValidToken, logout } = useAuth();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<ParentProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -1041,6 +1044,20 @@ const Dashboard: React.FC = () => {
           onClose={() => setShowManageProfiles(false)}
         />
       )}
+
+      {/* Premium Outer Floating Sign Out Button */}
+      <button 
+        onClick={() => {
+          logout().then(() => {
+            toast.success("Signed out successfully");
+            navigate("/");
+          });
+        }}
+        className="hidden sm:flex absolute top-4 right-4 bg-[#2D6A4F] hover:bg-rose-700 hover:scale-105 border border-[#23533E] shadow-md hover:shadow-lg rounded-full px-4.5 py-2 items-center gap-1.5 transition-all text-white font-extrabold text-[10px] tracking-wider uppercase cursor-pointer z-50"
+      >
+        <LogOut className="w-3.5 h-3.5" />
+        <span>Sign Out</span>
+      </button>
     </div>
   );
 };

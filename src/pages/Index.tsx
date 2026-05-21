@@ -1,4 +1,5 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { getCanonicalUrl } from "@/lib/seo";
 import AppBanner from "@/components/AppBanner";
@@ -20,6 +21,13 @@ const FeedbackForm = lazy(() => import("@/components/forms/FeedbackForm"));
 const Index = () => {
   const canonical = getCanonicalUrl("/");
   const { signInWithGoogle, loading, user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
 
   const handleJoinNow = async () => {
     // Track CTA click
@@ -27,6 +35,7 @@ const Index = () => {
     try {
       await signInWithGoogle();
       toast.success("Successfully signed in with Google!");
+      navigate("/dashboard");
     } catch (error: any) {
       console.error("Login error:", error);
       if (error.code === "auth/popup-closed-by-user") {
