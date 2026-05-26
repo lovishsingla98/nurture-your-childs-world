@@ -7,23 +7,23 @@ import Header from "@/components/site/Header";
 import Footer from "@/components/site/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { 
-  Sparkles, 
-  Brain, 
-  Baby, 
-  Stars, 
-  ShieldCheck, 
-  Check, 
-  X, 
-  Flame, 
-  ArrowRight, 
-  MessageSquare, 
-  BookOpen, 
-  Activity, 
-  Compass, 
-  Calendar, 
-  Award, 
-  Play, 
+import {
+  Sparkles,
+  Brain,
+  Baby,
+  Stars,
+  ShieldCheck,
+  Check,
+  X,
+  Flame,
+  ArrowRight,
+  MessageSquare,
+  BookOpen,
+  Activity,
+  Compass,
+  Calendar,
+  Award,
+  Play,
   Heart,
   TrendingUp,
   Gift,
@@ -99,7 +99,7 @@ const Index = () => {
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     creator: { "@type": "Organization", name: "Cortiq Labs" }
   };
-  
+
   const orgLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -123,34 +123,38 @@ const Index = () => {
         <section className="relative pt-0 pb-16 sm:pb-24 lg:pb-32 bg-[#FAFBF9]/40">
           <AppBanner />
           <Header />
-          
+
           <div className="container px-4 sm:px-6 lg:px-8 mx-auto">
             <div className="grid gap-12 lg:grid-cols-12 items-center py-10 sm:py-16 lg:py-24">
-              
+
               {/* Hero Copy */}
               <div className="lg:col-span-7 space-y-6 sm:space-y-8 text-center lg:text-left">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#2D6A4F]/10 text-[#2D6A4F] text-xs font-bold uppercase tracking-wider">
                   <Stars className="w-3.5 h-3.5" />
-                  Your AI Parenting Co-pilot
+                  Your Parenting Co-pilot
                 </div>
-                
+
                 <h1 className="text-4xl sm:text-5xl md:text-6xl font-black leading-[1.1] tracking-tight text-[#18211A]">
                   Get personalized <span className="text-[#2D6A4F]">activities</span>, <span className="text-[#6C5B7B]">stories</span>, and <span className="text-[#355C7D]">guidance</span> for your child every day.
                 </h1>
-                
+
+                <p className="text-base sm:text-lg md:text-xl text-[#4A5D4E] font-semibold max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                  Discover your child's true hidden potential and guide them through every step with Nurture.
+                </p>
+
                 <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                  <Button 
-                    size="lg" 
-                    onClick={handleJoinNow} 
-                    disabled={loading} 
+                  <Button
+                    size="lg"
+                    onClick={handleJoinNow}
+                    disabled={loading}
                     className="bg-[#2D6A4F] hover:bg-[#1F513C] text-white font-extrabold px-8 py-4 text-base sm:text-lg rounded-full shadow-lg shadow-[#2D6A4F]/20 hover:shadow-xl hover:shadow-[#2D6A4F]/30 transition-all duration-300 transform hover:scale-105 w-full sm:w-auto"
                   >
                     {loading ? "Signing in..." : "Start Free"}
                   </Button>
-                  <Button 
-                    asChild 
-                    size="lg" 
-                    variant="outline" 
+                  <Button
+                    asChild
+                    size="lg"
+                    variant="outline"
                     className="border-[#D5DFD0] hover:bg-[#EAF0E6] text-[#2D6A4F] font-extrabold px-8 py-4 text-base sm:text-lg rounded-full w-full sm:w-auto transition-all"
                   >
                     <a href="#product">
@@ -159,7 +163,7 @@ const Index = () => {
                     </a>
                   </Button>
                 </div>
-                
+
                 <div className="text-xs sm:text-sm text-[#607060] font-semibold flex items-center justify-center lg:justify-start gap-4">
                   <span>👶 Ages 3–12</span>
                   <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
@@ -168,17 +172,17 @@ const Index = () => {
                   <span>✨ Instantly Setup</span>
                 </div>
               </div>
-              
+
               {/* Visual Mockups - Side-by-side & layered interactive mock cards visible immediately */}
               <div className="lg:col-span-5 flex flex-col items-center justify-center relative">
                 <ParallaxEffect intensity={0.03} className="w-full max-w-md lg:max-w-full">
                   <div className="relative space-y-4 w-full">
-                    
+
                     {/* Mock Card 1: Today's Activity */}
-                    <div 
-                      style={{ 
-                        transform: `perspective(1000px) translateY(${scrollY * -0.04}px) rotateX(${scrollY * 0.025}deg) rotateY(${scrollY * -0.015}deg) rotate(-2deg)`, 
-                        transition: 'transform 0.1s ease-out', 
+                    <div
+                      style={{
+                        transform: `perspective(1000px) translateY(${scrollY * -0.04}px) rotateX(${scrollY * 0.025}deg) rotateY(${scrollY * -0.015}deg) rotate(-2deg)`,
+                        transition: 'transform 0.1s ease-out',
                         willChange: 'transform',
                         transformStyle: 'preserve-3d'
                       }}
@@ -208,10 +212,10 @@ const Index = () => {
                     </div>
 
                     {/* Mock Card 2: Tonight's Bedtime Story */}
-                    <div 
-                      style={{ 
-                        transform: `perspective(1000px) translateY(${scrollY * -0.02}px) rotateX(${scrollY * -0.02}deg) rotateY(${scrollY * 0.02}deg) rotate(1deg) translateX(12px)`, 
-                        transition: 'transform 0.1s ease-out', 
+                    <div
+                      style={{
+                        transform: `perspective(1000px) translateY(${scrollY * -0.02}px) rotateX(${scrollY * -0.02}deg) rotateY(${scrollY * 0.02}deg) rotate(1deg) translateX(12px)`,
+                        transition: 'transform 0.1s ease-out',
                         willChange: 'transform',
                         transformStyle: 'preserve-3d'
                       }}
@@ -239,10 +243,10 @@ const Index = () => {
                     </div>
 
                     {/* Mock Card 3: Parent Growth Radar */}
-                    <div 
-                      style={{ 
-                        transform: `perspective(1000px) translateY(${scrollY * -0.06}px) rotateX(${scrollY * 0.03}deg) rotateY(${scrollY * -0.035}deg) rotate(-1deg) translateX(-12px)`, 
-                        transition: 'transform 0.1s ease-out', 
+                    <div
+                      style={{
+                        transform: `perspective(1000px) translateY(${scrollY * -0.06}px) rotateX(${scrollY * 0.03}deg) rotateY(${scrollY * -0.035}deg) rotate(-1deg) translateX(-12px)`,
+                        transition: 'transform 0.1s ease-out',
                         willChange: 'transform',
                         transformStyle: 'preserve-3d'
                       }}
@@ -301,7 +305,7 @@ const Index = () => {
                 <span className="text-xs uppercase font-extrabold tracking-wider text-[#607060] block text-center sm:text-left">
                   Parents often wonder:
                 </span>
-                
+
                 <div className="grid gap-4 sm:grid-cols-2 text-sm sm:text-base font-semibold text-[#18211A]">
                   {[
                     "What activity should my child do today?",
@@ -400,7 +404,7 @@ const Index = () => {
               </div>
 
               <div className="grid gap-8 lg:grid-cols-3">
-                
+
                 {/* Product Card 1: Daily Activities */}
                 <div className="bg-[#FAFBF9] border border-[#D5DFD0] rounded-3xl p-6 flex flex-col justify-between shadow-xs hover:shadow-md transition-all">
                   <div className="space-y-4">
@@ -412,7 +416,7 @@ const Index = () => {
                       One meaningful off-screen activity every single day designed to spark real-world creation, critical thinking, and bonding.
                     </p>
                   </div>
-                  
+
                   {/* Visual Interface Component inside card */}
                   <div className="bg-white rounded-2xl p-4 border border-[#EAF0E6] mt-6 shadow-2xs space-y-2">
                     <span className="text-[8px] font-black uppercase text-[#2D6A4F] bg-[#EAF0E6] px-1.5 py-0.5 rounded-full inline-block">Today's Prompt</span>
@@ -435,7 +439,7 @@ const Index = () => {
                       Stories generated and built specifically around the core moral values (e.g. Courage, Honesty) and real life behavioral challenges you want to teach.
                     </p>
                   </div>
-                  
+
                   {/* Visual Interface Component inside card */}
                   <div className="bg-white rounded-2xl p-4 border border-[#E8DDF3] mt-6 shadow-2xs space-y-2">
                     <div className="flex gap-1">
@@ -451,34 +455,34 @@ const Index = () => {
 
                 {/* Product Card 3: Parent Growth Insights */}
                 <div className="bg-[#FAFBF9] border border-[#D5DFD0] rounded-3xl p-6 flex flex-col justify-between shadow-xs hover:shadow-md transition-all">
-                    <div className="space-y-4">
-                      <div className="w-10 h-10 rounded-2xl bg-[#E6EEF5] text-[#355C7D] flex items-center justify-center font-black">
-                        📊
-                      </div>
-                      <h3 className="text-xl font-black text-[#18211A]">Progress Insights</h3>
-                      <p className="text-xs text-[#607060] leading-relaxed font-semibold">
-                        Understand your child's emerging strengths and consistency with dynamically updating radar maps across multiple developmental spectrums.
-                      </p>
+                  <div className="space-y-4">
+                    <div className="w-10 h-10 rounded-2xl bg-[#E6EEF5] text-[#355C7D] flex items-center justify-center font-black">
+                      📊
                     </div>
-                    
-                    {/* Visual Interface Component inside card */}
-                    <div className="bg-white rounded-2xl p-4 border border-[#D5DFD0] mt-6 shadow-2xs space-y-1.5">
-                      <span className="text-[8px] font-black uppercase text-[#355C7D] block mb-1">Growth Index</span>
-                      <div className="flex justify-between text-[9px] font-bold">
-                        <span>Creativity</span>
-                        <span className="text-[#355C7D]">88%</span>
-                      </div>
-                      <div className="w-full bg-slate-100 h-1 rounded-full overflow-hidden">
-                        <div className="bg-[#355C7D] h-full rounded-full" style={{ width: '88%' }} />
-                      </div>
-                      <div className="flex justify-between text-[9px] font-bold pt-1">
-                        <span>Logic & Reasoning</span>
-                        <span className="text-[#2D6A4F]">95%</span>
-                      </div>
-                      <div className="w-full bg-slate-100 h-1 rounded-full overflow-hidden">
-                        <div className="bg-[#2D6A4F] h-full rounded-full" style={{ width: '95%' }} />
-                      </div>
+                    <h3 className="text-xl font-black text-[#18211A]">Progress Insights</h3>
+                    <p className="text-xs text-[#607060] leading-relaxed font-semibold">
+                      Understand your child's emerging strengths and consistency with dynamically updating radar maps across multiple developmental spectrums.
+                    </p>
+                  </div>
+
+                  {/* Visual Interface Component inside card */}
+                  <div className="bg-white rounded-2xl p-4 border border-[#D5DFD0] mt-6 shadow-2xs space-y-1.5">
+                    <span className="text-[8px] font-black uppercase text-[#355C7D] block mb-1">Growth Index</span>
+                    <div className="flex justify-between text-[9px] font-bold">
+                      <span>Creativity</span>
+                      <span className="text-[#355C7D]">88%</span>
                     </div>
+                    <div className="w-full bg-slate-100 h-1 rounded-full overflow-hidden">
+                      <div className="bg-[#355C7D] h-full rounded-full" style={{ width: '88%' }} />
+                    </div>
+                    <div className="flex justify-between text-[9px] font-bold pt-1">
+                      <span>Logic & Reasoning</span>
+                      <span className="text-[#2D6A4F]">95%</span>
+                    </div>
+                    <div className="w-full bg-slate-100 h-1 rounded-full overflow-hidden">
+                      <div className="bg-[#2D6A4F] h-full rounded-full" style={{ width: '95%' }} />
+                    </div>
+                  </div>
                 </div>
 
                 {/* Product Card 4: Career Pathways */}
@@ -492,7 +496,7 @@ const Index = () => {
                       See how today's active play interests (like building and questioning) naturally transition into actual professional opportunities.
                     </p>
                   </div>
-                  
+
                   {/* Visual Interface Component inside card */}
                   <div className="bg-white rounded-2xl p-4 border border-amber-100 mt-6 shadow-2xs space-y-2">
                     <span className="text-[8px] font-black text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full inline-block">Active Pathway</span>
@@ -512,7 +516,7 @@ const Index = () => {
                       Get support for any parenting query, dilemma, or behavioral milestone whenever you need it from our dedicated AI parenting co-pilot.
                     </p>
                   </div>
-                  
+
                   {/* Visual Interface Component inside card */}
                   <div className="bg-white rounded-2xl p-4 border border-emerald-100 mt-6 shadow-2xs space-y-2">
                     <div className="bg-slate-50 p-2 rounded-xl text-[8px] font-bold text-[#607060]">
@@ -576,7 +580,7 @@ const Index = () => {
                           “{item.quote}”
                         </p>
                       </div>
-                      
+
                       <div className="flex items-center gap-3 pt-4 border-t border-[#EAF0E6] mt-4">
                         <div className="w-9 h-9 rounded-full bg-[#EAF0E6] flex items-center justify-center text-lg shrink-0">
                           {item.avatar}
@@ -644,9 +648,9 @@ const Index = () => {
 
         {/* SECTION 7: PRICING (SaaS Grid) */}
         <section id="pricing" ref={pricingRef} className="py-16 sm:py-24 bg-white/40 overflow-hidden relative min-h-[600px] flex items-center justify-center">
-          
+
           {/* Dynamic bold red marker strike-through line across the center of pricing */}
-          <div 
+          <div
             className={`absolute top-[48%] left-[5%] right-[5%] h-4 bg-red-600 rounded-full z-20 origin-left transition-all duration-1000 ease-in-out pointer-events-none ${pricingStruck ? 'scale-x-100 rotate-[-5deg] opacity-90' : 'scale-x-0 rotate-[-5deg] opacity-0'}`}
             style={{ transformOrigin: 'left center' }}
           />
@@ -661,16 +665,16 @@ const Index = () => {
                 <p className="text-sm text-[#607060] font-bold max-w-md mx-auto">
                   No hidden setup fees or locked levels. Choose a plan that matches your family's dynamic growth goals.
                 </p>
-                
+
                 {/* Billing Cycle Switch */}
                 <div className="inline-flex items-center gap-2 p-1 bg-[#EAF0E6] rounded-full border border-[#D5DFD0] mt-4">
-                  <button 
+                  <button
                     onClick={() => setPricingPeriod('monthly')}
                     className={`px-4 py-1.5 rounded-full text-xs font-black transition-all ${pricingPeriod === 'monthly' ? 'bg-[#2D6A4F] text-white shadow-xs' : 'text-[#2D6A4F]'}`}
                   >
                     Monthly
                   </button>
-                  <button 
+                  <button
                     onClick={() => setPricingPeriod('yearly')}
                     className={`px-4 py-1.5 rounded-full text-xs font-black transition-all ${pricingPeriod === 'yearly' ? 'bg-[#2D6A4F] text-white shadow-xs' : 'text-[#2D6A4F]'}`}
                   >
@@ -680,7 +684,7 @@ const Index = () => {
               </div>
 
               <div className="grid gap-6 sm:gap-8 lg:grid-cols-3 items-stretch">
-                
+
                 {/* Plan 1: Free */}
                 <div className="bg-white border border-[#D5DFD0] rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-xs hover:border-[#D5DFD0]/80 transition-all">
                   <div className="space-y-6">
@@ -688,7 +692,7 @@ const Index = () => {
                       <h3 className="text-lg font-black text-[#18211A]">Free</h3>
                       <p className="text-xs text-[#607060] mt-1 font-semibold">Basic child progress trial.</p>
                     </div>
-                    
+
                     <div className="flex items-baseline text-[#18211A] font-black">
                       <span className="text-4xl">$0</span>
                       <span className="text-xs text-[#607060] ml-1">/forever</span>
@@ -714,7 +718,7 @@ const Index = () => {
                     </ul>
                   </div>
 
-                  <Button 
+                  <Button
                     onClick={handleJoinNow}
                     className="mt-8 border border-[#D5DFD0] hover:bg-[#EAF0E6] text-[#2D6A4F] bg-white font-extrabold w-full py-3 rounded-full cursor-pointer transition-all"
                   >
@@ -727,13 +731,13 @@ const Index = () => {
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#2D6A4F] text-white text-[10px] font-black tracking-wider uppercase px-4.5 py-1 rounded-full shadow-xs">
                     ★ Best Value ★
                   </div>
-                  
+
                   <div className="space-y-6 mt-2">
                     <div>
                       <h3 className="text-lg font-black text-[#18211A]">Premium</h3>
                       <p className="text-xs text-[#607060] mt-1 font-semibold">Everything parents need daily.</p>
                     </div>
-                    
+
                     <div className="flex items-baseline text-[#18211A] font-black">
                       <span className="text-4xl">
                         {pricingPeriod === 'monthly' ? '$29' : '$19'}
@@ -765,7 +769,7 @@ const Index = () => {
                     </ul>
                   </div>
 
-                  <Button 
+                  <Button
                     onClick={handleJoinNow}
                     className="mt-8 bg-[#2D6A4F] hover:bg-[#1F513C] text-white font-extrabold w-full py-3 rounded-full cursor-pointer shadow-sm hover:shadow transition-all"
                   >
@@ -780,7 +784,7 @@ const Index = () => {
                       <h3 className="text-lg font-black text-[#18211A]">Family</h3>
                       <p className="text-xs text-[#607060] mt-1 font-semibold">Perfect for multiple children.</p>
                     </div>
-                    
+
                     <div className="flex items-baseline text-[#18211A] font-black">
                       <span className="text-4xl">
                         {pricingPeriod === 'monthly' ? '$49' : '$39'}
@@ -808,7 +812,7 @@ const Index = () => {
                     </ul>
                   </div>
 
-                  <Button 
+                  <Button
                     onClick={handleJoinNow}
                     className="mt-8 border border-[#D5DFD0] hover:bg-[#EAF0E6] text-[#2D6A4F] bg-white font-extrabold w-full py-3 rounded-full cursor-pointer transition-all"
                   >
@@ -821,27 +825,27 @@ const Index = () => {
           </ScrollReveal>
 
           {/* Gorgeous early bird 100% discount overlay popup */}
-          <div 
+          <div
             className={`absolute inset-0 flex items-center justify-center p-4 z-30 transition-all duration-700 ${pricingStruck ? 'opacity-100 scale-100' : 'opacity-0 scale-90 pointer-events-none'}`}
           >
             <div className="bg-[#18211A]/95 text-white p-8 sm:p-10 rounded-3xl border border-amber-400/40 max-w-lg w-full text-center shadow-[0_20px_50px_rgba(45,106,79,0.35)] space-y-6 relative overflow-hidden backdrop-blur-md">
               {/* Decorative gold background glow */}
               <div className="absolute -top-24 -left-24 w-48 h-48 rounded-full bg-amber-400/10 blur-3xl pointer-events-none" />
               <div className="absolute -bottom-24 -right-24 w-48 h-48 rounded-full bg-[#2D6A4F]/20 blur-3xl pointer-events-none" />
-              
+
               <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-400/15 border border-amber-400/30 text-amber-300 text-xs font-black uppercase tracking-wider animate-bounce">
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                 Early Bird Discount
               </div>
-              
+
               <h3 className="text-3xl sm:text-4xl font-black tracking-tight text-white leading-tight">
                 Get Nurture <span className="text-amber-400 underline decoration-wavy">100% Free</span> Today!
               </h3>
-              
+
               <p className="text-sm text-slate-300 font-semibold leading-relaxed">
                 We have struck out our pricing plans. Sign up today and get complete early access to all premium activities, bedtime moral stories, and parenting co-pilots for <span className="text-white font-extrabold">$0</span>.
               </p>
-              
+
               <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-2.5 text-left">
                   <Clock className="w-5 h-5 text-amber-400 shrink-0" />
@@ -858,14 +862,14 @@ const Index = () => {
                   </div>
                 </div>
               </div>
-              
-              <Button 
+
+              <Button
                 onClick={handleJoinNow}
                 className="w-full py-4 bg-amber-400 hover:bg-amber-300 text-[#18211A] hover:scale-102 font-black rounded-full shadow-lg hover:shadow-xl cursor-pointer transition-all duration-300 text-base"
               >
                 Claim Free Early Bird Access
               </Button>
-              
+
               <p className="text-[10px] text-slate-400 font-medium">
                 No credit card required. Instantly setup in 2 minutes.
               </p>
@@ -901,9 +905,9 @@ const Index = () => {
             </div>
           </ScrollReveal>
         </section>
+        
+        <Footer />
       </main>
-
-      <Footer />
     </div>
   );
 };

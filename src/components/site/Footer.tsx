@@ -2,7 +2,7 @@ import { Mail, MessageCircle } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer className="mt-24 border-t">
+    <footer className="relative z-40 mt-24 border-t bg-[#FAFBF9]">
       <div className="container py-10 grid gap-8 md:grid-cols-3">
         <div className="space-y-3">
           <div className="flex items-center gap-3">
