@@ -107,7 +107,7 @@ const OnboardingPage: React.FC = () => {
   const handleSkip = () => { if (currentQuestionIndex < (questionnaire?.questions.length || 0) - 1) { setCurrentQuestionIndex(p => p + 1); setCurrentAnswer(''); setSelectedOption(''); } };
 
   if (showTransition && questionnaire) {
-    return <OnboardingTransition childId={childId!} childName={questionnaire.child?.displayName || 'your child'} onComplete={() => navigate('/dashboard')} onError={(e) => { setError(e); setShowTransition(false); }} />;
+    return <OnboardingTransition childId={childId!} childName={questionnaire.child?.displayName || 'your child'} onComplete={() => navigate(`/child/${childId}/career-insights`)} onError={(e) => { setError(e); setShowTransition(false); }} />;
   }
 
   const currentQuestion = getCurrentQuestion();
@@ -139,7 +139,7 @@ const OnboardingPage: React.FC = () => {
               <CheckCircle className="w-10 h-10 text-emerald-600 mx-auto mb-2" />
               <h3 className="text-xs font-extrabold text-emerald-900 mb-1">Onboarding Completed! 🎉</h3>
               <p className="text-[9px] text-emerald-700 font-semibold mb-3">We now understand {questionnaire.child?.displayName}'s interests and learning style.</p>
-              <Button onClick={() => navigate(`/child/${childId}`)} className="bg-[#2D6A4F] hover:bg-[#1F513C] text-white font-bold px-5 py-2 rounded-full text-[10px]"><Calendar className="w-3 h-3 mr-1.5" />Go to Dashboard</Button>
+              <Button onClick={() => navigate(`/child/${childId}/career-insights`)} className="bg-[#2D6A4F] hover:bg-[#1F513C] text-white font-bold px-5 py-2 rounded-full text-[10px]"><Calendar className="w-3 h-3 mr-1.5" />View Career Insights & Roadmap</Button>
             </div>
           ) : currentQuestion && (
             <div className="relative">
