@@ -32,9 +32,6 @@ const Header = () => {
           <Button asChild variant="soft" size="sm" className="text-xs sm:text-sm">
             <a href="#feedback">Feedback</a>
           </Button>
-          <Button asChild variant="hero" size="sm" className="text-xs sm:text-sm px-2 sm:px-3">
-            <a href="#waitlist">Join Waitlist</a>
-          </Button>
           {user && (
             <Button asChild variant="outline" size="sm" className="text-xs sm:text-sm">
               <Link to="/dashboard">Dashboard</Link>

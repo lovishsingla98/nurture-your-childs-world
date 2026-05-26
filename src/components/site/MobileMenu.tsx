@@ -55,11 +55,6 @@ const MobileMenu = ({ user }: MobileMenuProps) => {
                 Feedback
               </a>
             </Button>
-            <Button asChild variant="hero" className="w-full">
-              <a href="#waitlist" onClick={() => setOpen(false)}>
-                Join Waitlist
-              </a>
-            </Button>
             {user && (
               <Button asChild variant="outline" className="w-full">
                 <Link to="/dashboard" onClick={() => setOpen(false)}>
