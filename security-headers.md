@@ -33,7 +33,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; img-src 'self' https: data:; font-src 'self' https: data:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https:; connect-src 'self' https:; frame-src 'none';"
+          "value": "default-src 'self'; img-src 'self' https: data:; font-src 'self' https: data:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https:; connect-src 'self' https:; frame-src 'self' https://nurture-466617.firebaseapp.com https://nurture-466617.web.app https://accounts.google.com;"
         }
       ]
     }
@@ -50,7 +50,7 @@
   X-XSS-Protection: 1; mode=block
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
-  Content-Security-Policy: default-src 'self'; img-src 'self' https: data:; font-src 'self' https: data:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https:; connect-src 'self' https:; frame-src 'none';
+  Content-Security-Policy: default-src 'self'; img-src 'self' https: data:; font-src 'self' https: data:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https:; connect-src 'self' https:; frame-src 'self' https://nurture-466617.firebaseapp.com https://nurture-466617.web.app https://accounts.google.com;
 ```
 
 ## For Nginx
@@ -61,7 +61,7 @@ add_header X-Frame-Options "DENY" always;
 add_header X-XSS-Protection "1; mode=block" always;
 add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
-add_header Content-Security-Policy "default-src 'self'; img-src 'self' https: data:; font-src 'self' https: data:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https:; connect-src 'self' https:; frame-src 'none';" always;
+add_header Content-Security-Policy "default-src 'self'; img-src 'self' https: data:; font-src 'self' https: data:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https:; connect-src 'self' https:; frame-src 'self' https://nurture-466617.firebaseapp.com https://nurture-466617.web.app https://accounts.google.com;" always;
 ```
 
 ## For Apache (.htaccess)
@@ -72,7 +72,7 @@ Header always set X-Frame-Options "DENY"
 Header always set X-XSS-Protection "1; mode=block"
 Header always set Referrer-Policy "strict-origin-when-cross-origin"
 Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
-Header always set Content-Security-Policy "default-src 'self'; img-src 'self' https: data:; font-src 'self' https: data:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https:; connect-src 'self' https:; frame-src 'none';"
+Header always set Content-Security-Policy "default-src 'self'; img-src 'self' https: data:; font-src 'self' https: data:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https:; connect-src 'self' https:; frame-src 'self' https://nurture-466617.firebaseapp.com https://nurture-466617.web.app https://accounts.google.com;"
 ```
 
 ## For Cloudflare (Page Rules)
