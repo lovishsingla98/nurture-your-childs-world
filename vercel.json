@@ -29,7 +29,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; img-src 'self' https: data:; font-src 'self' https: data:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https:; connect-src 'self' https:; frame-src 'self' https://nurture-466617.firebaseapp.com https://nurture-466617.web.app https://accounts.google.com;"
+          "value": "default-src 'self'; img-src 'self' https: data:; font-src 'self' https: data:; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://apis.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https:; connect-src 'self' https:; frame-src 'self' https://nurture-466617.firebaseapp.com https://nurture-466617.web.app https://accounts.google.com https://apis.google.com;"
         }
       ]
     }
