@@ -17,7 +17,15 @@ const prerender = async () => {
   const server = await preview({ preview: { port: 4199, strictPort: true } });
   const baseUrl = 'http://localhost:4199';
 
-  const browser = await puppeteer.launch({ headless: 'new' });
+  let browser;
+  try {
+    browser = await puppeteer.launch({ headless: 'new' });
+  } catch (launchError) {
+    console.warn('⚠️ Puppeteer could not launch Chrome (expected in Vercel build environments). Bypassing prerender step gracefully.');
+    console.warn(launchError.message);
+    server.httpServer.close();
+    return;
+  }
 
   try {
     for (const route of ROUTES) {
