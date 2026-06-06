@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { createServer } from 'vite';
 
-const ROUTES = ['/', '/blog'];
+const ROUTES = ['/', '/blog', '/best-parenting-app', '/privacy', '/terms'];
 
 const prerender = async () => {
   const distDir = path.join(process.cwd(), 'dist');

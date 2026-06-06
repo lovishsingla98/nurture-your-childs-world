@@ -38,7 +38,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
           </LoginButton>
           
           <p className="text-sm text-muted-foreground text-center">
-            By signing in, you agree to our Terms of Service and Privacy Policy.
+            By signing in, you agree to our <a href="/terms" className="underline hover:text-foreground">Terms of Service</a> and <a href="/privacy" className="underline hover:text-foreground">Privacy Policy</a>.
           </p>
         </div>
       </div>

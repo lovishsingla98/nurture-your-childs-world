@@ -26,6 +26,8 @@ const ParentsChatbot = lazy(() => import("./pages/features/ParentsChatbot"));
 const InitialInterestPage = lazy(() => import("./pages/InitialInterestPage"));
 const PreOnboardingPage = lazy(() => import("./pages/PreOnboardingPage"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("./pages/TermsOfService"));
+const BestParentingApp = lazy(() => import("./pages/BestParentingApp"));
 const DeleteAccount = lazy(() => import("./pages/DeleteAccount"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Blog = lazy(() => import("./pages/Blog"));
@@ -76,6 +78,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<PublicRoute><Index /></PublicRoute>} />
             <Route path="/privacy" element={<PublicRoute><PrivacyPolicy /></PublicRoute>} />
+            <Route path="/terms" element={<PublicRoute><TermsOfService /></PublicRoute>} />
+            <Route path="/best-parenting-app" element={<PublicRoute><BestParentingApp /></PublicRoute>} />
             <Route path="/delete-account" element={<PublicRoute><DeleteAccount /></PublicRoute>} />
             <Route 
               path="/dashboard" 
