@@ -327,12 +327,12 @@ const Dashboard: React.FC = () => {
       };
     }
 
-    if (activities.dailyTask?.status !== 'completed') {
+    if ((activities as any).dailyLearning?.status !== 'completed' && activities.dailyTask?.status !== 'completed') {
       return {
-        label: "Open today's task",
-        description: `The daily task is the clearest next step for ${activeChild.displayName} right now.`,
-        icon: <Calendar className="w-3.5 h-3.5 text-[#2D6A4F]" />,
-        url: `/child/${activeChild.id}/daily-task`
+        label: "Open today's learning",
+        description: `Today's concept learning is the clearest next step for ${activeChild.displayName} right now.`,
+        icon: <BookOpen className="w-3.5 h-3.5 text-[#2D6A4F]" />,
+        url: `/child/${activeChild.id}/daily-learning`
       };
     }
     if (activities.weeklyInterest?.status !== 'completed') {
@@ -683,7 +683,7 @@ const Dashboard: React.FC = () => {
 
                       <div className="flex-1">
                         <h2 className="text-sm font-extrabold tracking-tight mb-1 leading-tight">
-                          Continue {activeChild.displayName}'s plan
+                          Continue {activeChild.displayName}'s learning
                         </h2>
                         <p className="text-white/90 text-[10px] leading-normal font-medium max-w-prose">
                           {overviewLoading ? 'Tailoring recommendations...' : nextStep?.description}

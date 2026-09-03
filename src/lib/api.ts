@@ -190,6 +190,24 @@ class ApiClient {
     });
   }
 
+  // Daily Learning APIs
+  async getDailyLearning(childId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/daily-learning/child/${childId}/daily-learning`);
+  }
+
+  async startDailyLearning(childId: string, learningId: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/daily-learning/child/${childId}/daily-learning/${learningId}/start`, {
+      method: 'PATCH'
+    });
+  }
+
+  async completeDailyLearning(childId: string, learningId: string, quizAnswers: number[], response?: string): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/daily-learning/child/${childId}/daily-learning/${learningId}/complete`, {
+      method: 'PATCH',
+      body: JSON.stringify({ quizAnswers, response })
+    });
+  }
+
   // Weekly Interest APIs
   async getWeeklyInterest(childId: string): Promise<ApiResponse<WeeklyInterestData>> {
     return this.makeRequest(`/weekly-interest/child/${childId}/weekly-interest`);

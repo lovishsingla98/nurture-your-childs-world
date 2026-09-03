@@ -225,6 +225,41 @@ export interface DailyTaskResponse {
   updatedAt?: string;
 }
 
+// Daily Learning Types - Matching Backend Schema
+export interface QuizQuestion {
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+}
+
+export interface DailyLearningData {
+  topic: string;
+  domain: string;
+  summary: string;
+  lesson: string;
+  keyTakeaways: string[];
+  funFacts: string[];
+  realWorldConnection: string;
+  quiz: QuizQuestion[];
+  difficulty: string;
+  readingTime: number;
+}
+
+export interface DailyLearningResponse {
+  learningId: string;
+  date: string;
+  data: DailyLearningData;
+  status: 'pending' | 'in_progress' | 'completed';
+  childId: string;
+  parentId: string;
+  quizScore?: number;
+  quizAnswers?: number[];
+  response?: string;
+  completedAt?: string;
+  updatedAt?: string;
+}
+
 // Spark Interest Types - Matching Backend Schema
 export interface CareerPath {
   id: string;

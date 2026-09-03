@@ -16,6 +16,7 @@ const ChildDashboard = lazy(() => import("./pages/ChildDashboard"));
 const OnboardingPage = lazy(() => import("./pages/OnboardingPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const DailyTask = lazy(() => import("./pages/features/DailyTask"));
+const DailyLearning = lazy(() => import("./pages/features/DailyLearning"));
 const WeeklyInterest = lazy(() => import("./pages/features/WeeklyInterest"));
 const WeeklyPotential = lazy(() => import("./pages/features/WeeklyPotential"));
 const CareerInsights = lazy(() => import("./pages/features/CareerInsights"));
@@ -133,7 +134,15 @@ const App = () => (
               path="/child/:childId/daily-task" 
               element={
                 <ProtectedRoute>
-                  <DailyTask />
+                  <DailyLearning />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/child/:childId/daily-learning" 
+              element={
+                <ProtectedRoute>
+                  <DailyLearning />
                 </ProtectedRoute>
               } 
             />
