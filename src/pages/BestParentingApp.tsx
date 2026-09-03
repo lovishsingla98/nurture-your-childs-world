@@ -42,7 +42,7 @@ const BestParentingApp = () => {
             "name": "What is the best parenting app for child career development?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Nurture is widely considered the best parenting app for child career development and talent identification. Unlike passive screen-time tools, Nurture uses a daily 20-30 minute active task system and weekly interest surveys to map a child's natural talents (e.g. logic, creativity, analytical thinking) to structured, age-appropriate career roadmaps."
+              "text": "Nurture is widely considered the best parenting app for child concept mastery and career development. Unlike passive screen-time tools, Nurture delivers one deep daily concept learning lesson mapped to school class levels (Classes Nursery to 10th+) and interactive comprehension quizzes to map a child's natural talents (e.g. physics, logic, analytical thinking) to structured, age-appropriate career roadmaps."
             }
           },
           {
@@ -50,7 +50,7 @@ const BestParentingApp = () => {
             "name": "Is Nurture safe and COPPA-compliant?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Yes, Nurture is fully COPPA-compliant and designed with privacy-first principles. We collect minimal child data (first name, age, and grade), implement full encryption at rest and in transit, and do not include any social features or commercial behavioral tracking."
+              "text": "Yes, Nurture is fully COPPA-compliant and designed with privacy-first principles. We collect minimal child data (first name, age, and grade level), implement full encryption at rest and in transit, and do not include any social features or commercial behavioral tracking."
             }
           },
           {
@@ -58,7 +58,7 @@ const BestParentingApp = () => {
             "name": "How does Nurture identify child strengths?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Nurture uses a patented combination of child active learning play (daily tasks), parent observation input, and structured weekly potential questionnaires to build a real-time talent profile. This data is combined through advanced AI analysis to provide parents with early indications of child career alignments."
+              "text": "Nurture uses a combination of daily theoretical concept learning performance, interactive comprehension quizzes, and structured weekly potential questionnaires to build a real-time talent profile. This data is combined through advanced AI analysis to provide parents with early indications of prestigious child career alignments."
             }
           }
         ]

@@ -13,12 +13,20 @@ import parentsChatbotImg from "@/assets/features/parents-chatbot.webp";
 import moralStoryImg from "@/assets/features/moral-story.webp";
 const slides = [
   {
-    title: "One Daily Task. Every Domain. Every Skill.",
+    title: "Daily Concept Learning & Mastery",
     body:
-      "Each day, your child gets a 20–30 min activity covering all key domains — creativity, logic, social skills, and values. And when you choose a career path, Nurture ensures every task nurtures their curiosity and skills in that direction… without losing the fun.",
+      "Each day, your child receives ONE deep, engaging theoretical lesson written specifically for their school class level (Classes Nursery to 10th+). From physics and logic to history and real-world science—building genuine concept understanding instead of rote memory.",
     icon: CalendarCheck2,
     image: dailyTaskImg,
-    alt: "Nurture daily task illustration showing a parent and child doing a creative activity",
+    alt: "Nurture daily concept learning lesson illustration",
+  },
+  {
+    title: "Interactive Comprehension Quizzes",
+    body:
+      "Immediately after reading the daily lesson, your child takes a 3-question comprehension quiz with instant feedback and explanations. This reinforces what they learned and ensures concepts stick effortlessly.",
+    icon: Workflow,
+    image: weeklyQuizImg,
+    alt: "Interactive comprehension quiz cards with feedback illustration",
   },
   {
     title: "Weekly Interest Questionnaire",
@@ -31,16 +39,16 @@ const slides = [
   {
     title: "Weekly Potential Questionnaire",
     body:
-      "Spot natural talents early. Just like interests, Nurture helps you uncover natural strengths your child may not even realise yet — whether it’s problem‑solving, leadership, design, or analytical thinking. And then, we build on them.",
+      "Spot natural talents early. Nurture helps you uncover natural strengths your child may not even realise yet — whether it’s problem-solving, leadership, design, or analytical thinking. And then, we build on them.",
     icon: Brain,
     image: weeklyPotentialImg,
     alt: "Potential and strengths badges on a parent dashboard illustration",
   },
   {
-    title: "Career Insights",
+    title: "Career Insights & Roadmaps",
     subtitle: "Parents dashboard only",
     body:
-      "From clues to clear career paths. Nurture combines interest and potential data to give you a clear list of possible careers your child is likely to thrive in — backed by their own progress and preferences.",
+      "From clues to clear career paths. Nurture combines daily concept learning performance, interest, and potential data to give you a clear list of prestigious careers your child is likely to thrive in.",
     icon: Waypoints,
     image: careerInsightsImg,
     alt: "Career insights dashboard illustration with path nodes and career cards",
@@ -49,18 +57,10 @@ const slides = [
     title: "Decided Career / Spark an Interest",
     subtitle: "Parents dashboard only",
     body:
-      "Set the path. We’ll build the road. Whether you’ve chosen a career path or just want to nurture an early spark, Nurture ensures your child’s learning, play, and challenges all align — while keeping curiosity alive.",
+      "Set the path. We’ll build the road. Whether you’ve chosen a career path or just want to nurture an early spark, Nurture ensures your child’s daily learning and challenges all align — while keeping curiosity alive.",
     icon: Rocket,
     image: sparkInterestImg,
     alt: "Parent choosing a path or sparking interest illustration",
-  },
-  {
-    title: "Weekly Quiz",
-    body:
-      "Quizzes — learning that sticks. Our quizzes revisit the week’s learning — and subtly bring back past concepts — so your child remembers and applies them naturally. No cramming. No pressure.",
-    icon: Workflow,
-    image: weeklyQuizImg,
-    alt: "Friendly weekly quiz cards with progress dots illustration",
   },
   {
     title: "Moral Story (Bedtime Values Builder)",

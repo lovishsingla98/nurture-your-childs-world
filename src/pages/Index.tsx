@@ -135,11 +135,11 @@ const Index = () => {
                 </div>
 
                 <h1 className="text-4xl sm:text-5xl md:text-6xl font-black leading-[1.1] tracking-tight text-[#18211A]">
-                  Get personalized <span className="text-[#2D6A4F]">activities</span>, <span className="text-[#6C5B7B]">stories</span>, and <span className="text-[#355C7D]">guidance</span> for your child every day.
+                  Get personalized <span className="text-[#2D6A4F]">daily learning</span>, <span className="text-[#6C5B7B]">comprehension quizzes</span>, and <span className="text-[#355C7D]">career insights</span> for your child every day.
                 </h1>
 
                 <p className="text-base sm:text-lg md:text-xl text-[#4A5D4E] font-semibold max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                  Discover your child's true hidden potential and guide them through every step with Nurture.
+                  Discover your child's true hidden potential through deep theoretical concept lessons mapped to their school class level (Ages 3-12 / Classes Nursery to 10th+).
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -165,7 +165,7 @@ const Index = () => {
                 </div>
 
                 <div className="text-xs sm:text-sm text-[#607060] font-semibold flex items-center justify-center lg:justify-start gap-4">
-                  <span>👶 Ages 3–12</span>
+                  <span>👶 Ages 3–12 (Class Nursery to 10th+)</span>
                   <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
                   <span>🔒 Privacy First & Safe</span>
                   <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
@@ -178,7 +178,7 @@ const Index = () => {
                 <ParallaxEffect intensity={0.03} className="w-full max-w-md lg:max-w-full">
                   <div className="relative space-y-4 w-full">
 
-                    {/* Mock Card 1: Today's Activity */}
+                    {/* Mock Card 1: Today's Daily Learning */}
                     <div
                       style={{
                         transform: `perspective(1000px) translateY(${scrollY * -0.04}px) rotateX(${scrollY * 0.025}deg) rotateY(${scrollY * -0.015}deg) rotate(-2deg)`,
@@ -191,22 +191,22 @@ const Index = () => {
                       <div className="flex justify-between items-start mb-3">
                         <div className="flex items-center gap-2">
                           <div className="p-2 rounded-lg bg-[#EAF0E6] text-[#2D6A4F]">
-                            <Activity className="w-4.5 h-4.5" />
+                            <BookOpen className="w-4.5 h-4.5" />
                           </div>
                           <div>
-                            <span className="text-[10px] text-[#607060] font-bold uppercase tracking-wider block">Today's Activity</span>
-                            <h4 className="text-xs font-black text-[#18211A] leading-tight">Cardboard Constellation Project</h4>
+                            <span className="text-[10px] text-[#607060] font-bold uppercase tracking-wider block">Today's Daily Learning</span>
+                            <h4 className="text-xs font-black text-[#18211A] leading-tight">Why Do Airplanes Fly? (Bernoulli's Principle)</h4>
                           </div>
                         </div>
-                        <span className="text-[9px] font-bold bg-[#EAF0E6] text-[#2D6A4F] px-2 py-0.5 rounded-full">15 mins</span>
+                        <span className="text-[9px] font-bold bg-[#EAF0E6] text-[#2D6A4F] px-2 py-0.5 rounded-full">Class 3-5 Level</span>
                       </div>
                       <p className="text-[10px] text-[#4A5D4E] leading-relaxed mb-3">
-                        Create a flashlight constellation projector using clean recycled boxes to spark interest in astronomy.
+                        Explore how air pressure differences create lift, how wing curves work, and how aerospace engineers design aircraft.
                       </p>
                       <div className="flex justify-between items-center text-[9px] font-bold text-[#607060]">
-                        <span>🚀 Target: Curiosity & Logic</span>
+                        <span>🚀 Target: Physics & Logic</span>
                         <div className="flex items-center gap-1 text-[#2D6A4F]">
-                          <Check className="w-3.5 h-3.5" /> Complete
+                          <Check className="w-3.5 h-3.5" /> Quiz 3/3 Score
                         </div>
                       </div>
                     </div>
@@ -231,7 +231,7 @@ const Index = () => {
                             <h4 className="text-xs font-black text-[#4B3C5B] leading-tight">Leo's First Day at School</h4>
                           </div>
                         </div>
-                        <span className="text-[9px] font-bold bg-[#F3EBFC] text-[#7B4FA8] px-2 py-0.5 rounded-full">Courage</span>
+                        <span className="text-[9px] font-bold bg-[#F3EBFC] text-[#7B4FA8] px-2 py-0.5 rounded-full">Courage & Values</span>
                       </div>
                       <p className="text-[10px] text-[#6E5C7D] leading-relaxed mb-3">
                         Leo the lion was scared his mane looked different. Follow his journey learning the beauty of unique differences.
@@ -242,7 +242,7 @@ const Index = () => {
                       </div>
                     </div>
 
-                    {/* Mock Card 3: Parent Growth Radar */}
+                    {/* Mock Card 3: Parent Growth & Career Radar */}
                     <div
                       style={{
                         transform: `perspective(1000px) translateY(${scrollY * -0.06}px) rotateX(${scrollY * 0.03}deg) rotateY(${scrollY * -0.035}deg) rotate(-1deg) translateX(-12px)`,
@@ -256,12 +256,12 @@ const Index = () => {
                         <div className="p-1.5 rounded-md bg-amber-50 text-amber-600">
                           <Award className="w-4 h-4" />
                         </div>
-                        <span className="text-[9px] text-[#607060] font-black uppercase tracking-wider">Weekly Insights</span>
+                        <span className="text-[9px] text-[#607060] font-black uppercase tracking-wider">Career & Skill Radar</span>
                       </div>
                       <div className="space-y-1.5">
                         <div>
                           <div className="flex justify-between text-[9px] font-bold mb-0.5">
-                            <span>Logic & Coding Potential</span>
+                            <span>Robotics Engineer Fit</span>
                             <span className="text-[#2D6A4F]">92%</span>
                           </div>
                           <div className="w-full bg-slate-100 h-1 rounded-full overflow-hidden">
@@ -270,11 +270,11 @@ const Index = () => {
                         </div>
                         <div>
                           <div className="flex justify-between text-[9px] font-bold mb-0.5">
-                            <span>Creativity</span>
-                            <span className="text-[#7B4FA8]">85%</span>
+                            <span>Concept Comprehension</span>
+                            <span className="text-[#7B4FA8]">96%</span>
                           </div>
                           <div className="w-full bg-slate-100 h-1 rounded-full overflow-hidden">
-                            <div className="bg-[#7B4FA8] h-full rounded-full" style={{ width: '85%' }} />
+                            <div className="bg-[#7B4FA8] h-full rounded-full" style={{ width: '96%' }} />
                           </div>
                         </div>
                       </div>
@@ -297,7 +297,7 @@ const Index = () => {
                   Parenting shouldn't feel like guessing.
                 </h2>
                 <p className="text-base text-[#607060] font-bold max-w-xl mx-auto">
-                  Every parent wants to support their child's development, but modern life presents hard questions every single day.
+                  Every parent wants to support their child's development, but modern learning presents hard questions every single day.
                 </p>
               </div>
 
@@ -308,11 +308,11 @@ const Index = () => {
 
                 <div className="grid gap-4 sm:grid-cols-2 text-sm sm:text-base font-semibold text-[#18211A]">
                   {[
-                    "What activity should my child do today?",
-                    "How can I reduce screen time?",
-                    "What skills should I focus on?",
-                    "Is my child developing the right strengths?",
-                    "Am I doing enough as a parent?"
+                    "How do I make sure my child really understands concepts instead of just memorizing?",
+                    "How can I prepare my child for future high-growth careers without overwhelming them?",
+                    "How do I give my child structured daily learning beyond screen distractions?",
+                    "What skills and career paths fit my child's unique curiosity?",
+                    "Am I doing enough as a parent to nurture their full potential?"
                   ].map((item, idx) => (
                     <div key={idx} className="flex items-center gap-3 p-3 bg-white rounded-xl border border-[#EAF0E6] shadow-2xs">
                       <div className="w-5 h-5 rounded-full bg-[#EAF0E6] text-[#2D6A4F] flex items-center justify-center font-bold text-xs shrink-0">
@@ -325,7 +325,7 @@ const Index = () => {
 
                 <div className="pt-4 border-t border-[#D5DFD0]/60 text-center">
                   <p className="text-base sm:text-lg font-black text-[#2D6A4F]">
-                    Nurture helps answer those questions every single day.
+                    Nurture delivers structured concept learning and career guidance every single day.
                   </p>
                 </div>
               </div>
@@ -342,7 +342,7 @@ const Index = () => {
                   How Nurture Works
                 </h2>
                 <p className="text-sm sm:text-base text-[#607060] font-semibold max-w-xl mx-auto">
-                  No complex manuals or rigid routines. We align with your schedule and your child's personality effortlessly.
+                  No complex manuals or rigid routines. We align with your schedule and your child's age & class level effortlessly.
                 </p>
               </div>
 
@@ -351,25 +351,25 @@ const Index = () => {
                   {
                     step: "1",
                     title: "Tell us about your child",
-                    desc: "Complete a simple 2-minute onboarding about their age, current interests, personality, and values.",
+                    desc: "Complete a simple 2-minute onboarding about their age, school class level, chosen career path, and curiosity preferences.",
                     color: "bg-[#2D6A4F]"
                   },
                   {
                     step: "2",
-                    title: "Understand their strengths",
-                    desc: "Nurture continuously tracks milestones, learning rates, and curiosity profiles from interactive daily completions.",
+                    title: "Daily concept lessons",
+                    desc: "Get one deep, theoretical learning lesson every day tailored specifically to your child's school class level.",
                     color: "bg-[#7B4FA8]"
                   },
                   {
                     step: "3",
-                    title: "Personalized daily guidance",
-                    desc: "Get one highly focused daily activity, custom moral moral bedtime stories, and conversational questions.",
+                    title: "Interactive comprehension quizzes",
+                    desc: "Each lesson ends with 3 comprehension quiz questions to reinforce real understanding with instant explanations.",
                     color: "bg-[#355C7D]"
                   },
                   {
                     step: "4",
-                    title: "Watch growth over time",
-                    desc: "Visualize developmental trends across five major dimensions like Creativity, Logic, and Empathy.",
+                    title: "Career insights & roadmaps",
+                    desc: "Discover top high-growth career matches and personalized skill roadmaps built continuously from your child's learning history.",
                     color: "bg-[#C06C84]"
                   }
                 ].map((item, idx) => (
@@ -399,36 +399,61 @@ const Index = () => {
                   Everything your child needs in one place
                 </h2>
                 <p className="text-sm sm:text-base text-[#607060] font-semibold max-w-xl mx-auto">
-                  Stop jumping between dozens of uncoordinated apps. We centralize premium guidance, play, and tools for modern parents.
+                  Stop jumping between uncoordinated apps. We centralize premium daily learning, comprehension quizzes, and career tools.
                 </p>
               </div>
 
               <div className="grid gap-8 lg:grid-cols-3">
 
-                {/* Product Card 1: Daily Activities */}
+                {/* Product Card 1: Daily Learning Lessons */}
                 <div className="bg-[#FAFBF9] border border-[#D5DFD0] rounded-3xl p-6 flex flex-col justify-between shadow-xs hover:shadow-md transition-all">
                   <div className="space-y-4">
                     <div className="w-10 h-10 rounded-2xl bg-[#EAF0E6] text-[#2D6A4F] flex items-center justify-center font-black">
-                      ⚽
+                      📚
                     </div>
-                    <h3 className="text-xl font-black text-[#18211A]">Daily Activities</h3>
+                    <h3 className="text-xl font-black text-[#18211A]">Daily Concept Learning</h3>
                     <p className="text-xs text-[#607060] leading-relaxed font-semibold">
-                      One meaningful off-screen activity every single day designed to spark real-world creation, critical thinking, and bonding.
+                      One deep, theoretical concept lesson every single day mapped to your child's school class level (Classes Nursery to 10th+). STEM, Physics, History, Logic, and Nature.
                     </p>
                   </div>
 
                   {/* Visual Interface Component inside card */}
                   <div className="bg-white rounded-2xl p-4 border border-[#EAF0E6] mt-6 shadow-2xs space-y-2">
-                    <span className="text-[8px] font-black uppercase text-[#2D6A4F] bg-[#EAF0E6] px-1.5 py-0.5 rounded-full inline-block">Today's Prompt</span>
-                    <p className="text-[10px] font-bold text-[#18211A]">"Construct a DIY sundial to teach light and shadows."</p>
+                    <span className="text-[8px] font-black uppercase text-[#2D6A4F] bg-[#EAF0E6] px-1.5 py-0.5 rounded-full inline-block">Today's Lesson</span>
+                    <p className="text-[10px] font-bold text-[#18211A]">"How Solar Panels Turn Sunlight into Electricity"</p>
                     <div className="w-full bg-[#FAFBF9] rounded-lg p-2 flex justify-between items-center text-[8px] font-black text-[#607060]">
-                      <span>🎒 Category: Science & Outdoors</span>
-                      <span className="text-[#2D6A4F]">15 min play</span>
+                      <span>🎒 Category: Physics & Energy</span>
+                      <span className="text-[#2D6A4F]">10 min read</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Product Card 2: Personalized Bedtime Stories */}
+                {/* Product Card 2: Interactive Quizzes */}
+                <div className="bg-[#FAFBF9] border border-[#D5DFD0] rounded-3xl p-6 flex flex-col justify-between shadow-xs hover:shadow-md transition-all">
+                  <div className="space-y-4">
+                    <div className="w-10 h-10 rounded-2xl bg-[#E6EEF5] text-[#355C7D] flex items-center justify-center font-black">
+                      🧠
+                    </div>
+                    <h3 className="text-xl font-black text-[#18211A]">Comprehension Quizzes</h3>
+                    <p className="text-xs text-[#607060] leading-relaxed font-semibold">
+                      Every daily lesson ends with 3 comprehension questions featuring instant feedback and explanations so concepts are locked into memory permanently.
+                    </p>
+                  </div>
+
+                  {/* Visual Interface Component inside card */}
+                  <div className="bg-white rounded-2xl p-4 border border-[#D5DFD0] mt-6 shadow-2xs space-y-2">
+                    <div className="flex justify-between items-center text-[8px] font-black text-[#355C7D]">
+                      <span>QUIZ MASTERY</span>
+                      <span className="bg-[#E6EEF5] px-1.5 py-0.5 rounded-full">Score: 3/3</span>
+                    </div>
+                    <p className="text-[10px] font-bold text-slate-800">"Why do photons release electrons in solar cells?"</p>
+                    <div className="w-full bg-[#EAF0E6] rounded-lg p-2 text-center text-[8px] font-black text-[#2D6A4F]">
+                      ✓ Correct! Explanations provided after answer
+                    </div>
+                  </div>
+                </div>
+
+                {/* Product Card 3: Moral Stories Studio */}
                 <div className="bg-[#FAFBF9] border border-[#D5DFD0] rounded-3xl p-6 flex flex-col justify-between shadow-xs hover:shadow-md transition-all">
                   <div className="space-y-4">
                     <div className="w-10 h-10 rounded-2xl bg-[#F3EBFC] text-[#7B4FA8] flex items-center justify-center font-black">
@@ -436,7 +461,7 @@ const Index = () => {
                     </div>
                     <h3 className="text-xl font-black text-[#18211A]">Moral Stories Studio</h3>
                     <p className="text-xs text-[#607060] leading-relaxed font-semibold">
-                      Stories generated and built specifically around the core moral values (e.g. Courage, Honesty) and real life behavioral challenges you want to teach.
+                      Bedtime stories built around core values (Courage, Honesty, Empathy) that also subtly reflect their chosen career direction.
                     </p>
                   </div>
 
@@ -448,39 +473,7 @@ const Index = () => {
                     </div>
                     <p className="text-[10px] font-bold text-[#4B3C5B]">"Leo the Lion learns why sharing his special toys makes everyone happy."</p>
                     <div className="w-full bg-[#FAF7FD] rounded-lg p-2 text-center text-[8px] font-black text-[#7B4FA8]">
-                      ✨ Click to read bedtime moral story
-                    </div>
-                  </div>
-                </div>
-
-                {/* Product Card 3: Parent Growth Insights */}
-                <div className="bg-[#FAFBF9] border border-[#D5DFD0] rounded-3xl p-6 flex flex-col justify-between shadow-xs hover:shadow-md transition-all">
-                  <div className="space-y-4">
-                    <div className="w-10 h-10 rounded-2xl bg-[#E6EEF5] text-[#355C7D] flex items-center justify-center font-black">
-                      📊
-                    </div>
-                    <h3 className="text-xl font-black text-[#18211A]">Progress Insights</h3>
-                    <p className="text-xs text-[#607060] leading-relaxed font-semibold">
-                      Understand your child's emerging strengths and consistency with dynamically updating radar maps across multiple developmental spectrums.
-                    </p>
-                  </div>
-
-                  {/* Visual Interface Component inside card */}
-                  <div className="bg-white rounded-2xl p-4 border border-[#D5DFD0] mt-6 shadow-2xs space-y-1.5">
-                    <span className="text-[8px] font-black uppercase text-[#355C7D] block mb-1">Growth Index</span>
-                    <div className="flex justify-between text-[9px] font-bold">
-                      <span>Creativity</span>
-                      <span className="text-[#355C7D]">88%</span>
-                    </div>
-                    <div className="w-full bg-slate-100 h-1 rounded-full overflow-hidden">
-                      <div className="bg-[#355C7D] h-full rounded-full" style={{ width: '88%' }} />
-                    </div>
-                    <div className="flex justify-between text-[9px] font-bold pt-1">
-                      <span>Logic & Reasoning</span>
-                      <span className="text-[#2D6A4F]">95%</span>
-                    </div>
-                    <div className="w-full bg-slate-100 h-1 rounded-full overflow-hidden">
-                      <div className="bg-[#2D6A4F] h-full rounded-full" style={{ width: '95%' }} />
+                      ✨ Read personalized bedtime moral story
                     </div>
                   </div>
                 </div>
@@ -491,17 +484,17 @@ const Index = () => {
                     <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center font-black">
                       🚀
                     </div>
-                    <h3 className="text-xl font-black text-[#18211A]">Career Roadmaps</h3>
+                    <h3 className="text-xl font-black text-[#18211A]">Career Insights & Roadmaps</h3>
                     <p className="text-xs text-[#607060] leading-relaxed font-semibold">
-                      See how today's active play interests (like building and questioning) naturally transition into actual professional opportunities.
+                      See how your child's daily concept learning and curiosity map to high-growth, prestigious careers like Robotics Engineer, Surgeon, Architect, and Data Scientist.
                     </p>
                   </div>
 
                   {/* Visual Interface Component inside card */}
                   <div className="bg-white rounded-2xl p-4 border border-amber-100 mt-6 shadow-2xs space-y-2">
-                    <span className="text-[8px] font-black text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full inline-block">Active Pathway</span>
-                    <p className="text-[10px] font-bold text-slate-800">"Future Software Architect / Engineer"</p>
-                    <p className="text-[8px] text-slate-500 font-bold">Skills required: Logic, Spatial Reasoning, Focus</p>
+                    <span className="text-[8px] font-black text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full inline-block">Top Match</span>
+                    <p className="text-[10px] font-bold text-slate-800">"Robotics Engineer & System Designer"</p>
+                    <p className="text-[8px] text-slate-500 font-bold">Strengths: Physics Logic, Spatial Reasoning, Focus</p>
                   </div>
                 </div>
 
@@ -513,17 +506,17 @@ const Index = () => {
                     </div>
                     <h3 className="text-xl font-black text-[#18211A]">Parent AI Co-pilot</h3>
                     <p className="text-xs text-[#607060] leading-relaxed font-semibold">
-                      Get support for any parenting query, dilemma, or behavioral milestone whenever you need it from our dedicated AI parenting co-pilot.
+                      Get support for any parenting query, milestone advice, or educational question whenever you need it from your AI co-pilot.
                     </p>
                   </div>
 
                   {/* Visual Interface Component inside card */}
                   <div className="bg-white rounded-2xl p-4 border border-emerald-100 mt-6 shadow-2xs space-y-2">
                     <div className="bg-slate-50 p-2 rounded-xl text-[8px] font-bold text-[#607060]">
-                      "How do I help my child build empathy with classmates?"
+                      "How do I help my child understand science concepts better?"
                     </div>
                     <div className="bg-[#EAF0E6] p-2 rounded-xl text-[8px] font-bold text-[#2D6A4F] ml-2">
-                      "Encourage peer activities and follow up with tonight's Bedtime Story on Kindness!"
+                      "Check today's Daily Learning on Energy and discuss it during dinner!"
                     </div>
                   </div>
                 </div>
@@ -550,21 +543,21 @@ const Index = () => {
               <div className="grid gap-6 sm:gap-8 md:grid-cols-3">
                 {[
                   {
-                    quote: "My daughter now asks for her Nurture activity before watching YouTube.",
+                    quote: "My son looks forward to his Daily Learning lesson every single day. The comprehension quiz keeps him so engaged!",
                     author: "Priya S.",
-                    role: "Mom of 6-year-old",
+                    role: "Mom of 6-year-old (Class 1)",
                     avatar: "👩‍🍼"
                   },
                   {
-                    quote: "I finally know what to do with my child every day. Simple, fast, and structured.",
+                    quote: "The concept mapping to school class levels is spot on. He understands physics concepts way better than from textbooks alone.",
                     author: "David L.",
-                    role: "Father of 4-year-old",
+                    role: "Father of 9-year-old (Class 4)",
                     avatar: "👨‍🍼"
                   },
                   {
-                    quote: "The personalized moral stories are our favorite bedtime routine. She loves seeing her name in them!",
+                    quote: "Seeing Robotics Engineer appear as his top career match backed by his daily quiz performance was amazing. Highly recommended!",
                     author: "Aisha M.",
-                    role: "Mom of 8-year-old",
+                    role: "Mom of 8-year-old (Class 3)",
                     avatar: "👩‍💼"
                   }
                 ].map((item, idx) => (
@@ -607,7 +600,7 @@ const Index = () => {
                   Why Nurture is Different
                 </h2>
                 <p className="text-sm text-[#607060] font-bold max-w-lg mx-auto">
-                  A simple breakdown of how Nurture elevates parenting compared to generic apps.
+                  A simple breakdown of how Nurture elevates learning compared to generic parenting or gaming apps.
                 </p>
               </div>
 
@@ -622,11 +615,11 @@ const Index = () => {
                   </thead>
                   <tbody className="divide-y divide-[#EAF0E6] font-semibold text-[#18211A]">
                     {[
-                      { label: "Personalized Daily Plans", generic: "Sometimes", nurture: "Yes" },
-                      { label: "Daily Physical Activities", generic: "Limited", nurture: "Yes" },
+                      { label: "Daily Theoretical Concept Lessons", generic: "No", nurture: "Yes" },
+                      { label: "School Class Level Mapping (Nursery-10th+)", generic: "No", nurture: "Yes" },
+                      { label: "Interactive Comprehension Quizzes", generic: "Limited", nurture: "Yes" },
+                      { label: "Prestigious Career Insights & Roadmaps", generic: "No", nurture: "Yes" },
                       { label: "Custom Moral Bedtime Stories", generic: "No", nurture: "Yes" },
-                      { label: "Child Strengths Insights", generic: "No", nurture: "Yes" },
-                      { label: "Future Career Roadmaps", generic: "No", nurture: "Yes" },
                       { label: "AI Parenting Co-pilot Support", generic: "No", nurture: "Yes" }
                     ].map((row, idx) => (
                       <tr key={idx} className="hover:bg-[#FAFBF9]/50 transition-all">
