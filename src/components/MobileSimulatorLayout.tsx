@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Flame, RefreshCw } from 'lucide-react';
+import DesktopAppBanner from '@/components/DesktopAppBanner';
 
 interface MobileSimulatorLayoutProps {
   title: string;
@@ -24,7 +25,12 @@ const MobileSimulatorLayout: React.FC<MobileSimulatorLayoutProps> = ({
   const navigate = useNavigate();
 
   return (
-    <div className="h-screen w-screen bg-[#DCE8D7] flex flex-col items-center justify-center overflow-hidden p-0 sm:py-3 select-none text-[#18211A]">
+    <div className="h-screen w-screen bg-[#DCE8D7] flex flex-col items-center justify-center overflow-hidden p-0 sm:py-3 select-none text-[#18211A] relative">
+      {/* Floating Desktop App Banner in Empty Space on Left */}
+      <div className="hidden lg:flex fixed left-6 top-1/2 -translate-y-1/2 z-40">
+        <DesktopAppBanner />
+      </div>
+
       {/* Centered Device Simulator */}
       <div className="h-full max-h-[730px] w-full max-w-[365px] bg-[#F5F7F2] sm:rounded-[36px] sm:border-[8px] sm:border-slate-900 sm:shadow-[0_20px_50px_rgba(0,0,0,0.15)] flex flex-col relative overflow-hidden aspect-[9/19.2]">
 

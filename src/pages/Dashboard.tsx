@@ -11,6 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { toast } from 'sonner';
 import ChildForm from '@/components/forms/ChildForm';
 import ChildManagement from '@/components/forms/ChildManagement';
+import DesktopAppBanner from '@/components/DesktopAppBanner';
 import {
   Plus,
   Settings,
@@ -500,8 +501,13 @@ const Dashboard: React.FC = () => {
   const hasChildren = profile?.children && profile.children.length > 0;
 
   return (
-    <div className="h-screen w-screen bg-[#DCE8D7] flex flex-col items-center justify-center overflow-hidden p-0 sm:py-3 select-none text-[#18211A]">
+    <div className="h-screen w-screen bg-[#DCE8D7] flex flex-col items-center justify-center overflow-hidden p-0 sm:py-3 select-none text-[#18211A] relative">
       
+      {/* Floating Desktop App Banner in Empty Space on Left */}
+      <div className="hidden lg:flex fixed left-6 top-1/2 -translate-y-1/2 z-40">
+        <DesktopAppBanner />
+      </div>
+
       {/* Centered Device Simulator designed to perfectly fit 100% of the screen height without scrolling */}
       <div className="h-full max-h-[730px] w-full max-w-[365px] bg-[#F5F7F2] sm:rounded-[36px] sm:border-[8px] sm:border-slate-900 sm:shadow-[0_20px_50px_rgba(0,0,0,0.15)] flex flex-col relative overflow-hidden aspect-[9/19.2]">
         
@@ -958,6 +964,9 @@ const Dashboard: React.FC = () => {
                           )}
                         </div>
                       </div>
+
+                      {/* INLINE MOBILE APP BANNER */}
+                      <DesktopAppBanner className="w-full border-none shadow-xs bg-[#EAF0E6]/60 border border-[#D5DFD0]" />
 
                     </>
                   )}
