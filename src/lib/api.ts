@@ -35,6 +35,7 @@ class ApiClient {
 
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
+      'X-Client-Platform': 'web',
       ...options.headers,
     };
 
