@@ -8,6 +8,7 @@ const PrivacyPolicy = () => {
     <div className="min-h-screen bg-gray-50 py-8">
       <Helmet>
         <title>Privacy Policy — Nurture</title>
+        <meta name="robots" content="noindex, nofollow" />
         <link rel="canonical" href={getCanonicalUrl("/privacy")} />
       </Helmet>
       <div className="max-w-4xl mx-auto px-4">
@@ -18,11 +19,13 @@ const PrivacyPolicy = () => {
             </h1>
             
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-8">
+              <p className="text-yellow-800 mb-2">
+                <strong>Important:</strong> This Privacy Policy applies to the <strong>Nurture</strong> mobile application (Package Name: <code>com.cortiqlabs.nurture</code>) and website, created and operated by <strong>Cortiq Labs</strong> (represented by <strong>Lovish Singla</strong>).
+              </p>
               <p className="text-yellow-800">
-                <strong>Important:</strong> This privacy policy applies to the Nurture mobile application and website. 
                 Since our app is designed for children's learning and development, we have implemented special 
                 protections for children's privacy in compliance with COPPA (Children's Online Privacy Protection Act) 
-                and other applicable laws.
+                and other applicable laws. For any privacy inquiries, contact us at <strong>cortiqlabs@gmail.com</strong>.
               </p>
             </div>
 
@@ -206,9 +209,12 @@ const PrivacyPolicy = () => {
             </section>
 
 
-            <div className="text-center text-gray-600 italic mt-8">
-              <p><strong>Last Updated:</strong> September 2025</p>
-              <p><strong>Effective Date:</strong> September 2025</p>
+            <div className="text-center text-gray-600 italic mt-8 space-y-1">
+              <p><strong>App:</strong> Nurture (com.cortiqlabs.nurture)</p>
+              <p><strong>Developer / Legal Entity:</strong> Cortiq Labs (Lovish Singla)</p>
+              <p><strong>Contact Email:</strong> cortiqlabs@gmail.com</p>
+              <p><strong>Last Updated:</strong> September 17, 2026</p>
+              <p><strong>Effective Date:</strong> September 17, 2026</p>
             </div>
           </CardContent>
         </Card>
