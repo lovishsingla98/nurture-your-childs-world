@@ -27,6 +27,11 @@ export interface OnboardingResponse {
   answeredAt: Date;
 }
 
+export interface ChildPreferences {
+  dailyReminderTime?: string;
+  preferredWeeklyDay?: string;
+}
+
 export interface Child {
   id: string; // Changed from childId to id to match backend
   displayName: string;
@@ -35,6 +40,7 @@ export interface Child {
   dateOfBirth: { seconds: number; nanoseconds: number }; // Firestore Timestamp
   imageUrl?: string;
   chosenCareer?: string;
+  preferences?: ChildPreferences;
   meta?: {
     createdAt: Date;
     updatedAt: Date;

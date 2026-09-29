@@ -107,13 +107,12 @@ const OnboardingTransition: React.FC<OnboardingTransitionProps> = ({
     return () => clearInterval(statusInterval);
   }, []);
 
-  // Check for timeout
+  // Check for timeout (show banner after 15 seconds)
   useEffect(() => {
     const timeoutCheck = setInterval(() => {
       const elapsed = Date.now() - startTime;
-      if (elapsed > 120000) { // 2 minutes
+      if (elapsed > 15000) { // 15 seconds
         setShowTimeoutBanner(true);
-        setIsPolling(false);
       }
     }, 1000);
 
@@ -126,58 +125,40 @@ const OnboardingTransition: React.FC<OnboardingTransitionProps> = ({
 
     const pollForCompletion = async () => {
       try {
-        console.log('🔍 Polling for setup completion...');
+        console.log('🔍 Polling for Career Insights completion...');
         
-        // Check if daily task exists by trying to get today's task
-        const dailyTaskResponse = await apiClient.getDailyTask(childId);
+        const insightsResp = await apiClient.getCareerInsights(childId);
+        let hasInsights = false;
         
-        console.log('📅 Daily task check:', { 
-          success: dailyTaskResponse.success, 
-          hasTask: !!dailyTaskResponse.data,
-          taskData: dailyTaskResponse.data 
-        });
-        
-        // For now, assume roadmap exists if we have a daily task (since roadmap is created first)
-        // In the future, we could add a separate API call to check roadmap status
-        const taskExists = dailyTaskResponse.success && dailyTaskResponse.data;
-        const roadmapExists = taskExists; // Roadmap is created before daily task
-        
-        setHasRoadmap(!!roadmapExists);
-        setHasDailyTask(!!taskExists);
-        
-        // Only update progress after initial delay is complete
-        if (initialDelayComplete) {
-          // Calculate actual progress
-          let progress = 50; // Start at 50% after initial delay
-          if (taskExists) progress = 100; // Daily task is the remaining 50%
-          
-          setActualProgress(progress);
-          
-          // Update status based on progress
-          if (progress === 50) {
-            setCurrentStatus('Creating a personalized learning roadmap...');
-          } else if (progress === 100) {
-            setCurrentStatus('Almost ready! Your smart agent is being finalized...');
-            console.log('✅ Setup complete! Both roadmap and daily task are ready.');
-            
-            // Wait a moment to show completion, then proceed
-            setTimeout(() => {
-              onComplete();
-            }, 2000);
+        if (insightsResp.success && insightsResp.data) {
+          const d = insightsResp.data as any;
+          const careers = d.careers || d.topMatches || (d.data?.careers || d.data?.topMatches);
+          if (Array.isArray(careers) && careers.length > 0) {
+            hasInsights = true;
           }
         }
         
+        setHasRoadmap(hasInsights);
+        
+        if (hasInsights) {
+          setActualProgress(100);
+          setCurrentStatus('Career Insights & Learning Path ready! Redirecting...');
+          console.log('✅ Career Insights generated! Proceeding to insights.');
+          
+          setTimeout(() => {
+            onComplete();
+          }, 1500);
+        } else {
+          setCurrentStatus('Creating personalized career insights & roadmap...');
+        }
+        
       } catch (error) {
-        console.error('Error polling for completion:', error);
-        // Continue polling even if there's an error
+        console.error('Error polling for career insights:', error);
       }
     };
 
-    // Start polling after a short delay to allow backend processing
-    const initialDelay = setTimeout(pollForCompletion, 2000);
-
-    // Poll every 5 seconds
-    const pollInterval = setInterval(pollForCompletion, 5000);
+    const initialDelay = setTimeout(pollForCompletion, 1500);
+    const pollInterval = setInterval(pollForCompletion, 3000);
 
     return () => {
       clearTimeout(initialDelay);

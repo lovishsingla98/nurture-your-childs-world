@@ -102,8 +102,14 @@ const ChildDashboard: React.FC = () => {
           {/* Features */}
           <h3 className="text-[10px] font-bold text-[#607060] uppercase tracking-wider">Activities</h3>
           <div className="space-y-2">
-            {features.map(f => (
-              f.status === 'coming-soon' ? (
+            {features.map(f => {
+              const preferredDay = (dashboardData.child as any)?.preferences?.preferredWeeklyDay?.toLowerCase() || 'sunday';
+              const dayMap: Record<string, number> = { sunday: 0, monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5, saturday: 6 };
+              const isWeeklyDueToday = new Date().getDay() === (dayMap[preferredDay] ?? 0);
+              const isWeeklyFeature = ['weekly-interest', 'weekly-potential', 'weekly-quiz'].includes(f.id);
+              const showDueBadge = isWeeklyFeature && isWeeklyDueToday && f.status !== 'completed';
+
+              return f.status === 'coming-soon' ? (
                 <div key={f.id} className="bg-white/60 border border-[#D5DFD0] rounded-2xl p-3 opacity-60">
                   <div className="flex items-center gap-2.5">
                     <div className="p-2 rounded-xl bg-slate-100 text-slate-400 flex-none">{f.icon}</div>
@@ -113,16 +119,26 @@ const ChildDashboard: React.FC = () => {
                 </div>
               ) : (
                 <Link key={f.id} to={`/child/${childId}/${f.id}`} className="block">
-                  <div className={`bg-white border border-[#D5DFD0] rounded-2xl p-3 shadow-sm hover:shadow-md transition-all active:scale-[0.98] ${f.status === 'pending' ? 'ring-1 ring-orange-200' : ''}`}>
+                  <div className={`bg-white border ${showDueBadge ? 'border-amber-400 ring-2 ring-amber-300/40 bg-amber-50/20' : 'border-[#D5DFD0]'} rounded-2xl p-3 shadow-sm hover:shadow-md transition-all active:scale-[0.98] ${f.status === 'pending' ? 'ring-1 ring-orange-200' : ''}`}>
                     <div className="flex items-center gap-2.5">
-                      <div className={`p-2 rounded-xl flex-none ${f.status==='completed'?'bg-emerald-50 text-emerald-600':f.status==='pending'?'bg-orange-50 text-orange-600':'bg-[#D8EADB] text-[#2D6A4F]'}`}>{f.icon}</div>
-                      <div className="flex-1 min-w-0"><h4 className="text-[10px] font-bold text-[#18211A] truncate">{f.name}</h4><p className="text-[8px] text-[#607060] font-semibold">{f.description}</p>{f.lastCompleted && <p className="text-[7px] text-slate-400 mt-0.5">{f.lastCompleted}</p>}{f.streak && f.status === 'pending' && <p className="text-[7px] text-orange-600 font-bold">🔥 {f.streak}d streak</p>}</div>
+                      <div className={`p-2 rounded-xl flex-none ${f.status==='completed'?'bg-emerald-50 text-emerald-600':showDueBadge?'bg-amber-100 text-amber-800':f.status==='pending'?'bg-orange-50 text-orange-600':'bg-[#D8EADB] text-[#2D6A4F]'}`}>{f.icon}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <h4 className="text-[10px] font-bold text-[#18211A] truncate">{f.name}</h4>
+                          {showDueBadge && (
+                            <Badge className="bg-red-600 text-white border-transparent text-[6px] font-black px-1.5 py-0 rounded-full animate-pulse">DUE TODAY!</Badge>
+                          )}
+                        </div>
+                        <p className="text-[8px] text-[#607060] font-semibold">{f.description}</p>
+                        {f.lastCompleted && <p className="text-[7px] text-slate-400 mt-0.5">{f.lastCompleted}</p>}
+                        {f.streak && f.status === 'pending' && <p className="text-[7px] text-orange-600 font-bold">🔥 {f.streak}d streak</p>}
+                      </div>
                       <Badge className={`${statusColor(f.status)} border-transparent text-[6px] font-extrabold px-1.5 py-0 rounded-full flex items-center gap-0.5`}>{statusIcon(f.status)}{f.status}</Badge>
                     </div>
                   </div>
                 </Link>
-              )
-            ))}
+              );
+            })}
           </div>
         </div>
       ) : null}

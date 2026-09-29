@@ -39,6 +39,29 @@ const OnboardingPage: React.FC = () => {
   ];
   const [factIndex, setFactIndex] = useState(0);
 
+  const [showPreferences, setShowPreferences] = useState(false);
+  const [dailyReminderTime, setDailyReminderTime] = useState('18:00');
+  const [preferredWeeklyDay, setPreferredWeeklyDay] = useState('sunday');
+  const [savingPrefs, setSavingPrefs] = useState(false);
+
+  const timeOptions = [
+    { label: '8:00 AM', value: '08:00' },
+    { label: '12:00 PM', value: '12:00' },
+    { label: '4:00 PM', value: '16:00' },
+    { label: '6:00 PM (Default)', value: '18:00' },
+    { label: '8:00 PM', value: '20:00' },
+  ];
+
+  const dayOptions = [
+    { label: 'Sunday (Default)', value: 'sunday' },
+    { label: 'Monday', value: 'monday' },
+    { label: 'Tuesday', value: 'tuesday' },
+    { label: 'Wednesday', value: 'wednesday' },
+    { label: 'Thursday', value: 'thursday' },
+    { label: 'Friday', value: 'friday' },
+    { label: 'Saturday', value: 'saturday' },
+  ];
+
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
     const timeoutId = setTimeout(() => { intervalId = setInterval(() => { setFactIndex(i => (i + 1) % facts.length); }, 8000); }, 1000);
@@ -52,7 +75,13 @@ const OnboardingPage: React.FC = () => {
       const r = await apiClient.getOnboardingQuestionnaire(childId!);
       if (r.success && r.data) {
         setQuestionnaire(r.data);
-        if (r.data.status === 'completed' || r.data.responses.length >= 10) { setShowTransition(true); }
+        if (r.data.status === 'completed' || r.data.responses.length >= 10) {
+          if (!r.data.child?.preferences?.dailyReminderTime) {
+            setShowPreferences(true);
+          } else {
+            setShowTransition(true);
+          }
+        }
         else { const idx = findFirstUnanswered(r.data); setCurrentQuestionIndex(idx !== -1 ? idx : r.data.questions.length); }
       } else { setError('Failed to load questionnaire'); }
     } catch (e: any) { setError(e.message || 'Failed to load'); } finally { setLoading(false); }
@@ -60,7 +89,17 @@ const OnboardingPage: React.FC = () => {
 
   const fetchSilently = async () => {
     try { await getValidToken(); const r = await apiClient.getOnboardingQuestionnaire(childId!);
-      if (r.success && r.data) { setQuestionnaire(r.data); if (r.data.status === 'completed' || r.data.responses.length >= 10) setShowTransition(true); return r.data; }
+      if (r.success && r.data) {
+        setQuestionnaire(r.data);
+        if (r.data.status === 'completed' || r.data.responses.length >= 10) {
+          if (!r.data.child?.preferences?.dailyReminderTime) {
+            setShowPreferences(true);
+          } else {
+            setShowTransition(true);
+          }
+        }
+        return r.data;
+      }
       throw new Error('Failed');
     } catch (e: any) { throw e; }
   };
@@ -80,7 +119,12 @@ const OnboardingPage: React.FC = () => {
       try {
         const fresh = await fetchSilently();
         if (!fresh) throw new Error('Not found');
-        if (fresh.responses.length >= 10) { setShowTyping(false); toast.success('Onboarding completed!'); return; }
+        if (fresh.responses.length >= 10) {
+          setShowTyping(false);
+          toast.success('Onboarding completed!');
+          setShowPreferences(true);
+          return;
+        }
         if (fresh.questions.length > lastQCount) { const ni = fresh.questions.length - 1; setCurrentQuestionIndex(ni); setForceUpdate(p => p + 1); setShowTyping(false); return; }
         const nui = findFirstUnanswered(fresh);
         if (nui !== -1 && nui !== currentQuestionIndex) { setCurrentQuestionIndex(nui); setForceUpdate(p => p + 1); setShowTyping(false); return; }
@@ -91,20 +135,116 @@ const OnboardingPage: React.FC = () => {
     }
   };
 
+  const handleSavePreferences = async () => {
+    try {
+      setSavingPrefs(true);
+      await getValidToken();
+      await apiClient.updateChildPreferences(childId!, {
+        dailyReminderTime,
+        preferredWeeklyDay,
+      });
+      toast.success('Preferences saved!');
+      setShowPreferences(false);
+      setShowTransition(true);
+    } catch (e: any) {
+      toast.error('Failed to save preferences');
+      setShowPreferences(false);
+      setShowTransition(true);
+    } finally {
+      setSavingPrefs(false);
+    }
+  };
+
   const handleAnswerSubmit = async (clickedOptionId?: string) => {
     const cq = getCurrentQuestion(); if (!cq || !childId) return;
     const eff = clickedOptionId || selectedOption;
     if (cq.required && !currentAnswer && !eff) { toast.error('Please provide an answer'); return; }
-    try { setSubmitting(true); setShowTyping(true); await getValidToken();
-      const ad = { questionId: cq.questionId, answer: (cq.type === 'multiple_choice' || cq.type === 'rating') ? (eff || '') : currentAnswer, optionId: (cq.type === 'multiple_choice' || cq.type === 'rating') ? (eff || '') : undefined };
-      apiClient.submitOnboardingAnswer(childId, ad).catch(e => { setShowTyping(false); toast.error('Failed to submit'); });
-      toast.success('Answer submitted!'); setCurrentAnswer(''); setSelectedOption('');
-      await pollForNext();
-    } catch (e: any) { setShowTyping(false); toast.error(e.message || 'Failed'); } finally { setSubmitting(false); }
+
+    const isLastQuestion = currentQuestionIndex >= (questionnaire?.questions.length || 10) - 1;
+    const answerVal = (cq.type === 'multiple_choice' || cq.type === 'rating') ? (eff || '') : currentAnswer;
+    const optionVal = (cq.type === 'multiple_choice' || cq.type === 'rating') ? (eff || '') : undefined;
+
+    try {
+      await getValidToken();
+      const ad = { questionId: cq.questionId, answer: answerVal, optionId: optionVal };
+
+      // Update local questionnaire response
+      if (questionnaire) {
+        const newResponse = { questionId: cq.questionId, answer: answerVal, createdAt: new Date().toISOString() };
+        setQuestionnaire({
+          ...questionnaire,
+          responses: [...questionnaire.responses, newResponse as any],
+        });
+      }
+
+      setCurrentAnswer('');
+      setSelectedOption('');
+
+      if (!isLastQuestion) {
+        // INSTANT PROGRESSION: Advance immediately with 0 delay!
+        setCurrentQuestionIndex(prev => prev + 1);
+        setShowTyping(false);
+        apiClient.submitOnboardingAnswer(childId, ad).catch(e => {
+          console.error('Background submit failed:', e);
+        });
+      } else {
+        setSubmitting(true);
+        setShowTyping(true);
+        await apiClient.submitOnboardingAnswer(childId, ad);
+        setShowTyping(false);
+        toast.success('Onboarding completed!');
+        setShowPreferences(true);
+      }
+    } catch (e: any) {
+      setShowTyping(false);
+      toast.error(e.message || 'Failed to submit answer');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handlePrev = () => { if (currentQuestionIndex > 0) { setCurrentQuestionIndex(p => p - 1); setCurrentAnswer(''); setSelectedOption(''); } };
   const handleSkip = () => { if (currentQuestionIndex < (questionnaire?.questions.length || 0) - 1) { setCurrentQuestionIndex(p => p + 1); setCurrentAnswer(''); setSelectedOption(''); } };
+
+  if (showPreferences && questionnaire) {
+    return (
+      <MobileSimulatorLayout title="Schedule Preferences" subtitle={`Customize for ${questionnaire.child?.displayName || 'your child'}`} backUrl="/dashboard">
+        <div className="space-y-4 py-2">
+          <div className="bg-white border border-[#D5DFD0] rounded-2xl p-4 shadow-sm">
+            <h3 className="text-xs font-bold text-[#18211A] mb-1 flex items-center gap-1.5">
+              <span>⏰</span> 1. Daily Task Reminder Time
+            </h3>
+            <p className="text-[9px] text-[#607060] font-semibold mb-3">When do you want to be reminded to complete daily learning?</p>
+            <div className="grid grid-cols-2 gap-1.5">
+              {timeOptions.map(t => (
+                <Button key={t.value} variant={dailyReminderTime === t.value ? 'default' : 'outline'} className={`text-[9px] font-bold py-1.5 h-auto rounded-xl justify-start ${dailyReminderTime === t.value ? 'bg-[#2D6A4F] hover:bg-[#1F513C] text-white' : 'bg-white text-[#18211A]'}`} onClick={() => setDailyReminderTime(t.value)}>
+                  {t.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-white border border-[#D5DFD0] rounded-2xl p-4 shadow-sm">
+            <h3 className="text-xs font-bold text-[#18211A] mb-1 flex items-center gap-1.5">
+              <span>📅</span> 2. Preferred Weekly Activities Day
+            </h3>
+            <p className="text-[9px] text-[#607060] font-semibold mb-3">Which day of the week do you prefer for weekly quizzes & activities?</p>
+            <div className="grid grid-cols-2 gap-1.5">
+              {dayOptions.map(d => (
+                <Button key={d.value} variant={preferredWeeklyDay === d.value ? 'default' : 'outline'} className={`text-[9px] font-bold py-1.5 h-auto rounded-xl justify-start ${preferredWeeklyDay === d.value ? 'bg-[#2D6A4F] hover:bg-[#1F513C] text-white' : 'bg-white text-[#18211A]'}`} onClick={() => setPreferredWeeklyDay(d.value)}>
+                  {d.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <Button onClick={handleSavePreferences} disabled={savingPrefs} className="w-full bg-[#2D6A4F] hover:bg-[#1F513C] text-white font-bold py-2.5 rounded-full text-xs shadow-md">
+            {savingPrefs ? <Loader2 className="w-4 h-4 animate-spin mr-1.5" /> : null} Continue to Setup <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+          </Button>
+        </div>
+      </MobileSimulatorLayout>
+    );
+  }
 
   if (showTransition && questionnaire) {
     return <OnboardingTransition childId={childId!} childName={questionnaire.child?.displayName || 'your child'} onComplete={() => navigate(`/child/${childId}/career-insights`)} onError={(e) => { setError(e); setShowTransition(false); }} />;

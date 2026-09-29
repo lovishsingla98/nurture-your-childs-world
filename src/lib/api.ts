@@ -348,12 +348,17 @@ class ApiClient {
     });
   }
 
-  // Dashboard APIs
+  // Dashboard & Parent APIs
   async getChildDashboardData(childId: string): Promise<ApiResponse<any>> {
     return this.makeRequest(`/parent/child/${childId}/dashboard-data`);
   }
 
-
+  async updateChildPreferences(childId: string, preferences: { dailyReminderTime?: string; preferredWeeklyDay?: string }): Promise<ApiResponse<any>> {
+    return this.makeRequest(`/parent/child/${childId}/preferences`, {
+      method: 'PATCH',
+      body: JSON.stringify(preferences),
+    });
+  }
 }
 
 export const apiClient = new ApiClient();
